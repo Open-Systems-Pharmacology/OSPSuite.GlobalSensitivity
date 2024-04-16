@@ -1,4 +1,4 @@
-install.packages(c('ggplot2','shiny','shinyTree','shinyjs','dplyr','SobolSequence','writexl','tictoc'), repos = 'http://cran.us.r-project.org', type='win.binary')
+install.packages(c('ggplot2','shiny','shinyTree','shinyjs','dplyr','SobolSequence','writexl','tictoc','pkgload'), repos = 'http://cran.us.r-project.org', type='win.binary')
 install.packages('https://github.com/Open-Systems-Pharmacology/rClr/releases/download/v0.9.1/rClr_0.9.1.zip', repos = NULL, type = 'binary')
 download.file('https://ci.appveyor.com/api/projects/open-systems-pharmacology-ci/ospsuite-rutils/artifacts/ospsuite.utils.zip?pr=false', destfile = 'ospsuite.utils.zip', mode='wb')
 install.packages('ospsuite.utils.zip', repos = NULL, type = 'binary')
