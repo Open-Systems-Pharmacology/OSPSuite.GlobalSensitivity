@@ -1,4 +1,4 @@
-install.packages(c('ggplot2','shiny','shinyTree','shinyjs','dplyr','SobolSequence','writexl','tictoc','pkgload'), repos = 'http://cran.us.r-project.org', type='win.binary')
+install.packages(c('dplyr','purrr','covr','readr','tidyr','webshot','spelling','readxl','data.table','gridtext','ggtext','tidyselect','testthat','rmarkdown','pkgdown','ggplot2','shiny','shinyTree','shinyjs','SobolSequence','writexl','tictoc','pkgload'), repos = 'http://cran.us.r-project.org', type='win.binary')
 install.packages('https://github.com/Open-Systems-Pharmacology/rClr/releases/download/v0.9.1/rClr_0.9.1.zip', repos = NULL, type = 'binary')
 install.packages('https://github.com/Open-Systems-Pharmacology/OSPSuite.RUtils/releases/download/v1.4.23/ospsuite.utils_1.4.23.zip', repos = NULL, type = 'binary')
 install.packages('https://github.com/Open-Systems-Pharmacology/TLF-Library/releases/download/v1.5.125/tlf_1.5.125.zip', repos = NULL, type = 'binary')
