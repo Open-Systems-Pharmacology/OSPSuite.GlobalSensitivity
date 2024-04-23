@@ -51,7 +51,6 @@ getSensitivityClass <- function(sensitivityValue) {
 
 #' @export
 getParameterListForUncertaintyAnalysis <- function(parameterPaths, simulation, variationRange = 0.1) {
-
   parameters <- list()
 
   # Get all valid parameters from simulation
@@ -91,42 +90,43 @@ runSU <- function(simulation,
                   customParameters = NULL,
                   outputs,
                   evaluateForAllParameters = FALSE,
-                  ##Sensitivity analysis settings
+                  ## Sensitivity analysis settings
                   variationRange = 0.1,
                   numberOfSensitivityAnalysisSteps = 2,
                   sensitivityThreshold = 0.1,
-                  ##Uncetainty analysis settings
+                  ## Uncetainty analysis settings
                   runUncertaintyAnalysis = TRUE,
                   runUncertaintlyOnlyForSensitiveParameters = TRUE,
                   numberOfUncertaintyAnalysisSamples = 100,
                   quantiles = c(0.05, 0.5, 0.95),
-                  ##Save settings
+                  ## Save settings
                   saveResults = FALSE,
                   saveFolder = NULL,
                   saveFileName = NULL,
-                  #Parallel run and updating settings
+                  # Parallel run and updating settings
                   runParallel = TRUE,
                   updateProgressSensitivity = NULL,
                   updateProgressUncertainty = NULL) {
   print("Loading parameters.")
-  error(condition = is.null(outputs),errorMessage = "No model outputs have been selected.")
+  error(condition = is.null(outputs), errorMessage = "No model outputs have been selected.")
   error(!(variationRange > 0 & variationRange < 1), paste0("Argument 'variationRange' must lie strictly between 0 and 1."))
   error(!(numberOfSensitivityAnalysisSteps %% 1 == 0), paste0("Argument 'numberOfSensitivityAnalysisSteps' must be an integer."))
   error(!(numberOfSensitivityAnalysisSteps > 0), paste0("Argument 'numberOfSensitivityAnalysisSteps' must be positive."))
   error(any(quantiles > 1), "Elements of the vector 'quantiles' must be less than 1.")
   error(any(quantiles < 0), "Elements of the vector 'quantiles' must be greater than 0.")
 
-  #Set nominal parameter values in simulation based on any customParameters
+  # Set nominal parameter values in simulation based on any customParameters
   parameterPaths <- NULL
   customParameterPaths <- NULL
   originalParameterValues <- NULL
   if (!is.null(customParameters)) {
-
-    names(customParameters) <- sapply(customParameters, function(x){x$path})
+    names(customParameters) <- sapply(customParameters, function(x) {
+      x$path
+    })
     customParameterPaths <- names(customParameters)
 
     originalParameterValues <- sapply(customParameterPaths, function(pth) {
-      return(ospsuite::getParameter(path = pth,container = simulation)$value)
+      return(ospsuite::getParameter(path = pth, container = simulation)$value)
     })
 
     ospsuite::setParameterValuesByPath(
@@ -143,7 +143,7 @@ runSU <- function(simulation,
       })
     )
 
-    if(!is.null(DDIsimulation)){
+    if (!is.null(DDIsimulation)) {
       ospsuite::setParameterValuesByPath(
         simulation = DDIsimulation,
         parameterPaths = customParameterPaths,
@@ -158,87 +158,98 @@ runSU <- function(simulation,
         })
       )
     }
-
-
   }
 
   additionalParameterPaths <- NULL
-  if(evaluateForAllParameters){
-    additionalParameterPaths <- sapply(ospsuite::getAllParametersForSensitivityAnalysisMatching(paths = "**",simulation = simulation),function(x){x$path})
-    additionalParameterPaths <- setdiff(additionalParameterPaths,customParameterPaths)
+  if (evaluateForAllParameters) {
+    additionalParameterPaths <- sapply(ospsuite::getAllParametersForSensitivityAnalysisMatching(paths = "**", simulation = simulation), function(x) {
+      x$path
+    })
+    additionalParameterPaths <- setdiff(additionalParameterPaths, customParameterPaths)
   }
 
-  #Set outputs
+  # Set outputs
   outputPaths <- sapply(outputs, function(op) {
     op$path
   })
   names(outputs) <- outputPaths
 
 
-  checkParametersExistInSimulation(simulation = simulation,
-                                   parameterPaths = c(additionalParameterPaths,customParameterPaths),
-                                   simulationName =  "simulation",
-                                   stopIfNotFound = TRUE)
+  checkParametersExistInSimulation(
+    simulation = simulation,
+    parameterPaths = c(additionalParameterPaths, customParameterPaths),
+    simulationName = "simulation",
+    stopIfNotFound = TRUE
+  )
 
-  checkOutputsExistInSimulation(simulation = simulation,
-                                outputPaths = outputPaths,
-                                simulationName =  "simulation",
-                                stopIfNotFound = TRUE)
+  checkOutputsExistInSimulation(
+    simulation = simulation,
+    outputPaths = outputPaths,
+    simulationName = "simulation",
+    stopIfNotFound = TRUE
+  )
 
 
-  if(!is.null(DDIsimulation)){
-    checkParametersExistInSimulation(simulation = DDIsimulation,
-                                     parameterPaths = c(additionalParameterPaths,customParameterPaths),
-                                     simulationName =  "DDI simulation",
-                                     stopIfNotFound = TRUE)
+  if (!is.null(DDIsimulation)) {
+    checkParametersExistInSimulation(
+      simulation = DDIsimulation,
+      parameterPaths = c(additionalParameterPaths, customParameterPaths),
+      simulationName = "DDI simulation",
+      stopIfNotFound = TRUE
+    )
 
-    checkOutputsExistInSimulation(simulation = DDIsimulation,
-                                  outputPaths = outputPaths,
-                                  simulationName =  "DDI simulation",
-                                  stopIfNotFound = TRUE)
+    checkOutputsExistInSimulation(
+      simulation = DDIsimulation,
+      outputPaths = outputPaths,
+      simulationName = "DDI simulation",
+      stopIfNotFound = TRUE
+    )
   }
 
   simulation$outputSelections$clear()
   ospsuite::addOutputs(quantitiesOrPaths = names(outputs), simulation = simulation)
 
 
-  if(!is.null(DDIsimulation)){
+  if (!is.null(DDIsimulation)) {
     DDIsimulation$outputSelections$clear()
     ospsuite::addOutputs(quantitiesOrPaths = names(outputs), simulation = DDIsimulation)
   }
 
-  allParameterPaths <- c(customParameterPaths,additionalParameterPaths)
+  allParameterPaths <- c(customParameterPaths, additionalParameterPaths)
   sensitivityDataframe <- getLocalSensitivity(simulation,
-                                              DDIsimulation = DDIsimulation,
-                                              parameterPaths = allParameterPaths,
-                                              outputs,
-                                              variationRange = variationRange,
-                                              numberOfSteps = numberOfSensitivityAnalysisSteps,
-                                              runParallel = TRUE,
-                                              updateProgress = updateProgressSensitivity)
+    DDIsimulation = DDIsimulation,
+    parameterPaths = allParameterPaths,
+    outputs,
+    variationRange = variationRange,
+    numberOfSteps = numberOfSensitivityAnalysisSteps,
+    runParallel = TRUE,
+    updateProgress = updateProgressSensitivity
+  )
 
   sensitiveParameterPaths <- allParameterPaths
-  if(runUncertaintlyOnlyForSensitiveParameters){
+  if (runUncertaintlyOnlyForSensitiveParameters) {
     sensitivityDataframe <- na.omit(sensitivityDataframe)
     sensitiveParameterPaths <- as.character(unique(sensitivityDataframe$parameterPath[abs(sensitivityDataframe$sensitivity) > sensitivityThreshold]))
-    sensitivityDataframe <- sensitivityDataframe[sensitivityDataframe$parameterPath %in% sensitiveParameterPaths,]
+    sensitivityDataframe <- sensitivityDataframe[sensitivityDataframe$parameterPath %in% sensitiveParameterPaths, ]
   }
 
   parameters <- customParameters
-  if(evaluateForAllParameters){
-    parameters <- c(parameters,
-                    getParameterListForUncertaintyAnalysis(additionalParameterPaths, simulation, variationRange = variationRange))
+  if (evaluateForAllParameters) {
+    parameters <- c(
+      parameters,
+      getParameterListForUncertaintyAnalysis(additionalParameterPaths, simulation, variationRange = variationRange)
+    )
   }
   if (runUncertaintyAnalysis) {
-
     uncertaintyAnalysisResults <- getUncertaintyAnalysisResults(simulation,
-                                                                DDIsimulation = DDIsimulation,
-                                                                parameters,
-                                                                outputs,
-                                                                numberOfUncertaintyAnalysisSamples,
-                                                                sensitiveParameterPaths,
-                                                                runParallel = TRUE,
-                                                                updateProgress = updateProgressUncertainty)
+      DDIsimulation = DDIsimulation,
+      parameters,
+      outputs,
+      numberOfUncertaintyAnalysisSamples,
+      sensitiveParameterPaths,
+      runParallel = TRUE,
+      updateProgress = updateProgressUncertainty
+    )
   }
 
   # Build summary of sensitivity and uncertainty results
@@ -247,16 +258,18 @@ runSU <- function(simulation,
   for (outPth in names(outputs)) {
     suResultsList[[outPth]] <- list()
 
-    pkNames <- unique( sensitivityDataframe$pkParameter[sensitivityDataframe$outputPath == outPth] )
+    pkNames <- unique(sensitivityDataframe$pkParameter[sensitivityDataframe$outputPath == outPth])
     if (runUncertaintyAnalysis) {
-      pkNames <- unique(c( sensitivityDataframe$pkParameter[sensitivityDataframe$outputPath == outPth] ,
-                           uncertaintyAnalysisResults$pkParameter[uncertaintyAnalysisResults$outputPath == outPth] ))
+      pkNames <- unique(c(
+        sensitivityDataframe$pkParameter[sensitivityDataframe$outputPath == outPth],
+        uncertaintyAnalysisResults$pkParameter[uncertaintyAnalysisResults$outputPath == outPth]
+      ))
     }
 
 
-    for (pk in pkNames){
-      #CHECK
-      #for (pk in outputs[[outPth]]$pkParameterList) {
+    for (pk in pkNames) {
+      # CHECK
+      # for (pk in outputs[[outPth]]$pkParameterList) {
       suResultsList[[outPth]][[pk]] <- NULL
 
       for (pth in sensitiveParameterPaths) {
@@ -281,7 +294,7 @@ runSU <- function(simulation,
           u02p5 <- unname(quantile(uncertaintyVec, 0.025))
           u50 <- unname(quantile(uncertaintyVec, 0.5))
           u97p5 <- unname(quantile(uncertaintyVec, 0.975))
-          uncertaintyValue <- (u97p5 - u02p5)/u50
+          uncertaintyValue <- (u97p5 - u02p5) / u50
           uMean <- mean(uncertaintyVec)
           # Case where PK can't be evaluated
           if (any(c(NaN, NA) %in% c(u02p5, u50, u97p5))) {
@@ -305,7 +318,7 @@ runSU <- function(simulation,
         suResultsList[[outPth]][[pk]] <- rbind.data.frame(suResultsList[[outPth]][[pk]], df)
       }
 
-      if(!is.null(suResultsList[[outPth]][[pk]])){
+      if (!is.null(suResultsList[[outPth]][[pk]])) {
         if (runUncertaintyAnalysis) {
           suResultsList[[outPth]][[pk]] <- suResultsList[[outPth]][[pk]][with(suResultsList[[outPth]][[pk]], order(-UncertaintyRatio, -Sensitivity)), ]
           exclusionRows <- (suResultsList[[outPth]][[pk]]$SensitivityClass %in% c(NA)) & (suResultsList[[outPth]][[pk]]$UncertaintyClass %in% NA)
@@ -317,79 +330,81 @@ runSU <- function(simulation,
         # Exclude rows that have negligible sensitivity or NA sensitivity or NA uncertainty
         suResultsList[[outPth]][[pk]] <- suResultsList[[outPth]][[pk]][!exclusionRows, ]
 
-        allSUResults <- rbind.data.frame(allSUResults , suResultsList[[outPth]][[pk]])
+        allSUResults <- rbind.data.frame(allSUResults, suResultsList[[outPth]][[pk]])
       }
     }
   }
 
   summaryTable <- getSUSummaryDf(su = allSUResults)
-  settings <- buildSettingsCMD(parameters = parameters,outputs = outputs)
+  settings <- buildSettingsCMD(parameters = parameters, outputs = outputs)
   suResults <- list(Results = allSUResults, Settings = settings)
 
-  suResults <- c(suResults,summaryTable)
+  suResults <- c(suResults, summaryTable)
 
-  if(saveResults){
-
+  if (saveResults) {
     dateTime <- paste0(format(Sys.Date(), "%Y%m%d"), "_", format(Sys.time(), "%H%M%S"))
 
-    if(is.null(saveFileName)){
-      saveFileName <- paste0("sensitivity-uncertainty-summary-", dateTime, ".xlsx" )
+    if (is.null(saveFileName)) {
+      saveFileName <- paste0("sensitivity-uncertainty-summary-", dateTime, ".xlsx")
     }
 
     if (is.null(saveFolder)) {
       saveFolder <- getwd()
     }
 
-    writexl::write_xlsx(x = suResults,
-                        path = file.path(saveFolder,saveFileName))
-
+    writexl::write_xlsx(
+      x = suResults,
+      path = file.path(saveFolder, saveFileName)
+    )
   }
 
   print(allSUResults)
 
-  if(!is.null(originalParameterValues)){
-    ospsuite::setParameterValuesByPath(parameterPaths = names(originalParameterValues) ,values = unname(originalParameterValues),simulation = simulation)
+  if (!is.null(originalParameterValues)) {
+    ospsuite::setParameterValuesByPath(parameterPaths = names(originalParameterValues), values = unname(originalParameterValues), simulation = simulation)
   }
 
   return(suResults)
 }
 
-sensitivityLevels <- c("High","Medium","Low","Negligible",NA)
+sensitivityLevels <- c("High", "Medium", "Low", "Negligible", NA)
 
-cleanUpSUDf <- function(df){
+cleanUpSUDf <- function(df) {
   newDf <- NULL
-  for (sen in sensitivityLevels){
-    subdf <- df[df$Index %in% sen,]
-    for (unc in c("High","Medium","Low","Parameter")){
-      if(!(unc %in% names(subdf))){
+  for (sen in sensitivityLevels) {
+    subdf <- df[df$Index %in% sen, ]
+    for (unc in c("High", "Medium", "Low", "Parameter")) {
+      if (!(unc %in% names(subdf))) {
         next
       }
-      subdf[[unc]] <- sort(x = subdf[[unc]],decreasing = TRUE)
+      subdf[[unc]] <- sort(x = subdf[[unc]], decreasing = TRUE)
     }
-    if(nrow(subdf)>0){
-      subdf$Index <- rep("",nrow(subdf))
+    if (nrow(subdf) > 0) {
+      subdf$Index <- rep("", nrow(subdf))
     }
 
-    if("Parameter" %in% names(subdf)){
-      subdf <- rbind( data.frame("Index" = sen,"Parameter" = "") , subdf )
+    if ("Parameter" %in% names(subdf)) {
+      subdf <- rbind(data.frame("Index" = sen, "Parameter" = ""), subdf)
     } else {
-      subdf <- rbind( data.frame("Index" = sen,"High" = "","Medium" = "","Low" = "") , subdf )
+      subdf <- rbind(data.frame("Index" = sen, "High" = "", "Medium" = "", "Low" = ""), subdf)
     }
 
-    for (nr in rev(seq_len(nrow(subdf)))  ){
-      whichRowsEmpty <- sapply(names(subdf),function(x){subdf[nr,x] == ""})
+    for (nr in rev(seq_len(nrow(subdf)))) {
+      whichRowsEmpty <- sapply(names(subdf), function(x) {
+        subdf[nr, x] == ""
+      })
       whichRowsEmpty[is.na(whichRowsEmpty)] <- FALSE
       allEmpty <- all(whichRowsEmpty)
-      if(allEmpty){
-        subdf <- subdf[-nr,]
+      if (allEmpty) {
+        subdf <- subdf[-nr, ]
       }
     }
-    newDf <- rbind.data.frame(newDf,subdf)
+    newDf <- rbind.data.frame(newDf, subdf)
   }
   return(newDf)
 }
 
-renameSUDf <- function(df){
+renameSUDf <- function(df) {
   names(df)[names(df) == "High"] <- "High uncertainty"
   names(df)[names(df) == "Medium"] <- "Medium uncertainty"
   names(df)[names(df) == "Low"] <- "Low uncertainty"
@@ -401,46 +416,45 @@ renameSUDf <- function(df){
   return(df)
 }
 
-addLabelsSUDF <- function(df,output,pkParameter){
+addLabelsSUDF <- function(df, output, pkParameter) {
   nr <- nrow(df)
-  outputCol <- rep("",nr)
+  outputCol <- rep("", nr)
   outputCol[1] <- output
-  pkCol <- rep("",nr)
+  pkCol <- rep("", nr)
   pkCol[1] <- pkParameter
-  df <- cbind(data.frame("Output" = outputCol, PKparameter = pkCol),df)
+  df <- cbind(data.frame("Output" = outputCol, PKparameter = pkCol), df)
 }
 
-getSUSummaryDf<- function(su){
+getSUSummaryDf <- function(su) {
   sumlist <- list()
   counter <- 0
-  for (op in unique(su$Output)){
-    for (pk in unique(su$PK[su$Output == op])){
+  for (op in unique(su$Output)) {
+    for (pk in unique(su$PK[su$Output == op])) {
       counter <- counter + 1
-      subsu <- su[su$Output == op & su$PK == pk,]
+      subsu <- su[su$Output == op & su$PK == pk, ]
       df <- NULL
-      for (sens in sensitivityLevels){
-
+      for (sens in sensitivityLevels) {
         pars <- subsu$Parameter[subsu$SensitivityClass %in% sens]
-        if(length(pars) > 0){
-          for (pp in pars){
+        if (length(pars) > 0) {
+          for (pp in pars) {
             ppDisplayName <- subsu$ParameterDisplayName[subsu$SensitivityClass %in% sens & subsu$Parameter == pp]
-            if ("UncertaintyClass" %in% names(subsu)){
+            if ("UncertaintyClass" %in% names(subsu)) {
               uncLevel <- subsu$UncertaintyClass[subsu$SensitivityClass %in% sens & subsu$Parameter == pp]
-              newRow <- data.frame("Index" = sens,"High" = "","Medium" = "","Low" = "")
+              newRow <- data.frame("Index" = sens, "High" = "", "Medium" = "", "Low" = "")
               newRow[[uncLevel]] <- ppDisplayName
-              df <- rbind(df,newRow)
+              df <- rbind(df, newRow)
             } else {
-              newRow <- data.frame("Index" = sens,"Parameter" = "")
+              newRow <- data.frame("Index" = sens, "Parameter" = "")
               newRow[["Parameter"]] <- ppDisplayName
-              df <- rbind(df,newRow)
+              df <- rbind(df, newRow)
             }
           }
         }
       }
       df <- cleanUpSUDf(df)
       df <- renameSUDf(df)
-      df <- addLabelsSUDF(df,op,pk)
-      summaryName <- paste0(tail(ospsuite::toPathArray(op),1),"_",pk)
+      df <- addLabelsSUDF(df, op, pk)
+      summaryName <- paste0(tail(ospsuite::toPathArray(op), 1), "_", pk)
       sumlist[[summaryName]] <- df
     }
   }

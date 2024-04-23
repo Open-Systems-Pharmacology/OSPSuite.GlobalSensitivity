@@ -102,28 +102,34 @@ runMorris <- function(simulation,
   })
   names(outputs) <- outputPaths
 
-  checkParametersExistInSimulation(simulation = simulation,
-                                   parameterPaths = parameterPaths,
-                                   simulationName =  "simulation",
-                                   stopIfNotFound = TRUE)
+  checkParametersExistInSimulation(
+    simulation = simulation,
+    parameterPaths = parameterPaths,
+    simulationName = "simulation",
+    stopIfNotFound = TRUE
+  )
 
-  checkOutputsExistInSimulation(simulation = simulation,
-                                outputPaths = outputPaths,
-                                simulationName =  "simulation",
-                                stopIfNotFound = TRUE)
+  checkOutputsExistInSimulation(
+    simulation = simulation,
+    outputPaths = outputPaths,
+    simulationName = "simulation",
+    stopIfNotFound = TRUE
+  )
 
-  if(!is.null(DDIsimulation)){
+  if (!is.null(DDIsimulation)) {
+    checkParametersExistInSimulation(
+      simulation = DDIsimulation,
+      parameterPaths = parameterPaths,
+      simulationName = "DDI simulation",
+      stopIfNotFound = TRUE
+    )
 
-    checkParametersExistInSimulation(simulation = DDIsimulation,
-                                     parameterPaths = parameterPaths,
-                                     simulationName =  "DDI simulation",
-                                     stopIfNotFound = TRUE)
-
-    checkOutputsExistInSimulation(simulation = DDIsimulation,
-                                  outputPaths = outputPaths,
-                                  simulationName =  "DDI simulation",
-                                  stopIfNotFound = TRUE)
-
+    checkOutputsExistInSimulation(
+      simulation = DDIsimulation,
+      outputPaths = outputPaths,
+      simulationName = "DDI simulation",
+      stopIfNotFound = TRUE
+    )
   }
 
   simulation$outputSelections$clear()
@@ -132,7 +138,7 @@ runMorris <- function(simulation,
     simulation = simulation
   )
 
-  if(!is.null(DDIsimulation)){
+  if (!is.null(DDIsimulation)) {
     ospsuite::addOutputs(
       quantitiesOrPaths = outputPaths,
       simulation = DDIsimulation
@@ -145,7 +151,7 @@ runMorris <- function(simulation,
     numberParallelThreads = numberOfParameters + 1
   )
 
-  if(!is.null(DDIsimulation)){
+  if (!is.null(DDIsimulation)) {
     DDIsimBatches <- getSimulationBatches(
       simulation = DDIsimulation,
       parameterPaths = parameterPaths,
@@ -180,21 +186,24 @@ runMorris <- function(simulation,
     for (trajectoryStep in 1:(numberOfParameters + 1)) {
       simBatches[[trajectoryStep]]$addRunValues(parameterValues = A[[runNumber]][trajectoryStep, ])
 
-      if(!is.null(DDIsimulation)){
+      if (!is.null(DDIsimulation)) {
         DDIsimBatches[[trajectoryStep]]$addRunValues(parameterValues = A[[runNumber]][trajectoryStep, ])
       }
-
     }
 
     # Simulate model at each step of trajectory for current run
     runResults <- ospsuite::runSimulationBatches(simulationBatches = simBatches)
-    if(any(sapply(runResults,function(x){x[[1]]$count}) == 0)){
+    if (any(sapply(runResults, function(x) {
+      x[[1]]$count
+    }) == 0)) {
       stop()
     }
 
-    if(!is.null(DDIsimulation)){
+    if (!is.null(DDIsimulation)) {
       DDIrunResults <- ospsuite::runSimulationBatches(simulationBatches = DDIsimBatches)
-      if(any(sapply(runResults,function(x){x[[1]]$count}) == 0)){
+      if (any(sapply(runResults, function(x) {
+        x[[1]]$count
+      }) == 0)) {
         stop()
       }
     }
@@ -204,7 +213,7 @@ runMorris <- function(simulation,
       morrisResult[[runNumber]][[r]] <- list()
       morrisResult[[runNumber]][[r]]$simulationResults <- runResults[[r]][[1]]
 
-      if(!is.null(DDIsimulation)){
+      if (!is.null(DDIsimulation)) {
         morrisResult[[runNumber]][[r]]$DDIsimulationResults <- DDIrunResults[[r]][[1]]
       }
 
@@ -213,10 +222,10 @@ runMorris <- function(simulation,
       })
       names(morrisResult[[runNumber]][[r]]$inputParameters) <- parameterPaths
 
-      pkRes <- pkAnalysesToDataFrame( ospsuite::calculatePKAnalyses(results = morrisResult[[runNumber]][[r]]$simulationResults) )
+      pkRes <- pkAnalysesToDataFrame(ospsuite::calculatePKAnalyses(results = morrisResult[[runNumber]][[r]]$simulationResults))
 
-      if(!is.null(DDIsimulation)){
-        DDIpkRes <- pkAnalysesToDataFrame( ospsuite::calculatePKAnalyses(results = morrisResult[[runNumber]][[r]]$DDIsimulationResults) )
+      if (!is.null(DDIsimulation)) {
+        DDIpkRes <- pkAnalysesToDataFrame(ospsuite::calculatePKAnalyses(results = morrisResult[[runNumber]][[r]]$DDIsimulationResults))
       }
 
       morrisResult[[runNumber]][[r]]$outputs <- list()
@@ -224,8 +233,8 @@ runMorris <- function(simulation,
         morrisResult[[runNumber]][[r]]$outputs[[outPth]] <- list()
         for (pk in outputs[[outPth]]$pkParameterList) {
           morrisResult[[runNumber]][[r]]$outputs[[outPth]][[pk]] <- pkRes$Value[pkRes$QuantityPath == outPth & pkRes$Parameter == pk]
-          if(!is.null(DDIsimulation)){
-            morrisResult[[runNumber]][[r]]$outputs[[outPth]][[paste0(pk,"-DDI-ratio")]] <- DDIpkRes$Value[DDIpkRes$QuantityPath == outPth & DDIpkRes$Parameter == pk]/pkRes$Value[pkRes$QuantityPath == outPth & pkRes$Parameter == pk]
+          if (!is.null(DDIsimulation)) {
+            morrisResult[[runNumber]][[r]]$outputs[[outPth]][[paste0(pk, "-DDI-ratio")]] <- DDIpkRes$Value[DDIpkRes$QuantityPath == outPth & DDIpkRes$Parameter == pk] / pkRes$Value[pkRes$QuantityPath == outPth & pkRes$Parameter == pk]
           }
         }
       }
@@ -239,9 +248,9 @@ runMorris <- function(simulation,
 
       for (outPth in names(outputs)) {
         outputDisplayName <- outputs[[outPth]]$displayName
-        for (pk in  names(morrisResult[[runNumber]][[r]]$outputs[[outPth]])) {
-          #CHECK
-          #for (pk in outputs[[outPth]]$pkParameterList) {
+        for (pk in names(morrisResult[[runNumber]][[r]]$outputs[[outPth]])) {
+          # CHECK
+          # for (pk in outputs[[outPth]]$pkParameterList) {
           ee <- ((morrisResult[[runNumber]][[r + 1]]$outputs[[outPth]][[pk]] - morrisResult[[runNumber]][[r]]$outputs[[outPth]][[pk]])) / (currentDelta)
           df <- data.frame(
             runNumber = runNumber,
@@ -279,21 +288,21 @@ runMorris <- function(simulation,
   elementaryEffectsSummary$x <- NULL
   morrisResults <- list(Results = elementaryEffectsSummary, Settings = buildSettingsCMD(parameters = parameters, outputs = outputs))
 
-  if(saveResults){
-
+  if (saveResults) {
     dateTime <- paste0(format(Sys.Date(), "%Y%m%d"), "_", format(Sys.time(), "%H%M%S"))
 
-    if(is.null(saveFileName)){
-      saveFileName <- paste0("morris-summary-", dateTime, ".xlsx" )
+    if (is.null(saveFileName)) {
+      saveFileName <- paste0("morris-summary-", dateTime, ".xlsx")
     }
 
     if (is.null(saveFolder)) {
       saveFolder <- getwd()
     }
 
-    writexl::write_xlsx(x = morrisResults,
-                        path = file.path(saveFolder,saveFileName))
-
+    writexl::write_xlsx(
+      x = morrisResults,
+      path = file.path(saveFolder, saveFileName)
+    )
   }
 
   print(morrisResults)
