@@ -1,13 +1,23 @@
+#' @title SAParameter
+#' @description R6 class defining a parameter object
 #' @export
 SAParameter <- R6::R6Class(
   classname = "SAParameter",
   public = list(
+    #' @description Create a new `SAParameter` object.
+    #' @param simulation simulation A PKML simulation in which the parameter exists.
+    #' @param path A PKML simulation in which the parameter exists.
+    #' @param displayName A shorthand string for the parameter that substitutes for the path for display purposes.
+    #' @param unit A valid OSP unit used to interpret the numerical values that are input into the `parameterDistribution` object, such as the mean and variance of a normal distribution.
+    #' @param parameterDistribution A `SADistribution` object specifying the probability distribution of the parameter.
+    #' @param defaultVariationRangeForLogUniformDistributions When no `parameterDistribution` is specified, a loguniform distribution is assumed with multiplicative variation range given by `defaultVariationRangeForLogUniformDistributions`.
+    #' @return An instance of the `SAParameter` class.
     initialize = function(simulation,
                           path,
                           displayName = NULL,
                           unit = NULL,
-                          defaultVariationRangeForLogUniformDistributions = 0.1,
-                          parameterDistribution = NULL) {
+                          parameterDistribution = NULL,
+                          defaultVariationRangeForLogUniformDistributions = 0.1) {
       self$path <- path
       self$displayName <- displayName %||% path
       ospParameter <- ospsuite::getParameter(
@@ -58,6 +68,7 @@ SAParameter <- R6::R6Class(
     .distribution = NULL
   ),
   active = list(
+    #' @field path is the path to the parameter within the `simulation` PKML simulation.
     path = function(value) {
       if (missing(value)) {
         return(private$.path)
@@ -68,6 +79,7 @@ SAParameter <- R6::R6Class(
       )
       private$.path <- value
     },
+    #' @field displayName is the display name for the parameter in lieu of the parameter path in the `simulation` PKML simulation.
     displayName = function(value) {
       if (missing(value)) {
         return(private$.displayName)
@@ -78,6 +90,7 @@ SAParameter <- R6::R6Class(
       )
       private$.displayName <- value
     },
+    #' @field dimension is the dimension of the parameter in the `simulation` PKML simulation.
     dimension = function(value) {
       if (missing(value)) {
         return(private$.dimension)
@@ -88,6 +101,7 @@ SAParameter <- R6::R6Class(
       )
       private$.dimension <- value
     },
+    #' @field unit is the unit of the parameter in the `simulation` PKML simulation.
     unit = function(value) {
       if (missing(value)) {
         return(private$.unit)
@@ -98,6 +112,7 @@ SAParameter <- R6::R6Class(
       )
       private$.unit <- value
     },
+    #' @field distribution is the distribution of the parameter
     distribution = function(value) {
       if (missing(value)) {
         return(private$.distribution)
