@@ -6,17 +6,17 @@ template:
 development:
   mode: !expr Sys.getenv('PKGDOWN_MODE')
 
-articles:
-  - title: XXXXXX
-    navbar: XXXXXX
-    desc: XXXXXX
-    contents:
+#articles:
+#  - title: XXXXXX
+#    navbar: XXXXXX
+#    desc: XXXXXX
+#    contents:
 #    - vignette1_XXXXXXXXXXXXXXXXXXXXX
 
-reference:
-- title: "XXXXXXXXXXXXXXXXXXX"
-  desc: "XXXXXXXXXXXXXXXXXXXXXX"
-  contents:
-  - matches("XXXXX")
-  - starts_with("XXXXXX")
-  - has_concept("XXXXXXXXXX")
+#reference:
+#- title: "XXXXXXXXXXXXXXXXXXX"
+#  desc: "XXXXXXXXXXXXXXXXXXXXXX"
+#  contents:
+#  - matches("XXXXX")
+#  - starts_with("XXXXXX")
+#  - has_concept("XXXXXXXXXX")
