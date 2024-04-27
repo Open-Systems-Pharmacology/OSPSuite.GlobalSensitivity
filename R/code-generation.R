@@ -19,7 +19,7 @@ distributionStringsFnsList <- list(
 #' @description Generate code for setting up a SAParameter R6 object
 #' @param path The parameter path in the simulation.
 #' @param displayName A display name for the parameter in lieu of the parameter path.
-#' @param unit The units of the numerical values describing the parameter distribution, such as the mean and variance of a normal distribution.
+#' @param unit The units of the numerical values describing the parameter distribution, such as the mean and standard deviation of a normal distribution.
 #' @param parameterDistribution An SADistribution R6 object describing the distribution of the parameter.
 generateParameterCode <- function(path, displayName, unit, parameterDistribution) {
   code <- sprintf(

@@ -53,7 +53,7 @@ Create a new \code{SAParameter} object.
 
 \item{\code{displayName}}{A shorthand string for the parameter that substitutes for the path for display purposes.}
 
-\item{\code{unit}}{A valid OSP unit used to interpret the numerical values that are input into the \code{parameterDistribution} object, such as the mean and variance of a normal distribution.}
+\item{\code{unit}}{A valid OSP unit used to interpret the numerical values that are input into the \code{parameterDistribution} object, such as the mean and standard deviation of a normal distribution.}
 
 \item{\code{parameterDistribution}}{A \code{SADistribution} object specifying the probability distribution of the parameter.}
 

@@ -8,7 +8,7 @@ SAParameter <- R6::R6Class(
     #' @param simulation simulation A PKML simulation in which the parameter exists.
     #' @param path A PKML simulation in which the parameter exists.
     #' @param displayName A shorthand string for the parameter that substitutes for the path for display purposes.
-    #' @param unit A valid OSP unit used to interpret the numerical values that are input into the `parameterDistribution` object, such as the mean and variance of a normal distribution.
+    #' @param unit A valid OSP unit used to interpret the numerical values that are input into the `parameterDistribution` object, such as the mean and standard deviation of a normal distribution.
     #' @param parameterDistribution A `SADistribution` object specifying the probability distribution of the parameter.
     #' @param defaultVariationRangeForLogUniformDistributions When no `parameterDistribution` is specified, a loguniform distribution is assumed with multiplicative variation range given by `defaultVariationRangeForLogUniformDistributions`.
     #' @return An instance of the `SAParameter` class.

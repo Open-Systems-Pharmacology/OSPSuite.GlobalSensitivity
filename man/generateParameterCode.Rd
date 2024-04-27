@@ -11,7 +11,7 @@ generateParameterCode(path, displayName, unit, parameterDistribution)
 
 \item{displayName}{A display name for the parameter in lieu of the parameter path.}
 
-\item{unit}{The units of the numerical values describing the parameter distribution, such as the mean and variance of a normal distribution.}
+\item{unit}{The units of the numerical values describing the parameter distribution, such as the mean and standard deviation of a normal distribution.}
 
 \item{parameterDistribution}{An SADistribution R6 object describing the distribution of the parameter.}
 }
