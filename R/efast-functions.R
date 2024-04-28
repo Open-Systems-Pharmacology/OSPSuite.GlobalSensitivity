@@ -1,3 +1,4 @@
+
 #' @title generateParameterFrequenciesTotal
 #' @description Generate a set of frequencies with each parameter as per Saltelli, Tarantola & Chan, 1999.
 #' @param parameters List of `SAParameter` objects.
@@ -22,11 +23,12 @@ generateParameterFrequenciesTotal <- function(parameters, parameterNumber) {
   })
   return(parameterFrequencies)
 }
-
 #' @title getSampleRate
 #' @description Select a sampling rate within the parameter space as per Saltelli, Tarantola & Chan, 1999.
 #' @param parameterFrequencies A vector of the frequencies associated with each parameter.
 #' @return A maximal rate of sampling that satisfies Nyquist-Shannon with respect to the `parameterFrequencies`.
+
+
 getSampleRate <- function(parameterFrequencies) {
   # Ensure that the sampling rate is significantly higher than twice the maximum frequency of the parameters to satisfy the Nyquist-Shannon sampling theorem.
   # Eqns 21 and 24 in Saltelli, Tarantola, Chan, 1999
@@ -34,28 +36,28 @@ getSampleRate <- function(parameterFrequencies) {
   wMax <- max(parameterFrequencies)
   return(((2 * (wMax * M)) + 1))
 }
-
 #' @title getSamplingHypercube
 #' @description Build a hypercube of points at which the model will be simulated.
 #' @param parameterFrequencies A vector of the frequencies associated with each parameter.
 #' @param samplingRate Maximal rate of sampling that satisfies Nyquist-Shannon with respect to the `parameterFrequencies`.
 #' @return A hypercube of points in [0,2*pi].
+
 getSamplingHypercube <- function(parameterFrequencies, samplingRate) {
-  # Create vector of sampling points based on sampling frequency, which is much greater than twice the maximum parameter frequency as per Nyquist-Shannon
-  samplingPoints <- head(seq(0, 1, 1 / samplingRate), -1)
+  # Create vector of sampling timepoints based on sampling frequency, which is much greater than twice the maximum parameter frequency as per Nyquist-Shannon
+  samplingTimepoints <- head(seq(0, 1, 1 / samplingRate), -1)
   # Build parameter samples on the unit hypercube
   X <- lapply(parameterFrequencies, function(w) {
-    ((2 * pi * w * samplingPoints))
-  })
+    ((2 * pi * w * samplingTimepoints))
+  }) #   %% (2*pi) ) })
   X <- as.data.frame(X)
   return(X)
 }
-
 #' @title mapHypercubeToParameterSpace
 #' @description Use parameter distributions to map points in the sampling hypercube to values within the domain of each parameter's distribution.
 #' @param parameters List of `SAParameter` objects.
 #' @param hypercube A hypercube of points in the percentile space (0,1) that is to be mapped onto the domain of each parameter's distribution.
 #' @return A list of points in the domain of each parameter at which the model is to be evaluated.
+
 mapHypercubeToParameterSpace <- function(parameters, hypercube) {
   X <- hypercube
   for (i in seq_along(parameters)) {
@@ -73,37 +75,40 @@ mapHypercubeToParameterSpace <- function(parameters, hypercube) {
   }
   return(X)
 }
-
 #' @title perturbHypercube
 #' @description Perturb the points within the sampling hypercube as per Saltelli, Tarantola & Chan, 1999.
 #' @param hyperCube Hypercube of points in parameter space at which model will be evaluated.
 #' @return A perturbation to the points of the original `hypercube`.
+
+
 perturbHypercube <- function(hyperCube) {
   for (colnm in names(hyperCube)) {
-    hyperCube[[colnm]] <- (hyperCube[[colnm]] + runif(1, 0, 2 * pi))
+    hyperCube[[colnm]] <- (hyperCube[[colnm]] + runif(1, 0, 2 * pi)) # %% (2*pi)
     hyperCube[[colnm]] <- 0.5 + (asin(sin(hyperCube[[colnm]]))) / pi
   }
   return(hyperCube)
 }
-
-
 #' @title getEFASTResultsDf
 #' @description Format the EFAST results into a data frame.
 #' @param ffEvaluationsList List of evaluated first order and total effect indices.
 #' @param outputs List of `SAOutput` objects.
-getEFASTResultsDf <- function(ffEvaluationsList, outputs) {
+
+
+
+getEFASTResultsDf <- function(fft_list, outputList) {
   eFASTResultsDf <- NULL
 
-  for (outPth in names(outputs)) {
-    for (pk in names(ffEvaluationsList[[outPth]])) {
-
-      parPth <- names(ffEvaluationsList[[outPth]][[pk]])
+  for (outPth in names(outputList)) {
+    for (pk in names(fft_list[[outPth]])) {
+      # CHECK
+      # for (pk in outputList[[outPth]]$pkParameterList) {
+      parPth <- names(fft_list[[outPth]][[pk]])
 
       df1 <- data.frame(
         Output = outPth,
         PK = pk,
         Parameter = parPth,
-        Value = ffEvaluationsList[[outPth]][[pk]][[parPth]]$S1,
+        Value = fft_list[[outPth]][[pk]][[parPth]]$S1,
         Measure = "FirstOrder"
       )
 
@@ -111,7 +116,7 @@ getEFASTResultsDf <- function(ffEvaluationsList, outputs) {
         Output = outPth,
         PK = pk,
         Parameter = parPth,
-        Value = ffEvaluationsList[[outPth]][[pk]][[parPth]]$St,
+        Value = fft_list[[outPth]][[pk]][[parPth]]$St,
         Measure = "Total"
       )
 
@@ -121,15 +126,13 @@ getEFASTResultsDf <- function(ffEvaluationsList, outputs) {
 
   return(eFASTResultsDf)
 }
-
 #' @title extractPKParametersFromBatchSimulationResults
 #' @description Evaluate the PK parameters corresponding to each output in the simulation results obtained from batch mode simulation.
 #' @param batchSimulationResults for the main `simulation`
 #' @param DDIbatchSimulationResults for the DDI `simulation`
 #' @param outputs List of `SAOutput` objects.
-extractPKParametersFromBatchSimulationResults <- function(batchSimulationResults, DDIbatchSimulationResults, outputs) {
 
-  pkEvaluationsList <- getEvaluationMatrixStructure(outputs)
+extractPKParametersFromBatchSimulationResults <- function(batchSimulationResults, DDIbatchSimulationResults, outputs, outputStructure) {
   for (r in seq_along(batchSimulationResults)) {
     failed <- FALSE
     res <- batchSimulationResults[[r]][[1]]
@@ -155,8 +158,8 @@ extractPKParametersFromBatchSimulationResults <- function(batchSimulationResults
         if (!failed) {
           newPK <- pkRes$Value[pkRes$QuantityPath == outPth & pkRes$Parameter == pk]
         }
-        pkEvaluationsList[[outPth]][[pk]] <- c(
-          pkEvaluationsList[[outPth]][[pk]],
+        outputStructure[[outPth]][[pk]] <- c(
+          outputStructure[[outPth]][[pk]],
           newPK
         )
 
@@ -166,18 +169,16 @@ extractPKParametersFromBatchSimulationResults <- function(batchSimulationResults
           if (!DDIfailed) {
             DDInewPK <- DDIpkRes$Value[DDIpkRes$QuantityPath == outPth & DDIpkRes$Parameter == pk] / pkRes$Value[pkRes$QuantityPath == outPth & pkRes$Parameter == pk]
           }
-          pkEvaluationsList[[outPth]][[paste0(pk, "-DDI-ratio")]] <- c(
-            pkEvaluationsList[[outPth]][[paste0(pk, "-DDI-ratio")]],
+          outputStructure[[outPth]][[paste0(pk, "-DDI-ratio")]] <- c(
+            outputStructure[[outPth]][[paste0(pk, "-DDI-ratio")]],
             DDInewPK
           )
         }
       }
     }
   }
-  return(pkEvaluationsList)
+  return(outputStructure)
 }
-
-
 #' @title runFFT2
 #' @description Run the Fast Fourier Transform and the sensitivity indices.
 #' @param outputs List of `SAOutput` objects.
@@ -187,19 +188,25 @@ extractPKParametersFromBatchSimulationResults <- function(batchSimulationResults
 #' @param parameterFrequencies A vector of the frequencies associated with each parameter.
 #' @param addHarmonicsForParameterNumber Parameter number for which first order index is to be calculated
 #' @return First order and total effect indices of EFAST evaluation.
+
+
 runFFT2 <- function(outputs,
-                    pkEvaluationsList,
+                    outputStructure,
                     parameters,
+                    fftStructure,
                     allFrequencies,
                     parameterFrequencies,
                     addHarmonicsForParameterNumber) {
-
-  fftStructure <- getEvaluationMatrixStructure(outputs)
-
   for (outPth in names(outputs)) {
-    for (pk in names(pkEvaluationsList[[outPth]])) {
+    for (pk in names(outputStructure[[outPth]])) {
+      # CHECK
+      # for (pk in outputs[[outPth]]$pkParameterList) {
 
-      fftRes <- fft(pkEvaluationsList[[outPth]][[pk]])
+      fftRes <- fft(outputStructure[[outPth]][[pk]])
+      # abs(fftRes[(which.min(abs(allFrequencies - 82)))])
+      # sapply(c(77:84),function(f){abs(fftRes[(which.min(abs(allFrequencies - f)))])})
+      # plot(allFrequencies[allFrequencies <= 0.6*8*max(parameterFrequencies)],abs(fftRes[allFrequencies <= 0.6*8*max(parameterFrequencies)]))
+      # browser()
 
       # Parameter number for which first order index is to be calculated
       parNo <- addHarmonicsForParameterNumber
@@ -234,10 +241,6 @@ runFFT2 <- function(outputs,
   }
   return(fftStructure)
 }
-
-
-
-
 #' @title runEFAST
 #' @description Run the EFAST algorithm.
 #' @param simulation PKML simulation object.
@@ -249,6 +252,11 @@ runFFT2 <- function(outputs,
 #' @param saveResults Logical value.  Results are saved if `TRUE`.
 #' @param saveFolder Folder in which results will be saved if `saveResults` is set to `TRUE`.
 #' @param saveFileName File name to which results will be saved if `saveResults` is set to `TRUE`.
+
+
+
+
+
 #' @export
 runEFAST <- function(simulation,
                      DDIsimulation = NULL,
@@ -337,6 +345,8 @@ runEFAST <- function(simulation,
     # Simulate
     # For each resampling
     for (rsm in seq_len(numberOfResamples)) {
+      fU_list <- getEvaluationMatrixStructure(outputs)
+      fft_list <- getEvaluationMatrixStructure(outputs)
       XPerturbed <- perturbHypercube(X)
       XPerturbed <- mapHypercubeToParameterSpace(parameters = parameters, hypercube = XPerturbed)
 
@@ -373,7 +383,9 @@ runEFAST <- function(simulation,
         fU_list <- extractPKParametersFromBatchSimulationResults(
           batchSimulationResults = resList,
           DDIbatchSimulationResults = DDIresList,
-          outputs = outputs)
+          outputs = outputs,
+          outputStructure = fU_list
+        )
 
         tictoc::toc()
       }
@@ -401,16 +413,17 @@ runEFAST <- function(simulation,
       }
 
       # For current resample, run fast Fourier transform on each output and PK parameter and extract absolute value of Fourier coefficients corresponding to each parameter
-      ffEvaluationsList <- runFFT2(
+      fft_list <- runFFT2(
         outputs = outputs,
-        pkEvaluationsList = fU_list,
+        outputStructure = fU_list,
         parameters = parameters,
+        fftStructure = fft_list,
         allFrequencies = allFrequencies,
         parameterFrequencies = parameterFrequencies,
         addHarmonicsForParameterNumber = parNo
       )
 
-      runEFASTResultsDf <- getEFASTResultsDf(ffEvaluationsList, outputs)
+      runEFASTResultsDf <- getEFASTResultsDf(fft_list, outputs)
       runEFASTResultsDf$resampleNumber <- rsm
       runEFASTResultsDf$ParameterDisplayName <- parameters[[parNo]]$displayName
       runEFASTResultsDf$OutputDisplayName <- sapply(runEFASTResultsDf$Output, function(path) {
