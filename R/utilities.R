@@ -127,3 +127,9 @@ checkOutputsExistInSimulation <- function(simulation, outputPaths, simulationNam
   }
   return(outputPresent)
 }
+
+squareTheCircle <- function(x) {
+  x <- sub(pattern = "[)]", x = x, replacement = "]")
+  x <- sub(pattern = "[(]", x = x, replacement = "[")
+  return(x)
+}
