@@ -190,17 +190,17 @@ extractPKParametersFromBatchSimulationResults <- function(batchSimulationResults
 
 
 runFFT2 <- function(outputs,
-                    outputStructure,
+                    pkEvaluationsList,
                     parameters,
                     fftStructure,
                     allFrequencies,
                     parameterFrequencies,
                     addHarmonicsForParameterNumber) {
   for (outPth in names(outputs)) {
-    for (pk in names(outputStructure[[outPth]])) {
+    for (pk in names(pkEvaluationsList[[outPth]])) {
 
 
-      fftRes <- fft(outputStructure[[outPth]][[pk]])
+      fftRes <- fft(pkEvaluationsList[[outPth]][[pk]])
 
 
       # Parameter number for which first order index is to be calculated
@@ -408,9 +408,9 @@ runEFAST <- function(simulation,
       }
 
       # For current resample, run fast Fourier transform on each output and PK parameter and extract absolute value of Fourier coefficients corresponding to each parameter
-      fft_list <- runFFT2(
+      ffEvaluationsList <- runFFT2(
         outputs = outputs,
-        outputStructure = fU_list,
+        pkEvaluationsList = fU_list,
         parameters = parameters,
         fftStructure = fft_list,
         allFrequencies = allFrequencies,
@@ -418,7 +418,7 @@ runEFAST <- function(simulation,
         addHarmonicsForParameterNumber = parNo
       )
 
-      runEFASTResultsDf <- getEFASTResultsDf(fft_list, outputs)
+      runEFASTResultsDf <- getEFASTResultsDf(ffEvaluationsList, outputs)
       runEFASTResultsDf$resampleNumber <- rsm
       runEFASTResultsDf$ParameterDisplayName <- parameters[[parNo]]$displayName
       runEFASTResultsDf$OutputDisplayName <- sapply(runEFASTResultsDf$Output, function(path) {
