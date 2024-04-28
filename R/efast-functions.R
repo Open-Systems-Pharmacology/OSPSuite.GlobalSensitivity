@@ -109,7 +109,9 @@ getEFASTResultsDf <- function(fft_list, outputList) {
 
 #' @title extractPKParametersFromBatchSimulationResults
 #' @description Evaluate the PK parameters corresponding to each output in the simulation results obtained from batch mode simulation.
-extractPKParametersFromBatchSimulationResults <- function(batchSimulationResults, DDIbatchSimulationResults, outputs, outputStructure) {
+extractPKParametersFromBatchSimulationResults <- function(batchSimulationResults, DDIbatchSimulationResults, outputs) {
+
+  outputStructure <- getEvaluationMatrixStructure(outputs)
   for (r in seq_along(batchSimulationResults)) {
     failed <- FALSE
     res <- batchSimulationResults[[r]][[1]]
@@ -170,10 +172,12 @@ extractPKParametersFromBatchSimulationResults <- function(batchSimulationResults
 runFFT2 <- function(outputs,
                     outputStructure,
                     parameters,
-                    fftStructure,
                     allFrequencies,
                     parameterFrequencies,
                     addHarmonicsForParameterNumber) {
+
+  fftStructure <- getEvaluationMatrixStructure(outputs)
+
   for (outPth in names(outputs)) {
     for (pk in names(outputStructure[[outPth]])) {
 
@@ -315,8 +319,6 @@ runEFAST <- function(simulation,
     # Simulate
     # For each resampling
     for (rsm in seq_len(numberOfResamples)) {
-      fU_list <- getEvaluationMatrixStructure(outputs)
-      fft_list <- getEvaluationMatrixStructure(outputs)
       XPerturbed <- perturbHypercube(X)
       XPerturbed <- mapHypercubeToParameterSpace(parameters = parameters, hypercube = XPerturbed)
 
@@ -353,9 +355,7 @@ runEFAST <- function(simulation,
         fU_list <- extractPKParametersFromBatchSimulationResults(
           batchSimulationResults = resList,
           DDIbatchSimulationResults = DDIresList,
-          outputs = outputs,
-          outputStructure = fU_list
-        )
+          outputs = outputs)
 
         tictoc::toc()
       }
@@ -387,7 +387,6 @@ runEFAST <- function(simulation,
         outputs = outputs,
         outputStructure = fU_list,
         parameters = parameters,
-        fftStructure = fft_list,
         allFrequencies = allFrequencies,
         parameterFrequencies = parameterFrequencies,
         addHarmonicsForParameterNumber = parNo
