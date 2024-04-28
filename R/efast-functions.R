@@ -43,12 +43,12 @@ getSampleRate <- function(parameterFrequencies) {
 #' @return A hypercube of points in [0,2*pi].
 
 getSamplingHypercube <- function(parameterFrequencies, samplingRate) {
-  # Create vector of sampling timepoints based on sampling frequency, which is much greater than twice the maximum parameter frequency as per Nyquist-Shannon
-  samplingTimepoints <- head(seq(0, 1, 1 / samplingRate), -1)
+  # Create vector of sampling points based on sampling frequency, which is much greater than twice the maximum parameter frequency as per Nyquist-Shannon
+  samplingPoints <- head(seq(0, 1, 1 / samplingRate), -1)
   # Build parameter samples on the unit hypercube
   X <- lapply(parameterFrequencies, function(w) {
-    ((2 * pi * w * samplingTimepoints))
-  }) #   %% (2*pi) ) })
+    ((2 * pi * w * samplingPoints))
+  })
   X <- as.data.frame(X)
   return(X)
 }
@@ -83,7 +83,7 @@ mapHypercubeToParameterSpace <- function(parameters, hypercube) {
 
 perturbHypercube <- function(hyperCube) {
   for (colnm in names(hyperCube)) {
-    hyperCube[[colnm]] <- (hyperCube[[colnm]] + runif(1, 0, 2 * pi)) # %% (2*pi)
+    hyperCube[[colnm]] <- (hyperCube[[colnm]] + runif(1, 0, 2 * pi))
     hyperCube[[colnm]] <- 0.5 + (asin(sin(hyperCube[[colnm]]))) / pi
   }
   return(hyperCube)
@@ -100,8 +100,7 @@ getEFASTResultsDf <- function(fft_list, outputList) {
 
   for (outPth in names(outputList)) {
     for (pk in names(fft_list[[outPth]])) {
-      # CHECK
-      # for (pk in outputList[[outPth]]$pkParameterList) {
+
       parPth <- names(fft_list[[outPth]][[pk]])
 
       df1 <- data.frame(
@@ -199,14 +198,10 @@ runFFT2 <- function(outputs,
                     addHarmonicsForParameterNumber) {
   for (outPth in names(outputs)) {
     for (pk in names(outputStructure[[outPth]])) {
-      # CHECK
-      # for (pk in outputs[[outPth]]$pkParameterList) {
+
 
       fftRes <- fft(outputStructure[[outPth]][[pk]])
-      # abs(fftRes[(which.min(abs(allFrequencies - 82)))])
-      # sapply(c(77:84),function(f){abs(fftRes[(which.min(abs(allFrequencies - f)))])})
-      # plot(allFrequencies[allFrequencies <= 0.6*8*max(parameterFrequencies)],abs(fftRes[allFrequencies <= 0.6*8*max(parameterFrequencies)]))
-      # browser()
+
 
       # Parameter number for which first order index is to be calculated
       parNo <- addHarmonicsForParameterNumber
