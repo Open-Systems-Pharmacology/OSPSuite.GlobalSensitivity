@@ -4,12 +4,15 @@
 \alias{getEFASTResultsDf}
 \title{getEFASTResultsDf}
 \usage{
-getEFASTResultsDf(ffEvaluationsList, outputs)
+getEFASTResultsDf(fftEvaluationsList, outputs)
 }
 \arguments{
-\item{ffEvaluationsList}{List of evaluated first order and total effect indices.}
+\item{fftEvaluationsList}{List of evaluated first order and total effect indices.}
 
 \item{outputs}{List of \code{SAOutput} objects.}
+}
+\value{
+FFT results in data frame format.
 }
 \description{
 Format the EFAST results into a data frame.

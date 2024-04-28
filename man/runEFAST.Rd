@@ -30,11 +30,16 @@ runEFAST(
 
 \item{numberOfResamples}{Number of times to run the EFAST algorithm steps with resampling, as per Saltelli, Tarantola & Chan, 1999.}
 
+\item{updateProgress}{Logical value.  Updates shiny app GUI with EFAST progress when \code{TRUE}.}
+
 \item{saveResults}{Logical value.  Results are saved if \code{TRUE}.}
 
 \item{saveFolder}{Folder in which results will be saved if \code{saveResults} is set to \code{TRUE}.}
 
 \item{saveFileName}{File name to which results will be saved if \code{saveResults} is set to \code{TRUE}.}
+}
+\value{
+Results of EFAST evaluation.
 }
 \description{
 Run the EFAST algorithm.

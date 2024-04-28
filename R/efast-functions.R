@@ -1,4 +1,3 @@
-
 #' @title generateParameterFrequenciesTotal
 #' @description Generate a set of frequencies with each parameter as per Saltelli, Tarantola & Chan, 1999.
 #' @param parameters List of `SAParameter` objects.
@@ -23,12 +22,12 @@ generateParameterFrequenciesTotal <- function(parameters, parameterNumber) {
   })
   return(parameterFrequencies)
 }
+
+
 #' @title getSampleRate
 #' @description Select a sampling rate within the parameter space as per Saltelli, Tarantola & Chan, 1999.
 #' @param parameterFrequencies A vector of the frequencies associated with each parameter.
 #' @return A maximal rate of sampling that satisfies Nyquist-Shannon with respect to the `parameterFrequencies`.
-
-
 getSampleRate <- function(parameterFrequencies) {
   # Ensure that the sampling rate is significantly higher than twice the maximum frequency of the parameters to satisfy the Nyquist-Shannon sampling theorem.
   # Eqns 21 and 24 in Saltelli, Tarantola, Chan, 1999
@@ -36,12 +35,13 @@ getSampleRate <- function(parameterFrequencies) {
   wMax <- max(parameterFrequencies)
   return(((2 * (wMax * M)) + 1))
 }
+
+
 #' @title getSamplingHypercube
 #' @description Build a hypercube of points at which the model will be simulated.
 #' @param parameterFrequencies A vector of the frequencies associated with each parameter.
 #' @param samplingRate Maximal rate of sampling that satisfies Nyquist-Shannon with respect to the `parameterFrequencies`.
 #' @return A hypercube of points in [0,2*pi].
-
 getSamplingHypercube <- function(parameterFrequencies, samplingRate) {
   # Create vector of sampling points based on sampling frequency, which is much greater than twice the maximum parameter frequency as per Nyquist-Shannon
   samplingPoints <- head(seq(0, 1, 1 / samplingRate), -1)
@@ -52,12 +52,13 @@ getSamplingHypercube <- function(parameterFrequencies, samplingRate) {
   X <- as.data.frame(X)
   return(X)
 }
+
+
 #' @title mapHypercubeToParameterSpace
 #' @description Use parameter distributions to map points in the sampling hypercube to values within the domain of each parameter's distribution.
 #' @param parameters List of `SAParameter` objects.
 #' @param hypercube A hypercube of points in the percentile space (0,1) that is to be mapped onto the domain of each parameter's distribution.
 #' @return A list of points in the domain of each parameter at which the model is to be evaluated.
-
 mapHypercubeToParameterSpace <- function(parameters, hypercube) {
   X <- hypercube
   for (i in seq_along(parameters)) {
@@ -75,12 +76,12 @@ mapHypercubeToParameterSpace <- function(parameters, hypercube) {
   }
   return(X)
 }
+
+
 #' @title perturbHypercube
 #' @description Perturb the points within the sampling hypercube as per Saltelli, Tarantola & Chan, 1999.
 #' @param hyperCube Hypercube of points in parameter space at which model will be evaluated.
 #' @return A perturbation to the points of the original `hypercube`.
-
-
 perturbHypercube <- function(hyperCube) {
   for (colnm in names(hyperCube)) {
     hyperCube[[colnm]] <- (hyperCube[[colnm]] + runif(1, 0, 2 * pi))
@@ -88,13 +89,13 @@ perturbHypercube <- function(hyperCube) {
   }
   return(hyperCube)
 }
+
+
 #' @title getEFASTResultsDf
 #' @description Format the EFAST results into a data frame.
 #' @param fftEvaluationsList List of evaluated first order and total effect indices.
 #' @param outputs List of `SAOutput` objects.
-
-
-
+#' @return FFT results in data frame format.
 getEFASTResultsDf <- function(fftEvaluationsList, outputs) {
   eFASTResultsDf <- NULL
 
@@ -124,12 +125,15 @@ getEFASTResultsDf <- function(fftEvaluationsList, outputs) {
 
   return(eFASTResultsDf)
 }
+
+
 #' @title extractPKParametersFromBatchSimulationResults
 #' @description Evaluate the PK parameters corresponding to each output in the simulation results obtained from batch mode simulation.
 #' @param batchSimulationResults for the main `simulation`
 #' @param DDIbatchSimulationResults for the DDI `simulation`
+#' @param pkEvaluationsList An empty structured list to be updated with the PK parameter evaluations.
 #' @param outputs List of `SAOutput` objects.
-
+#' @return Evaluation of PK parameters from batch simulation results.
 extractPKParametersFromBatchSimulationResults <- function(batchSimulationResults, DDIbatchSimulationResults, outputs, pkEvaluationsList) {
   for (r in seq_along(batchSimulationResults)) {
     failed <- FALSE
@@ -177,17 +181,18 @@ extractPKParametersFromBatchSimulationResults <- function(batchSimulationResults
   }
   return(pkEvaluationsList)
 }
+
+
 #' @title runFFT2
 #' @description Run the Fast Fourier Transform and the sensitivity indices.
 #' @param outputs List of `SAOutput` objects.
 #' @param pkEvaluationsList List of evaluated PK parameters for each output.
 #' @param parameters List of `SAParameter` objects.
+#' @param fftStructure An empty structured list to be updated with the first order and total effects resulting from the FFT evaluations.
 #' @param allFrequencies A vector of all integer frequencies from 0 up to the sampling rate that was used in generating the hypercube over which the pkEvaluationsList was evaluated.
 #' @param parameterFrequencies A vector of the frequencies associated with each parameter.
 #' @param addHarmonicsForParameterNumber Parameter number for which first order index is to be calculated
 #' @return First order and total effect indices of EFAST evaluation.
-
-
 runFFT2 <- function(outputs,
                     pkEvaluationsList,
                     parameters,
@@ -241,14 +246,11 @@ runFFT2 <- function(outputs,
 #' @param outputs List of `SAOutput` objects.
 #' @param runParallel  Logical value.  EFAST sensitivity computation is run in parallel when `TRUE`.
 #' @param numberOfResamples Number of times to run the EFAST algorithm steps with resampling, as per Saltelli, Tarantola & Chan, 1999.
+#' @param updateProgress Logical value.  Updates shiny app GUI with EFAST progress when `TRUE`.
 #' @param saveResults Logical value.  Results are saved if `TRUE`.
 #' @param saveFolder Folder in which results will be saved if `saveResults` is set to `TRUE`.
 #' @param saveFileName File name to which results will be saved if `saveResults` is set to `TRUE`.
-
-
-
-
-
+#' @return Results of EFAST evaluation.
 #' @export
 runEFAST <- function(simulation,
                      DDIsimulation = NULL,

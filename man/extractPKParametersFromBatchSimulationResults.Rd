@@ -7,7 +7,8 @@
 extractPKParametersFromBatchSimulationResults(
   batchSimulationResults,
   DDIbatchSimulationResults,
-  outputs
+  outputs,
+  pkEvaluationsList
 )
 }
 \arguments{
@@ -16,6 +17,11 @@ extractPKParametersFromBatchSimulationResults(
 \item{DDIbatchSimulationResults}{for the DDI \code{simulation}}
 
 \item{outputs}{List of \code{SAOutput} objects.}
+
+\item{pkEvaluationsList}{An empty structured list to be updated with the PK parameter evaluations.}
+}
+\value{
+Evaluation of PK parameters from batch simulation results.
 }
 \description{
 Evaluate the PK parameters corresponding to each output in the simulation results obtained from batch mode simulation.

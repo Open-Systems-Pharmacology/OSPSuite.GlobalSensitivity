@@ -8,6 +8,7 @@ runFFT2(
   outputs,
   pkEvaluationsList,
   parameters,
+  fftStructure,
   allFrequencies,
   parameterFrequencies,
   addHarmonicsForParameterNumber
@@ -19,6 +20,8 @@ runFFT2(
 \item{pkEvaluationsList}{List of evaluated PK parameters for each output.}
 
 \item{parameters}{List of \code{SAParameter} objects.}
+
+\item{fftStructure}{An empty structured list to be updated with the first order and total effects resulting from the FFT evaluations.}
 
 \item{allFrequencies}{A vector of all integer frequencies from 0 up to the sampling rate that was used in generating the hypercube over which the pkEvaluationsList was evaluated.}
 
