@@ -1,3 +1,7 @@
+#' @title generateLowryPlot
+#' @description Function to generate a Lowry plot of Sobol or EFAST sensitivity analysis results.
+#' @param gsaResultsDataframe Sobol or EFAST results returned by the `runSobol` or `runFAST` functions, respectively.
+#' @return A list of ggplot Lowry plots, one corresponding to each output path/PK parameter combination.
 #' @export
 generateLowryPlot <- function(gsaResultsDataframe) {
   plotList <- list()
@@ -13,6 +17,13 @@ generateLowryPlot <- function(gsaResultsDataframe) {
   return(plotList)
 }
 
+
+#' @title getLowryPlot
+#' @description Function to build a Lowry plot in ggplot for a spcific output and PK parameter.
+#' @param df Sobol or EFAST results  dataframe.
+#' @param outputDisplayName String. The display name of the output.
+#' @param pk String. The name of the PK parameter
+#' @return A ggplot Lowry plot for a specific output path and PK parameter combination.
 getLowryPlot <- function(df, outputDisplayName, pk) {
   sortedParameterOrder <- order(-df[df$Measure == "FirstOrder", ]$Value)
   sortedParameters <- df[df$Measure == "FirstOrder", ][sortedParameterOrder, ]$Parameter
@@ -97,6 +108,10 @@ getLowryPlot <- function(df, outputDisplayName, pk) {
   return(plt)
 }
 
+#' @title pltGSABarGraph
+#' @description Function to generate a bar graph of Sobol or EFAST sensitivity analysis results.
+#' @param df Sobol or EFAST results returned by the `runSobol` or `runFAST` functions, respectively.
+#' @return A list of ggplot bar graph plots, one corresponding to each output path/PK parameter combination.
 #' @export
 pltGSABarGraph <- function(df) {
   parameterOrder <- df[df$Measure == "FirstOrder", ]$Parameter[order(-df$Value[df$Measure == "FirstOrder"])]
