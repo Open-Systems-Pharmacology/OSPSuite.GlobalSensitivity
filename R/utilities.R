@@ -1,4 +1,4 @@
-#' @title title `%||%`
+#' @title `%||%`
 #' @description Function to select RHS argument in case LHS is NULL.  See purrr::%||%
 #' @param lhs argument
 #' @param rhs argument
