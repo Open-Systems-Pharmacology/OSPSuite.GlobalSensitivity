@@ -1,4 +1,3 @@
-
 #' @title runSobol
 #' @description Function to generate points in parameter space at which simulation will be run in Sobol sensitivity analysis.
 #' @param A A matrix consisting of a Sobol sequence with a number of columns equal to the number of parameter paths and a number of rows equal to the sample size.
@@ -107,7 +106,7 @@ varcalc <- function(fU_list, outputList) {
 #' @param saveResults  Logical value.  If `TRUE`, the results will be saved.
 #' @param saveFolder String indicating the path to the folder in which the results are to be saved.
 #' @param saveFileName String indicating the file name to use when saving the results.
-#' @return Sensitivity and uncertainty analysis results.
+#' @return Sobol sensitivity analysis results.
 #' @export
 runSobol <- function(simulation,
                      DDIsimulation = NULL,
