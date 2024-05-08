@@ -2,7 +2,7 @@
 % Please edit documentation in R/su-functions.R
 \name{runSU}
 \alias{runSU}
-\title{title}
+\title{runSU}
 \usage{
 runSU(
   simulation,

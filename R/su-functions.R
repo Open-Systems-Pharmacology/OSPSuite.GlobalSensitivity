@@ -93,7 +93,7 @@ getParameterListForUncertaintyAnalysis <- function(parameterPaths, simulation, v
   return(parameters)
 }
 
-#' @title title
+#' @title runSU
 #' @description Function to run sensitivity analysis and then run uncertainy analysis for parameters deemed sensitive.
 #' Main parameters:
 #' @param simulation PKML simulation object.
