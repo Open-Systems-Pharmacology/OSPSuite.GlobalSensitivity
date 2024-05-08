@@ -76,12 +76,6 @@ getTrajectory <- function(numberOfParameters, numberOfGridPartitions = defaultNu
   Bstar %>% return()
 }
 
-getVaryingParameterIndices <- function(trajectory) {
-  varyingParameterIndices <- sapply(2:nrow(trajectory), function(nr) {
-    which(!(trajectory[nr, ] - trajectory[nr - 1, ] == 0))
-  })
-}
-
 summaryFunctions <- list(
   mu = function(x) {
     return(mean(x))
