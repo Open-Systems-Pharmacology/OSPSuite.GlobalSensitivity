@@ -1,3 +1,14 @@
+#' @title getUncertaintyAnalysisResults
+#' @description Function to run uncertainty analysis
+#' @param simulation PKML simulation object.
+#' @param DDIsimulation DDI PKML simulation object.
+#' @param parameters List of `SAParameter` objects.
+#' @param outputs List of `SAOutput` objects.
+#' @param numberOfUncertaintyAnalysisSamples Number of samples at which to evaluate the simulation for the uncertainty analysis.
+#' @param sensitiveParameterPaths Paths of `simulation` parameters that are deemed sensitive.
+#' @param runParallel Logical value.  Uncertainty analysis computation is run in parallel when `TRUE`.
+#' @param updateProgress Logical value.  Updates shiny app GUI with uncertainty analysis progress when `TRUE`.
+#' @return description
 getUncertaintyAnalysisResults <- function(simulation,
                                           DDIsimulation = NULL,
                                           parameters,
@@ -18,7 +29,7 @@ getUncertaintyAnalysisResults <- function(simulation,
   )
 
   numberOfParameters <- length(parameters)
-  U_list <- matrix(data = runif(n = numberOfParameters*numberOfUncertaintyAnalysisSamples), ncol = numberOfParameters)
+  U_list <- matrix(data = runif(n = numberOfParameters * numberOfUncertaintyAnalysisSamples), ncol = numberOfParameters)
 
   for (i in seq_along(parameters)) {
     path <- parameterPaths[[i]]
@@ -54,7 +65,7 @@ getUncertaintyAnalysisResults <- function(simulation,
     simBatchesListMixed[[pth]] <- getSimulationBatches(simulation, pth, numberParallelThreads)
   }
 
-  if(!is.null(DDIsimulation)){
+  if (!is.null(DDIsimulation)) {
     DDIsimBatchesListMixed <- list()
     for (pth in sensitiveParameterPaths) {
       DDIsimBatchesListMixed[[pth]] <- getSimulationBatches(DDIsimulation, pth, numberParallelThreads)
@@ -70,7 +81,7 @@ getUncertaintyAnalysisResults <- function(simulation,
 
     resMixed <- list()
 
-    if(!is.null(DDIsimulation)){
+    if (!is.null(DDIsimulation)) {
       DDIresMixed <- list()
     }
 
@@ -92,7 +103,7 @@ getUncertaintyAnalysisResults <- function(simulation,
       }
       resMixed[[pth]] <- ospsuite::runSimulationBatches(simulationBatches = simBatchesListMixed[[pth]][1:numberOfRowsInSampleBlock])
 
-      if(!is.null(DDIsimulation)){
+      if (!is.null(DDIsimulation)) {
         for (r in seq_along(rowNumbersToSim)) {
           DDIsimBatchesListMixed[[pth]][[r]]$addRunValues(parameterValues = U_list[[pth]][rowNumbersToSim[r]])
         }
@@ -100,22 +111,21 @@ getUncertaintyAnalysisResults <- function(simulation,
       }
 
       for (r in seq_along(rowNumbersToSim)) {
-
         failed <- FALSE
         res <- resMixed[[pth]][[r]][[1]]
 
-        if(is.null(res)){
+        if (is.null(res)) {
           failed <- TRUE
         }
 
-        if(!is.null(DDIsimulation)){
+        if (!is.null(DDIsimulation)) {
           DDIres <- DDIresMixed[[pth]][[r]][[1]]
-          if(is.null(DDIres)){
+          if (is.null(DDIres)) {
             failed <- TRUE
           }
         }
 
-        if(!failed){
+        if (!failed) {
           pkRes <- suppressWarnings(pkAnalysesToDataFrame(ospsuite::calculatePKAnalyses(results = res)))
           for (outPth in names(outputs)) {
             for (pk in outputs[[outPth]]$pkParameterList) {
@@ -127,20 +137,19 @@ getUncertaintyAnalysisResults <- function(simulation,
             }
           }
 
-          if(!is.null(DDIsimulation)){
+          if (!is.null(DDIsimulation)) {
             DDIpkRes <- suppressWarnings(pkAnalysesToDataFrame(ospsuite::calculatePKAnalyses(results = DDIres)))
             for (outPth in names(outputs)) {
               for (pk in outputs[[outPth]]$pkParameterList) {
                 DDInewPK <- DDIpkRes$Value[DDIpkRes$QuantityPath == outPth & DDIpkRes$Parameter == pk] / pkRes$Value[pkRes$QuantityPath == outPth & pkRes$Parameter == pk]
-                fU_list[[pth]][[outPth]][[paste0(pk,"-DDI-ratio")]] <- c(
-                  fU_list[[pth]][[outPth]][[paste0(pk,"-DDI-ratio")]],
+                fU_list[[pth]][[outPth]][[paste0(pk, "-DDI-ratio")]] <- c(
+                  fU_list[[pth]][[outPth]][[paste0(pk, "-DDI-ratio")]],
                   DDInewPK
                 )
               }
             }
           }
         }
-
       }
     }
 
@@ -149,10 +158,9 @@ getUncertaintyAnalysisResults <- function(simulation,
 
 
   uncertaintyResults <- NULL
-  for (parPth in names(fU_list)){
-    for (outPth in names(fU_list[[parPth]])){
-      for (pk in names(fU_list[[parPth]][[outPth]])){
-
+  for (parPth in names(fU_list)) {
+    for (outPth in names(fU_list[[parPth]])) {
+      for (pk in names(fU_list[[parPth]][[outPth]])) {
         df <- data.frame(
           parameterPath = parPth,
           outputPath = outPth,
@@ -160,10 +168,9 @@ getUncertaintyAnalysisResults <- function(simulation,
           value = fU_list[[parPth]][[outPth]][[pk]]
         )
 
-        df <- cbind(data.frame(parameterValue = U_list[[parPth]]) , df)
+        df <- cbind(data.frame(parameterValue = U_list[[parPth]]), df)
 
-        uncertaintyResults <- rbind.data.frame(uncertaintyResults,df)
-
+        uncertaintyResults <- rbind.data.frame(uncertaintyResults, df)
       }
     }
   }

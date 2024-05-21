@@ -1,101 +1,7 @@
-
-distSelection <- function(path) {
-  paste0("distributionSelection", path, collapse = "_")
-}
-
-distParameterForm <- function(path) {
-  paste0("miniform", path, collapse = "_")
-}
-distValParameterDisplayName <- function(path) {
-  paste0("parameterDisplayName_", path)
-}
-distValUniformMinimum <- function(path) {
-  paste0("uniformMin_", path)
-}
-distValUniformMaximum <- function(path) {
-  paste0("uniformMax_", path)
-}
-distValUniformUnit <- function(path) {
-  paste0("uniformUnit_", path)
-}
-distValLogUniformMinimum <- function(path) {
-  paste0("logUniformMin_", path)
-}
-distValLogUniformMaximum <- function(path) {
-  paste0("logUniformMax_", path)
-}
-distValLogUniformUnit <- function(path) {
-  paste0("logUniformUnit_", path)
-}
-distValNormalMean <- function(path) {
-  paste0("normalMean_", path)
-}
-distValNormalStdv <- function(path) {
-  paste0("normalStdv_", path)
-}
-distValNormalUnit <- function(path) {
-  paste0("normalUnit_", path)
-}
-distValLogNormalMean <- function(path) {
-  paste0("logNormalMu_", path)
-}
-distValLogNormalStdv <- function(path) {
-  paste0("logNormalCV_", path)
-}
-distValLogNormalUnit <- function(path) {
-  paste0("logNormalUnit_", path)
-}
-distValDimension <- function(path) {
-  paste0("dimension_", path)
-}
-
-getDistValsList <- function(path) {
-  distValKey <- list(
-    "Uniform" = list(
-      "minimum" = distValUniformMinimum(path),
-      "maximum" = distValUniformMaximum(path),
-      "unit" = distValUniformUnit(path)
-    ),
-    "LogUniform" = list(
-      "minimum" = distValLogUniformMinimum(path),
-      "maximum" = distValLogUniformMaximum(path),
-      "unit" = distValLogUniformUnit(path)
-    ),
-    "Normal" = list(
-      "mean" = distValNormalMean(path),
-      "stdv" = distValNormalStdv(path),
-      "unit" = distValNormalUnit(path)
-    ),
-    "LogNormal" = list(
-      "mean" = distValLogNormalMean(path),
-      "CV" = distValLogNormalStdv(path),
-      "unit" = distValLogNormalUnit(path)
-    ),
-    "dimension" = distValDimension(path)
-  )
-  return(distValKey)
-}
-
-verifyQuantileVec <- function(quantileVec) {
-  if (any(quantileVec < 0) | any(quantileVec > 1)) {
-    stop("Quantile out of bounds")
-  }
-}
-
-pkParameterSelection <- function(path) {
-  paste0("pkParameterSelection", path, collapse = "_")
-}
-
-squareTheCircle <- function(x){
-  x <-sub(pattern = "[)]",x = x,replacement = "]")
-  x <-sub(pattern = "[(]",x = x,replacement = "[")
-  return(x)
-}
-
-
+#' @title runGUI
+#' @description Function to run Shiny App GUI interface to `ospsuite.globalsensitivity` package.
 #' @export
-runGUI <- function(){
-
+runGUI <- function() {
   server <- function(input, output, session) {
     options(shiny.maxRequestSize = 30 * 1024^2)
     parameterPathsList <- reactiveValues(paths = NULL)
@@ -157,26 +63,27 @@ runGUI <- function(){
       n <- length(parameterPathsList$paths)
       if (n > 0) {
         sapply(1:n, function(i) {
-
           ospParameter <- ospsuite::getParameter(path = parameterPathsList$paths[[i]], container = sim$obj)
           ospParameterValue <- ospParameter$value
           ospParameterDimension <- ospParameter$dimension
           ospParameterUnit <- getBaseUnit(ospParameterDimension)
 
-          if(ospParameterDimension == ospDimensions$`Molecular weight`){
-            ospParameterValue <- toUnit(quantityOrDimension = ospDimensions$`Molecular weight`,
-                                        values = ospParameterValue,
-                                        targetUnit = ospUnits$`Molecular weight`$`g/mol`)
+          if (ospParameterDimension == ospDimensions$`Molecular weight`) {
+            ospParameterValue <- toUnit(
+              quantityOrDimension = ospDimensions$`Molecular weight`,
+              values = ospParameterValue,
+              targetUnit = ospUnits$`Molecular weight`$`g/mol`
+            )
             ospParameterUnit <- ospUnits$`Molecular weight`$`g/mol`
           }
 
           distValKey <- getDistValsList(parameterPathsList$paths[[i]])
 
-          vals[[distValKey$Uniform$minimum]] <- min(0.9*ospParameterValue,1.1*ospParameterValue)
-          vals[[distValKey$Uniform$maximum]] <- max(0.9*ospParameterValue,1.1*ospParameterValue)
+          vals[[distValKey$Uniform$minimum]] <- min(0.9 * ospParameterValue, 1.1 * ospParameterValue)
+          vals[[distValKey$Uniform$maximum]] <- max(0.9 * ospParameterValue, 1.1 * ospParameterValue)
           vals[[distValKey$Uniform$unit]] <- ospParameterUnit
-          vals[[distValKey$LogUniform$minimum]] <- min(0.1*ospParameterValue,10*ospParameterValue)
-          vals[[distValKey$LogUniform$maximum]] <- max(0.1*ospParameterValue,10*ospParameterValue)
+          vals[[distValKey$LogUniform$minimum]] <- min(0.1 * ospParameterValue, 10 * ospParameterValue)
+          vals[[distValKey$LogUniform$maximum]] <- max(0.1 * ospParameterValue, 10 * ospParameterValue)
           vals[[distValKey$LogUniform$unit]] <- ospParameterUnit
           vals[[distValKey$Normal$mean]] <- ospParameterValue
           vals[[distValKey$Normal$stdv]] <- 1
@@ -185,7 +92,6 @@ runGUI <- function(){
           vals[[distValKey$LogNormal$CV]] <- 1
           vals[[distValKey$LogNormal$unit]] <- ospParameterUnit
           vals[[distValKey$dimension]] <- ospParameterDimension
-
         })
       }
     })
@@ -216,9 +122,11 @@ runGUI <- function(){
     selectedDistributions <- reactiveValues()
     getDistributionSelection <- reactive({
       if (length(parameterPathsList$paths) > 0) {
-        for (pth in parameterPathsList$paths){
-          isolate({selectedDistributions[[pth]] <- input[[distSelection(pth)]]})
-          #selectedDistributions[[pth]] <- input[[distSelection(pth)]]
+        for (pth in parameterPathsList$paths) {
+          isolate({
+            selectedDistributions[[pth]] <- input[[distSelection(pth)]]
+          })
+          # selectedDistributions[[pth]] <- input[[distSelection(pth)]]
         }
       }
     })
@@ -227,8 +135,7 @@ runGUI <- function(){
     DDIsim <- reactiveValues()
 
     observeEvent(eventExpr = input$loadPKML, handlerExpr = {
-
-      if(is.null(input$selectPKML$datapath)){
+      if (is.null(input$selectPKML$datapath)) {
         showModal(modalDialog(
           title = "Error",
           "Please select a PKML simulation file.",
@@ -239,7 +146,7 @@ runGUI <- function(){
       sim$obj <- ospsuite::loadSimulation(filePath = input$selectPKML$datapath)
 
       DDIsim$obj <- NULL
-      if(!is.null(input$DDIselectPKML$datapath)){
+      if (!is.null(input$DDIselectPKML$datapath)) {
         DDIsim$obj <- ospsuite::loadSimulation(filePath = input$DDIselectPKML$datapath)
       }
 
@@ -286,7 +193,7 @@ runGUI <- function(){
     })
 
     makeDistributionValuesUpdateEvents <- reactive({
-      #This reactive maintains the values of selected distribution's parameters even if the user temporarily selects a different distribution
+      # This reactive maintains the values of selected distribution's parameters even if the user temporarily selects a different distribution
       n <- length(parameterPathsList$paths)
       if (n > 0) {
         sapply(1:n, function(i) {
@@ -398,15 +305,17 @@ runGUI <- function(){
 
           interaction[[i]] <- fluidRow(
             h3(paste0("Distribution for ", parameterPathsList$paths[[i]])),
-            textInput(inputId = distValParameterDisplayName(parameterPathsList$paths[[i]]),#paste0("parameterDisplayName_",parameterPathsList$paths[[i]]),
-                      label = "Display name",
-                      value = parameterPathsList$paths[[i]] ),
+            textInput(
+              inputId = distValParameterDisplayName(parameterPathsList$paths[[i]]), # paste0("parameterDisplayName_",parameterPathsList$paths[[i]]),
+              label = "Display name",
+              value = parameterPathsList$paths[[i]]
+            ),
             column(
               4,
               selectInput(
                 inputId = input_string,
-                label = "Distribution type", choices = c("Uniform", "LogUniform", "Normal" , "LogNormal"),
-                selected = selectedDistributions[[ parameterPathsList$paths[[i]]  ]]
+                label = "Distribution type", choices = c("Uniform", "LogUniform", "Normal", "LogNormal"),
+                selected = selectedDistributions[[parameterPathsList$paths[[i]]]]
               )
             ),
             column(
@@ -430,14 +339,18 @@ runGUI <- function(){
           paste0("PK parameters for ", outputPathsList$paths[[i]])
 
           interaction[[i]] <- fluidRow(
-            #GGGG
+            # GGGG
             h3(paste0("Output ", outputPathsList$paths[[i]])),
-            textInput(inputId = paste0("outputDisplayName_",i), label = "Display name",
-                      value = outputPathsList$paths[[i]] ),
+            textInput(
+              inputId = paste0("outputDisplayName_", i), label = "Display name",
+              value = outputPathsList$paths[[i]]
+            ),
             helpText(paste0("PK parameters for output ", outputPathsList$paths[[i]])),
-            column(4,
-                   checkboxGroupInput(inputId = input_string, label = NULL, choices = list("Cmax" = "C_max", "AUC_tEnd" = "AUC_tEnd", "C_tEnd" = "C_tEnd"), selected = selectedPKParameters[[input_string]])
-            ))
+            column(
+              4,
+              checkboxGroupInput(inputId = input_string, label = NULL, choices = list("Cmax" = "C_max", "AUC_tEnd" = "AUC_tEnd", "C_tEnd" = "C_tEnd"), selected = selectedPKParameters[[input_string]])
+            )
+          )
         }
         do.call(fluidRow, interaction)
       }
@@ -447,13 +360,13 @@ runGUI <- function(){
       eventExpr = input$goToEvaluation,
       handlerExpr = {
         results$dateTime <- paste0(format(Sys.Date(), "%Y%m%d"), "_", format(Sys.time(), "%H%M%S"))
-        results$settings <- buildSettingsCMD(buildParameterList(),buildOutputList())
+        results$settings <- buildSettingsCMD(buildParameterList(), buildOutputList())
         updateTabsetPanel(inputId = "mainTabPanel", selected = "Analyses")
       }
     )
 
-    verifyParametersSelected <- function(additionalCondition = TRUE){
-      if(isFALSE(additionalCondition) & !(length(parameterPathsList$paths) > 0)){
+    verifyParametersSelected <- function(additionalCondition = TRUE) {
+      if (isFALSE(additionalCondition) & !(length(parameterPathsList$paths) > 0)) {
         showModal(modalDialog(
           title = "Error",
           "Please select at least one parameter from the Parameter Tree or select 'Run for all constants'.",
@@ -463,10 +376,12 @@ runGUI <- function(){
       }
     }
 
-    verifyOutputsSelected <- function(){
-      selectedPKParameters <- unlist(sapply(outputPathsList$paths, function(pth){input[[ pkParameterSelection(pth) ]]}))
+    verifyOutputsSelected <- function() {
+      selectedPKParameters <- unlist(sapply(outputPathsList$paths, function(pth) {
+        input[[pkParameterSelection(pth)]]
+      }))
 
-      if(!(length(selectedPKParameters) > 0)){
+      if (!(length(selectedPKParameters) > 0)) {
         showModal(modalDialog(
           title = "Error",
           "Please select at least one output from the Output Tree.",
@@ -476,48 +391,56 @@ runGUI <- function(){
       }
     }
 
-    checkPathsInDDISimulation <- function(parameterList = parameterList,outputList = outputList){
+    checkPathsInDDISimulation <- function(parameterList = parameterList, outputList = outputList) {
+      parameterChecks <- checkParametersExistInSimulation(
+        simulation = DDIsim$obj,
+        parameterPaths = sapply(parameterList, function(par) {
+          par$path
+        }),
+        simulationName = "DDI simulation"
+      )
 
-      parameterChecks <- checkParametersExistInSimulation(simulation = DDIsim$obj,
-                                                          parameterPaths = sapply(parameterList,function(par){par$path}),
-                                                          simulationName =  "DDI simulation")
-
-      outputChecks <- checkOutputsExistInSimulation(simulation = DDIsim$obj,
-                                                    outputPaths = sapply(outputList,function(par){par$path}),
-                                                    simulationName = "DDI simulation")
+      outputChecks <- checkOutputsExistInSimulation(
+        simulation = DDIsim$obj,
+        outputPaths = sapply(outputList, function(par) {
+          par$path
+        }),
+        simulationName = "DDI simulation"
+      )
 
       missingPaths <- NULL
-      if(!all(unlist(parameterChecks))){
-        missingPaths <- c(missingPaths,"<b>Parameters not found in DDI simulation:</b>")
-        for (pth in names(parameterChecks)){
-          if(!parameterChecks[[pth]]){
-            missingPaths <- c(missingPaths,"<br>",pth)}
+      if (!all(unlist(parameterChecks))) {
+        missingPaths <- c(missingPaths, "<b>Parameters not found in DDI simulation:</b>")
+        for (pth in names(parameterChecks)) {
+          if (!parameterChecks[[pth]]) {
+            missingPaths <- c(missingPaths, "<br>", pth)
+          }
         }
       }
 
-      if(!all(unlist(outputChecks))){
-        if(!is.null(missingPaths)){
-          missingPaths <- c(missingPaths,"<br><br>")
+      if (!all(unlist(outputChecks))) {
+        if (!is.null(missingPaths)) {
+          missingPaths <- c(missingPaths, "<br><br>")
         }
-        missingPaths <- c(missingPaths,"<b>Outputs not found in DDI simulation:</b>")
-        for (pth in names(outputChecks)){
-          if(!outputChecks[[pth]]){
-            missingPaths <- c(missingPaths,"<br>",pth)}
+        missingPaths <- c(missingPaths, "<b>Outputs not found in DDI simulation:</b>")
+        for (pth in names(outputChecks)) {
+          if (!outputChecks[[pth]]) {
+            missingPaths <- c(missingPaths, "<br>", pth)
+          }
         }
       }
 
-      passed <- all(c(unlist(parameterChecks),unlist(outputChecks)))
+      passed <- all(c(unlist(parameterChecks), unlist(outputChecks)))
 
-      if(!passed){
+      if (!passed) {
         showModal(modalDialog(
           title = "Error",
-          HTML(paste0(missingPaths,collapse = "")),
+          HTML(paste0(missingPaths, collapse = "")),
           easyClose = FALSE
         ))
       }
 
       return(passed)
-
     }
 
     observeEvent(eventExpr = input$backToOutputs, handlerExpr = {
@@ -526,51 +449,50 @@ runGUI <- function(){
 
     results <- reactiveValues()
 
-    buildParameterList <- function(){
-
+    buildParameterList <- function() {
       parameterList <- list()
 
       for (i in seq_along(parameterPathsList$paths)) {
-
         path <- parameterPathsList$paths[[i]]
         distValKey <- getDistValsList(path)
 
 
-        #get dimension of distribution parameters for the selected model parameter with path = "path"
+        # get dimension of distribution parameters for the selected model parameter with path = "path"
         dimension <- vals[[distValKey$dimension]]
 
-        #get unit of distribution parameters for the selected model parameter with path = "path"
-        unit = vals[[distValKey[[input[[distSelection(path)]]]]$unit]]
+        # get unit of distribution parameters for the selected model parameter with path = "path"
+        unit <- vals[[distValKey[[input[[distSelection(path)]]]]$unit]]
 
-        #get name of distribution for the selected model parameter with path = "path"
+        # get name of distribution for the selected model parameter with path = "path"
         selectedDistributionForPath <- input[[distSelection(path)]]
 
 
-        #get ui key f0r distribution parameter values for the selected model parameter with path = "path"
+        # get ui key f0r distribution parameter values for the selected model parameter with path = "path"
         distributionParameterListKeys <- getDistValsList(path)[[selectedDistributionForPath]]
 
-        #get the list of parameters of the distribution for the selected model parameter with path = "path"
+        # get the list of parameters of the distribution for the selected model parameter with path = "path"
         distributionParameterList <- getDistributionParameterList[[selectedDistributionForPath]](distributionParameterListKeys)
 
 
-        parameterList[[i]] <- SAParameter$new(simulation = sim$obj,
-                                              path = path,
-                                              unit = unit,
-                                              displayName = input[[ distValParameterDisplayName(path) ]],
-                                              parameterDistribution = do.call(distribution[[selectedDistributionForPath]], distributionParameterList))
-
+        parameterList[[i]] <- SAParameter$new(
+          simulation = sim$obj,
+          path = path,
+          unit = unit,
+          displayName = input[[distValParameterDisplayName(path)]],
+          parameterDistribution = do.call(distribution[[selectedDistributionForPath]], distributionParameterList)
+        )
       }
 
       return(parameterList)
     }
 
-    buildOutputList <- function(){
+    buildOutputList <- function() {
       outputList <- list()
       for (i in seq_along(outputPathsList$paths)) {
         pth <- outputPathsList$paths[[i]]
         input_string <- pkParameterSelection(pth)
-        outputList[[pth]] <- SAOutput$new(simulation = sim$obj,path = pth,displayName = input[[paste0("outputDisplayName_",i)]])
-        for (pk in input[[input_string]]){
+        outputList[[pth]] <- SAOutput$new(simulation = sim$obj, path = pth, displayName = input[[paste0("outputDisplayName_", i)]])
+        for (pk in input[[input_string]]) {
           outputList[[pth]]$addPKParameter(standardPKParameter = pk)
         }
       }
@@ -580,9 +502,12 @@ runGUI <- function(){
     observeEvent(
       eventExpr = input$startLocalSA,
       handlerExpr = {
-
-        if( isFALSE(verifyParametersSelected(additionalCondition = input$runSensitivityAnalysisForAllParameters)) ) return()
-        if( isFALSE(verifyOutputsSelected()) ) return()
+        if (isFALSE(verifyParametersSelected(additionalCondition = input$runSensitivityAnalysisForAllParameters))) {
+          return()
+        }
+        if (isFALSE(verifyOutputsSelected())) {
+          return()
+        }
 
         numberOfUncertaintySamples <- input$numberOfUncertaintySamples
 
@@ -590,11 +515,11 @@ runGUI <- function(){
         outputList <- buildOutputList()
 
         verifiedPaths <- TRUE
-        if(!is.null(DDIsim$obj)){
-          verifiedPaths <- checkPathsInDDISimulation(parameterList = parameterList,outputList = outputList)
+        if (!is.null(DDIsim$obj)) {
+          verifiedPaths <- checkPathsInDDISimulation(parameterList = parameterList, outputList = outputList)
         }
 
-        if(verifiedPaths){
+        if (verifiedPaths) {
           print("Starting local sensitivity...")
 
 
@@ -607,8 +532,7 @@ runGUI <- function(){
           }
 
           updateProgressUncertainty <- NULL
-          if(input$runUncertaintyCheckbox){
-
+          if (input$runUncertaintyCheckbox) {
             progressUncertainty <- shiny::Progress$new()
             progressUncertainty$set(message = "Computing uncertainty`", value = 0)
             on.exit(progressUncertainty$close())
@@ -618,36 +542,41 @@ runGUI <- function(){
             }
           }
 
-          results$su <- tryCatch({
-            runSU(simulation = sim$obj,
-                  DDIsimulation = DDIsim$obj,
-                  runUncertaintyAnalysis = input$runUncertaintyCheckbox,
-                  evaluateForAllParameters = input$runSensitivityAnalysisForAllParameters, #****** IF FALSE, ONLY THE PARAMETERS IN parametersList WILL BE ANALYZED
-                  customParameters = parameterList,
-                  sensitivityThreshold = input$sensitivityThreshold,
-                  variationRange = input$variationRangeNumericInput, #
-                  numberOfSensitivityAnalysisSteps = input$numberOfStepsNumericInput,
-                  quantiles = eval(parse(text = paste0("c(", input$quantilesTestInput ,")"))),
-                  outputs = outputList,
-                  saveFolder = NULL,
-                  saveResults = FALSE,
-                  numberOfUncertaintyAnalysisSamples = input$numberOfUncertaintySamples, #****** FOR THE UNCERTAINTY ANALYSIS ONLY, THESE SAMPLES WILL BE TAKEN FROM LOGUNIFORM +/- 10% BY DEFAULT, UNLESS A DIFFERENT DISTRIBUTION WAS SPECIFIED IN parametersList
-                  runParallel = TRUE,
-                  updateProgressSensitivity = updateProgressSensitivity,
-                  updateProgressUncertainty = updateProgressUncertainty)
-          }, error = function(e) {
-            showModal(modalDialog(
-              title = "Error",
-              "Evaluation of local sensitivity was not completed successfully.  Verify whether the PKML model can be successfully run at all points in the specified parameter space.",
-              easyClose = TRUE
-            ))
-            shinyjs::disable("saveLocalSAResults")
-            shinyjs::disable("saveTornadoGGPLOT")
-            shinyjs::disable("saveTornadoPNG")
-            return(FALSE)
-          })
+          results$su <- tryCatch(
+            {
+              runSU(
+                simulation = sim$obj,
+                DDIsimulation = DDIsim$obj,
+                runUncertaintyAnalysis = input$runUncertaintyCheckbox,
+                evaluateForAllParameters = input$runSensitivityAnalysisForAllParameters, #****** IF FALSE, ONLY THE PARAMETERS IN parametersList WILL BE ANALYZED
+                customParameters = parameterList,
+                sensitivityThreshold = input$sensitivityThreshold,
+                variationRange = input$variationRangeNumericInput, #
+                numberOfSensitivityAnalysisSteps = input$numberOfStepsNumericInput,
+                quantiles = eval(parse(text = paste0("c(", input$quantilesTestInput, ")"))),
+                outputs = outputList,
+                saveFolder = NULL,
+                saveResults = FALSE,
+                numberOfUncertaintyAnalysisSamples = input$numberOfUncertaintySamples, #****** FOR THE UNCERTAINTY ANALYSIS ONLY, THESE SAMPLES WILL BE TAKEN FROM LOGUNIFORM +/- 10% BY DEFAULT, UNLESS A DIFFERENT DISTRIBUTION WAS SPECIFIED IN parametersList
+                runParallel = TRUE,
+                updateProgressSensitivity = updateProgressSensitivity,
+                updateProgressUncertainty = updateProgressUncertainty
+              )
+            },
+            error = function(e) {
+              showModal(modalDialog(
+                title = "Error",
+                "Evaluation of local sensitivity was not completed successfully.  Verify whether the PKML model can be successfully run at all points in the specified parameter space.",
+                easyClose = TRUE
+              ))
+              shinyjs::disable("saveLocalSAResults")
+              shinyjs::disable("saveTornadoGGPLOT")
+              shinyjs::disable("saveTornadoPNG")
+              return(FALSE)
+            }
+          )
 
-          if(is.null(results$su$Results)){
+          if (is.null(results$su$Results)) {
             showModal(modalDialog(
               title = "Error",
               "No non-negligible local sensitivities found.",
@@ -659,7 +588,7 @@ runGUI <- function(){
             return()
           }
 
-          if(!isFALSE(results$su$Results)){
+          if (!isFALSE(results$su$Results)) {
             shinyjs::enable("saveLocalSAResults")
             shinyjs::enable("saveTornadoGGPLOT")
             shinyjs::enable("saveTornadoPNG")
@@ -674,12 +603,16 @@ runGUI <- function(){
     observeEvent(
       eventExpr = input$startMorris,
       handlerExpr = {
-        if( isFALSE(verifyParametersSelected()) ) return()
-        if( isFALSE(verifyOutputsSelected()) ) return()
+        if (isFALSE(verifyParametersSelected())) {
+          return()
+        }
+        if (isFALSE(verifyOutputsSelected())) {
+          return()
+        }
 
         numberOfSamplesMorris <- input$numberOfSamplesMorris
 
-        if (!is.integer(numberOfSamplesMorris)){
+        if (!is.integer(numberOfSamplesMorris)) {
           showModal(modalDialog(
             title = "Error",
             HTML("The number of samples must an integer."),
@@ -688,7 +621,7 @@ runGUI <- function(){
           return(NULL)
         }
 
-        if (numberOfSamplesMorris < 1){
+        if (numberOfSamplesMorris < 1) {
           showModal(modalDialog(
             title = "Error",
             HTML("The number of samples must be 1 or greater."),
@@ -697,7 +630,7 @@ runGUI <- function(){
           return(NULL)
         }
 
-        if (numberOfSamplesMorris < 2){
+        if (numberOfSamplesMorris < 2) {
           showModal(modalDialog(
             title = "Warning",
             HTML("Evaluation of Morris sensitivity interaction effect <em>&sigma;</em> requires the number of samples to be 2 or greater."),
@@ -709,11 +642,11 @@ runGUI <- function(){
         outputList <- buildOutputList()
 
         verifiedPaths <- TRUE
-        if(!is.null(DDIsim$obj)){
-          verifiedPaths <- checkPathsInDDISimulation(parameterList = parameterList,outputList = outputList)
+        if (!is.null(DDIsim$obj)) {
+          verifiedPaths <- checkPathsInDDISimulation(parameterList = parameterList, outputList = outputList)
         }
 
-        if(verifiedPaths){
+        if (verifiedPaths) {
           print("Starting Morris sensitivity...")
           progress <- shiny::Progress$new()
           progress$set(message = "Computing Morris sensitivity`", value = 0)
@@ -723,37 +656,37 @@ runGUI <- function(){
             progress$set(value = value, detail = detail)
           }
 
-          results$morris <- tryCatch({
+          results$morris <- tryCatch(
+            {
+              runMorris(
+                simulation = sim$obj,
+                DDIsimulation = DDIsim$obj,
+                parameters = parameterList,
+                outputs = outputList,
+                numberOfSamples = numberOfSamplesMorris,
+                runParallel = TRUE,
+                updateProgress = updateProgress
+              )
+            },
+            error = function(e) {
+              showModal(modalDialog(
+                title = "Error",
+                "Evaluation of Morris sensitivity was not completed successfully.  Verify whether the PKML model can be successfully run at all points in the specified parameter space.",
+                easyClose = TRUE
+              ))
+              shinyjs::disable("saveMorrisResults")
+              shinyjs::disable("saveMorrisGGPLOT")
+              shinyjs::disable("saveMorrisPNG")
+              return(FALSE)
+            }
+          )
 
-            runMorris(simulation = sim$obj,
-                      DDIsimulation = DDIsim$obj,
-                      parameters = parameterList,
-                      outputs = outputList,
-                      numberOfSamples = numberOfSamplesMorris,
-                      runParallel = TRUE,
-                      updateProgress = updateProgress)
-
-          }, error = function(e) {
-
-            showModal(modalDialog(
-              title = "Error",
-              "Evaluation of Morris sensitivity was not completed successfully.  Verify whether the PKML model can be successfully run at all points in the specified parameter space.",
-              easyClose = TRUE
-            ))
-            shinyjs::disable("saveMorrisResults")
-            shinyjs::disable("saveMorrisGGPLOT")
-            shinyjs::disable("saveMorrisPNG")
-            return(FALSE)
-          })
-
-          if(!isFALSE(results$morris$Results)){
+          if (!isFALSE(results$morris$Results)) {
             shinyjs::enable("saveMorrisResults")
             shinyjs::enable("saveMorrisGGPLOT")
             shinyjs::enable("saveMorrisPNG")
           }
-
         }
-
       }
     )
 
@@ -761,9 +694,12 @@ runGUI <- function(){
     observeEvent(
       eventExpr = input$startGSA,
       handlerExpr = {
-
-        if( isFALSE(verifyParametersSelected()) ) return()
-        if( isFALSE(verifyOutputsSelected()) ) return()
+        if (isFALSE(verifyParametersSelected())) {
+          return()
+        }
+        if (isFALSE(verifyOutputsSelected())) {
+          return()
+        }
 
         numberOfSamplesGSA <- input$numberOfSamplesGSA
 
@@ -772,12 +708,11 @@ runGUI <- function(){
         outputList <- buildOutputList()
 
         verifiedPaths <- TRUE
-        if(!is.null(DDIsim$obj)){
-          verifiedPaths <- checkPathsInDDISimulation(parameterList = parameterList,outputList = outputList)
+        if (!is.null(DDIsim$obj)) {
+          verifiedPaths <- checkPathsInDDISimulation(parameterList = parameterList, outputList = outputList)
         }
 
-        if(verifiedPaths){
-
+        if (verifiedPaths) {
           print("Starting GSA...")
 
           progress <- shiny::Progress$new()
@@ -788,36 +723,37 @@ runGUI <- function(){
             progress$set(value = value, detail = detail)
           }
 
-          results$sobol <- tryCatch({
+          results$sobol <- tryCatch(
+            {
+              runSobol(
+                simulation = sim$obj,
+                DDIsimulation = DDIsim$obj,
+                parameters = parameterList,
+                outputs = outputList,
+                numberOfSamples = numberOfSamplesGSA,
+                runParallel = TRUE,
+                updateProgress = updateProgress
+              )
+            },
+            error = function(e) {
+              showModal(modalDialog(
+                title = "Error",
+                "Evaluation of global sensitivity was not completed successfully.  Verify whether the PKML model can be successfully run at all points in the specified parameter space.",
+                easyClose = TRUE
+              ))
+              shinyjs::disable("saveGSAResults")
+              shinyjs::disable("saveGSAGGPLOT")
+              shinyjs::disable("saveGSAPNG")
+              return(FALSE)
+            }
+          )
 
-            runSobol(simulation = sim$obj,
-                     DDIsimulation = DDIsim$obj,
-                     parameters = parameterList,
-                     outputs = outputList,
-                     numberOfSamples = numberOfSamplesGSA,
-                     runParallel = TRUE,
-                     updateProgress =  updateProgress)
-
-          }, error = function(e) {
-
-            showModal(modalDialog(
-              title = "Error",
-              "Evaluation of global sensitivity was not completed successfully.  Verify whether the PKML model can be successfully run at all points in the specified parameter space.",
-              easyClose = TRUE
-            ))
-            shinyjs::disable("saveGSAResults")
-            shinyjs::disable("saveGSAGGPLOT")
-            shinyjs::disable("saveGSAPNG")
-            return(FALSE)
-          })
-
-          if(!isFALSE(results$sobol$Results)){
+          if (!isFALSE(results$sobol$Results)) {
             shinyjs::enable("saveGSAResults")
             shinyjs::enable("saveGSAGGPLOT")
             shinyjs::enable("saveGSAPNG")
           }
         }
-
       }
     )
 
@@ -825,9 +761,12 @@ runGUI <- function(){
     observeEvent(
       eventExpr = input$startEFAST,
       handlerExpr = {
-
-        if( isFALSE(verifyParametersSelected()) ) return()
-        if( isFALSE(verifyOutputsSelected()) ) return()
+        if (isFALSE(verifyParametersSelected())) {
+          return()
+        }
+        if (isFALSE(verifyOutputsSelected())) {
+          return()
+        }
 
 
 
@@ -838,11 +777,11 @@ runGUI <- function(){
         outputList <- buildOutputList()
 
         verifiedPaths <- TRUE
-        if(!is.null(DDIsim$obj)){
-          verifiedPaths <- checkPathsInDDISimulation(parameterList = parameterList,outputList = outputList)
+        if (!is.null(DDIsim$obj)) {
+          verifiedPaths <- checkPathsInDDISimulation(parameterList = parameterList, outputList = outputList)
         }
 
-        if(verifiedPaths){
+        if (verifiedPaths) {
           print("Starting EFAST...")
           progress <- shiny::Progress$new()
           progress$set(message = "Computing EFAST", value = 0)
@@ -852,30 +791,32 @@ runGUI <- function(){
             progress$set(value = value, detail = detail)
           }
 
-          results$efast <- tryCatch({
+          results$efast <- tryCatch(
+            {
+              runEFAST(
+                simulation = sim$obj,
+                DDIsimulation = DDIsim$obj,
+                parameters = parameterList,
+                outputs = outputList,
+                numberOfResamples = numberOfReSamplesEFAST,
+                runParallel = TRUE,
+                updateProgress = updateProgress
+              )
+            },
+            error = function(e) {
+              showModal(modalDialog(
+                title = "Error",
+                "Evaluation of EFAST was not completed successfully.  Verify whether the PKML model can be successfully run at all points in the specified parameter space.",
+                easyClose = TRUE
+              ))
+              shinyjs::disable("saveEFASTResults")
+              shinyjs::disable("saveEFASTGGPLOT")
+              shinyjs::disable("saveEFASTPNG")
+              return(FALSE)
+            }
+          )
 
-            runEFAST(simulation = sim$obj,
-                     DDIsimulation = DDIsim$obj,
-                     parameters = parameterList,
-                     outputs = outputList,
-                     numberOfResamples = numberOfReSamplesEFAST,
-                     runParallel = TRUE,
-                     updateProgress = updateProgress)
-
-          }, error = function(e) {
-
-            showModal(modalDialog(
-              title = "Error",
-              "Evaluation of EFAST was not completed successfully.  Verify whether the PKML model can be successfully run at all points in the specified parameter space.",
-              easyClose = TRUE
-            ))
-            shinyjs::disable("saveEFASTResults")
-            shinyjs::disable("saveEFASTGGPLOT")
-            shinyjs::disable("saveEFASTPNG")
-            return(FALSE)
-          })
-
-          if(!isFALSE(results$efast$Results)){
+          if (!isFALSE(results$efast$Results)) {
             shinyjs::enable("saveEFASTResults")
             shinyjs::enable("saveEFASTGGPLOT")
             shinyjs::enable("saveEFASTPNG")
@@ -887,7 +828,7 @@ runGUI <- function(){
 
 
     observeEvent(input$runUncertaintyCheckbox, {
-      if(input$runUncertaintyCheckbox){
+      if (input$runUncertaintyCheckbox) {
         shinyjs::enable("quantilesTestInput")
         shinyjs::enable("numberOfUncertaintySamples")
       } else {
@@ -902,44 +843,45 @@ runGUI <- function(){
         paste("one-at-a-time-results-", results$dateTime, ".xlsx", sep = "")
       },
       content = function(file) {
-        writexl::write_xlsx(x=results$su,path = file)
+        writexl::write_xlsx(x = results$su, path = file)
       }
     )
 
     #### saveGSAGGPLOT
     output$saveTornadoGGPLOT <- downloadHandler(
       filename = function() {
-        paste("TornadoGGPLOT_", results$dateTime , ".rds", sep = "")
+        paste("TornadoGGPLOT_", results$dateTime, ".rds", sep = "")
       },
       content = function(file) {
         plt <- generateTornadoPlot(sensitivityDataFrame = results$su$Results)
-        saveRDS(object = plt,file = file)
+        saveRDS(object = plt, file = file)
       }
     )
 
     #### saveGSAPNG
     output$saveTornadoPNG <- downloadHandler(
       filename = function() {
-        paste("TornadoPNG_", results$dateTime , ".zip", sep = "")
+        paste("TornadoPNG_", results$dateTime, ".zip", sep = "")
       },
       content = function(file) {
         pltList <- generateTornadoPlot(sensitivityDataFrame = results$su$Results)
         fileNames <- NULL
-        for(op in names(pltList)){
-          for (pk in names(pltList[[op]])){
-            fname <-  paste("TornadoPNG_", results$dateTime , ".png", sep = "")
-            fname <-  paste(op,pk,fname,sep = "_")
-            fname <-  gsub(pattern = "[|]",replacement = "-",x = fname)
-            ggsave(filename = fname,
-                   plot = pltList[[op]][[pk]],height = 7*length(parameterPathsList$paths)/4,width = 7,units = "in",
-                   device = "png")
-            fileNames <- c(fileNames,fname)
+        for (op in names(pltList)) {
+          for (pk in names(pltList[[op]])) {
+            fname <- paste("TornadoPNG_", results$dateTime, ".png", sep = "")
+            fname <- paste(op, pk, fname, sep = "_")
+            fname <- gsub(pattern = "[|]", replacement = "-", x = fname)
+            ggsave(
+              filename = fname,
+              plot = pltList[[op]][[pk]], height = 7 * length(parameterPathsList$paths) / 4, width = 7, units = "in",
+              device = "png"
+            )
+            fileNames <- c(fileNames, fname)
           }
         }
 
         zip(file, files = fileNames)
-        sapply(fileNames,file.remove)
-
+        sapply(fileNames, file.remove)
       }
     )
 
@@ -952,7 +894,7 @@ runGUI <- function(){
         paste("gsaResults_", results$dateTime, ".xlsx", sep = "")
       },
       content = function(file) {
-        writexl::write_xlsx(x=results$sobol,path = file)
+        writexl::write_xlsx(x = results$sobol, path = file)
       }
     )
 
@@ -960,38 +902,39 @@ runGUI <- function(){
     #### saveGSAGGPLOT
     output$saveGSAGGPLOT <- downloadHandler(
       filename = function() {
-        paste("GSAGGPLOT_", results$dateTime , ".rds", sep = "")
+        paste("GSAGGPLOT_", results$dateTime, ".rds", sep = "")
       },
       content = function(file) {
         plt <- generateLowryPlot(gsaResultsDataframe = results$sobol$Results)
-        saveRDS(object = plt,file = file)
+        saveRDS(object = plt, file = file)
       }
     )
 
     #### saveGSAPNG
     output$saveGSAPNG <- downloadHandler(
       filename = function() {
-        paste("GSAPNG_", results$dateTime , ".zip", sep = "")
+        paste("GSAPNG_", results$dateTime, ".zip", sep = "")
       },
       content = function(file) {
         pltList <- generateLowryPlot(gsaResultsDataframe = results$sobol$Results)
 
         fileNames <- NULL
-        for(op in names(pltList)){
-          for (pk in names(pltList[[op]])){
-            fname <-  paste("GSAPNG_", results$dateTime , ".png", sep = "")
-            fname <-  paste(op,pk,fname,sep = "_")
-            fname <-  gsub(pattern = "[|]",replacement = "-",x = fname)
-            ggsave(filename = fname,
-                   plot = pltList[[op]][[pk]],width = 7*length(parameterPathsList$paths)/4,height = 7,units = "in",
-                   device = "png")
-            fileNames <- c(fileNames,fname)
+        for (op in names(pltList)) {
+          for (pk in names(pltList[[op]])) {
+            fname <- paste("GSAPNG_", results$dateTime, ".png", sep = "")
+            fname <- paste(op, pk, fname, sep = "_")
+            fname <- gsub(pattern = "[|]", replacement = "-", x = fname)
+            ggsave(
+              filename = fname,
+              plot = pltList[[op]][[pk]], width = 7 * length(parameterPathsList$paths) / 4, height = 7, units = "in",
+              device = "png"
+            )
+            fileNames <- c(fileNames, fname)
           }
         }
 
         zip(file, files = fileNames)
-        sapply(fileNames,file.remove)
-
+        sapply(fileNames, file.remove)
       }
     )
 
@@ -999,39 +942,39 @@ runGUI <- function(){
     #### saveEFASTGGPLOT
     output$saveEFASTGGPLOT <- downloadHandler(
       filename = function() {
-        paste("EFASTGGPLOT_", results$dateTime , ".rds", sep = "")
+        paste("EFASTGGPLOT_", results$dateTime, ".rds", sep = "")
       },
       content = function(file) {
         plt <- generateLowryPlot(gsaResultsDataframe = results$efast$Results)
-        saveRDS(object = plt,file = file)
+        saveRDS(object = plt, file = file)
       }
     )
 
     #### saveEFASTPNG
     output$saveEFASTPNG <- downloadHandler(
       filename = function() {
-        paste("EFASTPNG_", results$dateTime , ".zip", sep = "")
+        paste("EFASTPNG_", results$dateTime, ".zip", sep = "")
       },
       content = function(file) {
-
         pltList <- generateLowryPlot(gsaResultsDataframe = results$efast$Results)
 
         fileNames <- NULL
-        for(op in names(pltList)){
-          for (pk in names(pltList[[op]])){
-            fname <-  paste("EFASTPNG_", results$dateTime , ".png", sep = "")
-            fname <-  paste(op,pk,fname,sep = "_")
-            fname <-  gsub(pattern = "[|]",replacement = "-",x = fname)
-            ggsave(filename = fname,
-                   plot = pltList[[op]][[pk]],width = 7*length(parameterPathsList$paths)/4,height = 7,units = "in",
-                   device = "png")
-            fileNames <- c(fileNames,fname)
+        for (op in names(pltList)) {
+          for (pk in names(pltList[[op]])) {
+            fname <- paste("EFASTPNG_", results$dateTime, ".png", sep = "")
+            fname <- paste(op, pk, fname, sep = "_")
+            fname <- gsub(pattern = "[|]", replacement = "-", x = fname)
+            ggsave(
+              filename = fname,
+              plot = pltList[[op]][[pk]], width = 7 * length(parameterPathsList$paths) / 4, height = 7, units = "in",
+              device = "png"
+            )
+            fileNames <- c(fileNames, fname)
           }
         }
 
         zip(file, files = fileNames)
-        sapply(fileNames,file.remove)
-
+        sapply(fileNames, file.remove)
       }
     )
 
@@ -1041,7 +984,7 @@ runGUI <- function(){
         paste("efastResults_", results$dateTime, ".xlsx", sep = "")
       },
       content = function(file) {
-        writexl::write_xlsx(x=results$efast,path = file)
+        writexl::write_xlsx(x = results$efast, path = file)
       }
     )
 
@@ -1049,21 +992,23 @@ runGUI <- function(){
     #### getSUCode
     output$getSUCode <- downloadHandler(
       filename = function() {
-        paste("SUCode_", results$dateTime , ".R", sep = "")
+        paste("SUCode_", results$dateTime, ".R", sep = "")
       },
       content = function(file) {
-        script <- writeParametersAndOutputsToFile(parametersList = buildParameterList(),outputsList = buildOutputList())
-        script <- append(x = script , values = writeSUFunctionToFile(input$runUncertaintyCheckbox,
-                                                                     input$runSensitivityAnalysisForAllParameters,
-                                                                     input$sensitivityThreshold,
-                                                                     input$variationRangeNumericInput,
-                                                                     input$numberOfStepsNumericInput,
-                                                                     input$quantilesTestInput,
-                                                                     input$numberOfUncertaintySamples,
-                                                                     input$runParallel))
+        script <- writeParametersAndOutputsToFile(parametersList = buildParameterList(), outputsList = buildOutputList())
+        script <- append(x = script, values = writeSUFunctionToFile(
+          input$runUncertaintyCheckbox,
+          input$runSensitivityAnalysisForAllParameters,
+          input$sensitivityThreshold,
+          input$variationRangeNumericInput,
+          input$numberOfStepsNumericInput,
+          input$quantilesTestInput,
+          input$numberOfUncertaintySamples,
+          input$runParallel
+        ))
 
         con <- file(file, open = "wt", encoding = "UTF-8")
-        writeLines(text =  script ,con = con )
+        writeLines(text = script, con = con)
         close(con)
       }
     )
@@ -1071,14 +1016,14 @@ runGUI <- function(){
     #### getSobolCode
     output$getSobolCode <- downloadHandler(
       filename = function() {
-        paste("SobolCode_", results$dateTime , ".R", sep = "")
+        paste("SobolCode_", results$dateTime, ".R", sep = "")
       },
       content = function(file) {
-        script <- writeParametersAndOutputsToFile(parametersList = buildParameterList(),outputsList = buildOutputList())
-        script <- append(x = script , values = writeSobolSensitivityFunctionToFile(numberOfSamplesGSA = input$numberOfSamplesGSA))
+        script <- writeParametersAndOutputsToFile(parametersList = buildParameterList(), outputsList = buildOutputList())
+        script <- append(x = script, values = writeSobolSensitivityFunctionToFile(numberOfSamplesGSA = input$numberOfSamplesGSA))
 
         con <- file(file, open = "wt", encoding = "UTF-8")
-        writeLines(text =  script ,con = con )
+        writeLines(text = script, con = con)
         close(con)
       }
     )
@@ -1086,14 +1031,14 @@ runGUI <- function(){
     #### getEFASTCode
     output$getEFASTCode <- downloadHandler(
       filename = function() {
-        paste("EFASTCode_", results$dateTime , ".R", sep = "")
+        paste("EFASTCode_", results$dateTime, ".R", sep = "")
       },
       content = function(file) {
-        script <- writeParametersAndOutputsToFile(parametersList = buildParameterList(),outputsList = buildOutputList())
-        script <- append(x = script , values = writeEFASTSensitivityFunctionToFile(numberOfReSamplesEFAST = input$numberOfReSamplesEFAST))
+        script <- writeParametersAndOutputsToFile(parametersList = buildParameterList(), outputsList = buildOutputList())
+        script <- append(x = script, values = writeEFASTSensitivityFunctionToFile(numberOfReSamplesEFAST = input$numberOfReSamplesEFAST))
 
         con <- file(file, open = "wt", encoding = "UTF-8")
-        writeLines(text =  script ,con = con )
+        writeLines(text = script, con = con)
         close(con)
       }
     )
@@ -1101,14 +1046,14 @@ runGUI <- function(){
     #### getMorrisCode
     output$getMorrisCode <- downloadHandler(
       filename = function() {
-        paste("morrisCode_", results$dateTime , ".R", sep = "")
+        paste("morrisCode_", results$dateTime, ".R", sep = "")
       },
       content = function(file) {
-        script <- writeParametersAndOutputsToFile(parametersList = buildParameterList(),outputsList = buildOutputList())
-        script <- append(x = script , values = writeMorrisSensitivityFunctionToFile(numberOfSamples = input$numberOfSamplesMorris))
+        script <- writeParametersAndOutputsToFile(parametersList = buildParameterList(), outputsList = buildOutputList())
+        script <- append(x = script, values = writeMorrisSensitivityFunctionToFile(numberOfSamples = input$numberOfSamplesMorris))
 
         con <- file(file, open = "wt", encoding = "UTF-8")
-        writeLines(text =  script ,con = con )
+        writeLines(text = script, con = con)
         close(con)
       }
     )
@@ -1116,10 +1061,10 @@ runGUI <- function(){
     #### saveMorrisResults
     output$saveMorrisResults <- downloadHandler(
       filename = function() {
-        paste("morrisResults_", results$dateTime , ".xlsx", sep = "")
+        paste("morrisResults_", results$dateTime, ".xlsx", sep = "")
       },
       content = function(file) {
-        writexl::write_xlsx(x=results$morris,path = file)
+        writexl::write_xlsx(x = results$morris, path = file)
       }
     )
 
@@ -1127,45 +1072,44 @@ runGUI <- function(){
     #### saveMorrisGGPLOT
     output$saveMorrisGGPLOT <- downloadHandler(
       filename = function() {
-        paste("morrisGGPLOT_", results$dateTime , ".rds", sep = "")
+        paste("morrisGGPLOT_", results$dateTime, ".rds", sep = "")
       },
       content = function(file) {
         plt <- generateMorrisPlot(morrisResults = results$morris$Results)
-        saveRDS(object = plt,file = file)
+        saveRDS(object = plt, file = file)
       }
     )
 
     #### saveMorrisPNG
     output$saveMorrisPNG <- downloadHandler(
       filename = function() {
-        paste("morrisPNG_", results$dateTime , ".zip", sep = "")
+        paste("morrisPNG_", results$dateTime, ".zip", sep = "")
       },
       content = function(file) {
-
         pltList <- generateMorrisPlot(morrisResults = results$morris$Results)
 
         fileNames <- NULL
-        for(op in names(pltList)){
-          for (pk in names(pltList[[op]])){
-            fname <-  paste("morrisPNG_", results$dateTime , ".png", sep = "")
-            fname <-  paste(op,pk,fname,sep = "_")
-            fname <-  gsub(pattern = "[|]",replacement = "-",x = fname)
-            ggsave(filename = fname,
-                   plot = pltList[[op]][[pk]],
-                   width = 7,
-                   height = 7,
-                   units = "in",
-                   device = "png")
-            fileNames <- c(fileNames,fname)
+        for (op in names(pltList)) {
+          for (pk in names(pltList[[op]])) {
+            fname <- paste("morrisPNG_", results$dateTime, ".png", sep = "")
+            fname <- paste(op, pk, fname, sep = "_")
+            fname <- gsub(pattern = "[|]", replacement = "-", x = fname)
+            ggsave(
+              filename = fname,
+              plot = pltList[[op]][[pk]],
+              width = 7,
+              height = 7,
+              units = "in",
+              device = "png"
+            )
+            fileNames <- c(fileNames, fname)
           }
         }
 
         zip(file, files = fileNames)
-        sapply(fileNames,file.remove)
-
+        sapply(fileNames, file.remove)
       }
     )
-
   }
 
 
@@ -1186,159 +1130,173 @@ tab.removeClass('disabled');
 }
 "
 
-css <- "
+  css <- "
 .nav li a.disabled {
 cursor: not-allowed !important;
 }"
 
-ui <- fluidPage(
-  shinyjs::useShinyjs(),
-  shinyjs::extendShinyjs(text = jscode, functions = c("disableTab","enableTab")),
-  shinyjs::inlineCSS(css),
-  tabsetPanel(
-    id = "mainTabPanel",
-    tabPanel(title = "Start",
-             value = "Start",
-             column(12, align="right",
-                    actionButton(inputId = "loadPKML", label = strong("Next"),style="color: #ffffff; background-color: #41719C;")),
-             hr(),
-             fluidRow(
-               column(
-                 3,
-                 helpText(h4(strong("Simulation file")),style = "color: #888888;"),
-                 fileInput(inputId = "selectPKML", label = NULL, placeholder = "Select file...", accept = ".pkml")
-               )
-             ),
-             fluidRow(
-               column(
-                 3,
-                 helpText(h4(strong("DDI simulation file (optional)")),style = "color: #888888;"),
-                 fileInput(inputId = "DDIselectPKML", label = NULL, placeholder = "Select file...", accept = ".pkml")
-               )
-             )
-    ),
-
-
-    tabPanel(
-      title = "Parameters",
-      value = "Parameters",
-      br(),
-      column(12,
-             align="right",
-             actionButton(inputId = "backToloadPKML", label = strong("Back"), style = "color: #ffffff; background-color: #41719C;"),
-             actionButton(inputId = "goToOutputs", label = strong("Next"), style = "color: #ffffff; background-color: #41719C;")),
-      hr(),
-      fluidRow(
+  ui <- fluidPage(
+    shinyjs::useShinyjs(),
+    shinyjs::extendShinyjs(text = jscode, functions = c("disableTab", "enableTab")),
+    shinyjs::inlineCSS(css),
+    tabsetPanel(
+      id = "mainTabPanel",
+      tabPanel(
+        title = "Start",
+        value = "Start",
+        column(12,
+          align = "right",
+          actionButton(inputId = "loadPKML", label = strong("Next"), style = "color: #ffffff; background-color: #41719C;")
+        ),
+        hr(),
+        fluidRow(
+          column(
+            3,
+            helpText(h4(strong("Simulation file")), style = "color: #888888;"),
+            fileInput(inputId = "selectPKML", label = NULL, placeholder = "Select file...", accept = ".pkml")
+          )
+        ),
+        fluidRow(
+          column(
+            3,
+            helpText(h4(strong("DDI simulation file (optional)")), style = "color: #888888;"),
+            fileInput(inputId = "DDIselectPKML", label = NULL, placeholder = "Select file...", accept = ".pkml")
+          )
+        )
+      ),
+      tabPanel(
+        title = "Parameters",
+        value = "Parameters",
+        br(),
+        column(12,
+          align = "right",
+          actionButton(inputId = "backToloadPKML", label = strong("Back"), style = "color: #ffffff; background-color: #41719C;"),
+          actionButton(inputId = "goToOutputs", label = strong("Next"), style = "color: #ffffff; background-color: #41719C;")
+        ),
+        hr(),
+        fluidRow(
+          column(
+            5,
+            h4(strong("Parameters tree"), style = "color: #888888;"),
+            shinyTree(outputId = "parameterTree", checkbox = TRUE)
+          ),
+          column(
+            7,
+            actionButton(inputId = "getPaths", label = strong("Specify distributions"), style = "color: #ffffff; background-color: #41719C;"),
+            br(),
+            br(),
+            uiOutput("interactionUI")
+          )
+        )
+      ),
+      tabPanel(
+        title = "Outputs",
+        value = "Outputs",
+        br(),
+        column(12,
+          align = "right",
+          actionButton(inputId = "backToParameters", label = strong("Back"), style = "color: #ffffff; background-color: #41719C;"),
+          actionButton(inputId = "goToEvaluation", label = strong("Next"), style = "color: #ffffff; background-color: #41719C;")
+        ),
+        hr(),
         column(
           5,
-          h4(strong("Parameters tree"),style = "color: #888888;"),
-          shinyTree(outputId = "parameterTree", checkbox = TRUE)
+          h4(strong("Outputs tree"), style = "color: #888888;"),
+          shinyTree(outputId = "outputTree", checkbox = TRUE)
         ),
         column(
           7,
-          actionButton(inputId = "getPaths", label = strong("Specify distributions"), style="color: #ffffff; background-color: #41719C;"),
+          actionButton(inputId = "getOutputPaths", label = strong("Specify PK parameters"), style = "color: #ffffff; background-color: #41719C;"),
           br(),
           br(),
-          uiOutput("interactionUI")
+          uiOutput("outputsUI")
         )
-      )
-    ),
-    tabPanel(
-      title = "Outputs",
-      value = "Outputs",
-      br(),
-      column(12, align="right",
-             actionButton(inputId = "backToParameters", label = strong("Back"),style="color: #ffffff; background-color: #41719C;"),
-             actionButton(inputId = "goToEvaluation", label = strong("Next"),style="color: #ffffff; background-color: #41719C;")),
-      hr(),
-      column(
-        5,
-        h4(strong("Outputs tree"),style = "color: #888888;"),
-        shinyTree(outputId = "outputTree", checkbox = TRUE)
       ),
-      column(
-        7,
-        actionButton(inputId = "getOutputPaths", label = strong("Specify PK parameters"), style="color: #ffffff; background-color: #41719C;"),
-        br(),
-        br(),
-        uiOutput("outputsUI")
-      )
-    ),
-    tabPanel(
-      title = "Run sensitivity analyses", value = "Analyses",
-      column(12, align="right",
-             actionButton(inputId = "backToOutputs", label = strong("Back"),style="color: #ffffff; background-color: #41719C")),
-      hr(),
-      verticalLayout(column(
-        12,
-        h3(strong("Local sensitivity analysis"),style = "color: #888888;"),
-        fluidRow(
-          column(width = 2, offset = 0.1,  checkboxInput(inputId = "runSensitivityAnalysisForAllParameters", label = "Run for all constants", value = FALSE)),
-          column(width = 2, offset = 0.1,  numericInput(inputId = "variationRangeNumericInput", label = h5("Variation range"), value = 0.2,min = 0,max = 1,step = 0.1)),
-          column(width = 2, offset = 0.1,  numericInput(inputId = "numberOfStepsNumericInput", label = h5("Number of steps"), value = 2,min = 1,step = 1)),
-          column(width = 2, offset = 0.1,  numericInput(inputId = "sensitivityThreshold", label = h5("Minimum sensitivity threshold"), value = 0.1,min = 0,step = 0.05))
+      tabPanel(
+        title = "Run sensitivity analyses", value = "Analyses",
+        column(12,
+          align = "right",
+          actionButton(inputId = "backToOutputs", label = strong("Back"), style = "color: #ffffff; background-color: #41719C")
         ),
-        fluidRow(
-          column(width = 2, offset = 0.1,   checkboxInput(inputId = "runUncertaintyCheckbox", label = "Run uncertainty analysis", value = FALSE)),
-          column(width = 2, offset = 0.1,   numericInput(inputId = "numberOfUncertaintySamples", label = h5("Number of uncertainty analysis samples"), value = 100)),
-          column(width = 2, offset = 0.1,  textInput("quantilesTestInput", label = h5("Quantiles for uncertainty analysis"), value = "0.05,0.25,0.5,0.75,0.95"))
-        ),
-        fluidRow(
-          column(width = 10, offset = 0.1,
-                 actionButton(inputId = "startLocalSA", label = strong("Run local sensitivity analysis"), style="color: #ffffff; background-color: #41719C;"),
-                 downloadButton(inputId = "getSUCode ", outputId = "getSUCode", label = "Get code"),
-                 downloadButton(inputId = "saveLocalSAResults", outputId = "saveLocalSAResults", label = "Save local sensitivity analysis results"),
-                 downloadButton(inputId = "saveTornadoGGPLOT", outputId = "saveTornadoGGPLOT", label = "ggplot"),
-                 downloadButton(inputId = "saveTornadoPNG", outputId = "saveTornadoPNG", label = "PNG"))
-        ),
-        tags$hr(style="border-color: black;"),
-
-        h3(strong("Global sensitivity analysis"),style = "color: #888888;"),
-        h4(strong("Sobol"),style = "color: #888888;"),
-        fluidRow(
-          column(width = 2,  offset = 0.1,
-                 numericInput(inputId = "numberOfSamplesGSA", label = h5("Number of samples"), value = 10)),
-          column(width = 10,  offset = 0.1,
-                 actionButton(inputId = "startGSA", label = strong("Run Sobol") , style = "margin-top: 40px; color: #ffffff; background-color: #41719C;"),
-                 downloadButton(inputId = "getSobolCode", outputId = "getSobolCode", label = "Get code" , style = "margin-top: 40px;"),
-                 downloadButton(inputId = "saveGSAResults", outputId = "saveGSAResults", label = "Save Sobol results", style = "margin-top: 40px;"),
-                 downloadButton(inputId = "saveGSAGGPLOT", outputId = "saveGSAGGPLOT", label = "ggplot" , style = "margin-top: 40px;"),
-                 downloadButton(inputId = "saveGSAPNG", outputId = "saveGSAPNG", label = "PNG" , style = "margin-top: 40px;"))
-        ),
-        tags$hr(style="border-color: black;"),
-
-        h4(strong("EFAST"),style = "color: #888888;"),
-        fluidRow(
-          column(width = 2,  offset = 0.1,
-                 numericInput(inputId = "numberOfReSamplesEFAST", label = h5("Number of re-sampling runs"), value = 10)),
-          column(width = 10,  offset = 0.1,
-                 actionButton(inputId = "startEFAST", label = strong("Run EFAST") , style = "margin-top: 40px; color: #ffffff; background-color: #41719C;"),
-                 downloadButton(inputId = "getEFASTCode", outputId = "getEFASTCode", label = "Get code" , style = "margin-top: 40px;"),
-                 downloadButton(inputId = "saveEFASTResults", outputId = "saveEFASTResults", label = "Save EFAST results", style = "margin-top: 40px;"),
-                 downloadButton(inputId = "saveEFASTGGPLOT", outputId = "saveEFASTGGPLOT", label = "ggplot" , style = "margin-top: 40px;"),
-                 downloadButton(inputId = "saveEFASTPNG", outputId = "saveEFASTPNG", label = "PNG" , style = "margin-top: 40px;")),
-
-        ),
-        tags$hr(style="border-color: black;"),
-
-
-        h4(strong("Morris sensitivity analysis"),style = "color: #888888;"),
-        fluidRow(
-          column(width = 2,  offset = 0.1,
-                 numericInput(inputId = "numberOfSamplesMorris", label = h5("Number of samples"), value = 10)),
-          column(width = 10,  offset = 0.1,
-                 actionButton(inputId = "startMorris", label = strong("Run Morris sensitivity analysis") , style = "margin-top: 40px; color: #ffffff; background-color: #41719C;"),
-                 downloadButton(inputId = "getMorrisCode", outputId = "getMorrisCode", label = "Get code" , style = "margin-top: 40px;"),
-                 downloadButton(inputId = "saveMorrisResults", outputId = "saveMorrisResults", label = "Save Morris sensitivity analysis results" , style = "margin-top: 40px;"),
-                 downloadButton(inputId = "saveMorrisGGPLOT", outputId = "saveMorrisGGPLOT", label = "ggplot" , style = "margin-top: 40px;"),
-                 downloadButton(inputId = "saveMorrisPNG", outputId = "saveMorrisPNG", label = "PNG" , style = "margin-top: 40px;"))
-        )
-      )
+        hr(),
+        verticalLayout(column(
+          12,
+          h3(strong("Local sensitivity analysis"), style = "color: #888888;"),
+          fluidRow(
+            column(width = 2, offset = 0.1, checkboxInput(inputId = "runSensitivityAnalysisForAllParameters", label = "Run for all constants", value = FALSE)),
+            column(width = 2, offset = 0.1, numericInput(inputId = "variationRangeNumericInput", label = h5("Variation range"), value = 0.2, min = 0, max = 1, step = 0.1)),
+            column(width = 2, offset = 0.1, numericInput(inputId = "numberOfStepsNumericInput", label = h5("Number of steps"), value = 2, min = 1, step = 1)),
+            column(width = 2, offset = 0.1, numericInput(inputId = "sensitivityThreshold", label = h5("Minimum sensitivity threshold"), value = 0.1, min = 0, step = 0.05))
+          ),
+          fluidRow(
+            column(width = 2, offset = 0.1, checkboxInput(inputId = "runUncertaintyCheckbox", label = "Run uncertainty analysis", value = FALSE)),
+            column(width = 2, offset = 0.1, numericInput(inputId = "numberOfUncertaintySamples", label = h5("Number of uncertainty analysis samples"), value = 100)),
+            column(width = 2, offset = 0.1, textInput("quantilesTestInput", label = h5("Quantiles for uncertainty analysis"), value = "0.05,0.25,0.5,0.75,0.95"))
+          ),
+          fluidRow(
+            column(
+              width = 10, offset = 0.1,
+              actionButton(inputId = "startLocalSA", label = strong("Run local sensitivity analysis"), style = "color: #ffffff; background-color: #41719C;"),
+              downloadButton(inputId = "getSUCode ", outputId = "getSUCode", label = "Get code"),
+              downloadButton(inputId = "saveLocalSAResults", outputId = "saveLocalSAResults", label = "Save local sensitivity analysis results"),
+              downloadButton(inputId = "saveTornadoGGPLOT", outputId = "saveTornadoGGPLOT", label = "ggplot"),
+              downloadButton(inputId = "saveTornadoPNG", outputId = "saveTornadoPNG", label = "PNG")
+            )
+          ),
+          tags$hr(style = "border-color: black;"),
+          h3(strong("Global sensitivity analysis"), style = "color: #888888;"),
+          h4(strong("Sobol"), style = "color: #888888;"),
+          fluidRow(
+            column(
+              width = 2, offset = 0.1,
+              numericInput(inputId = "numberOfSamplesGSA", label = h5("Number of samples"), value = 10)
+            ),
+            column(
+              width = 10, offset = 0.1,
+              actionButton(inputId = "startGSA", label = strong("Run Sobol"), style = "margin-top: 40px; color: #ffffff; background-color: #41719C;"),
+              downloadButton(inputId = "getSobolCode", outputId = "getSobolCode", label = "Get code", style = "margin-top: 40px;"),
+              downloadButton(inputId = "saveGSAResults", outputId = "saveGSAResults", label = "Save Sobol results", style = "margin-top: 40px;"),
+              downloadButton(inputId = "saveGSAGGPLOT", outputId = "saveGSAGGPLOT", label = "ggplot", style = "margin-top: 40px;"),
+              downloadButton(inputId = "saveGSAPNG", outputId = "saveGSAPNG", label = "PNG", style = "margin-top: 40px;")
+            )
+          ),
+          tags$hr(style = "border-color: black;"),
+          h4(strong("EFAST"), style = "color: #888888;"),
+          fluidRow(
+            column(
+              width = 2, offset = 0.1,
+              numericInput(inputId = "numberOfReSamplesEFAST", label = h5("Number of re-sampling runs"), value = 10)
+            ),
+            column(
+              width = 10, offset = 0.1,
+              actionButton(inputId = "startEFAST", label = strong("Run EFAST"), style = "margin-top: 40px; color: #ffffff; background-color: #41719C;"),
+              downloadButton(inputId = "getEFASTCode", outputId = "getEFASTCode", label = "Get code", style = "margin-top: 40px;"),
+              downloadButton(inputId = "saveEFASTResults", outputId = "saveEFASTResults", label = "Save EFAST results", style = "margin-top: 40px;"),
+              downloadButton(inputId = "saveEFASTGGPLOT", outputId = "saveEFASTGGPLOT", label = "ggplot", style = "margin-top: 40px;"),
+              downloadButton(inputId = "saveEFASTPNG", outputId = "saveEFASTPNG", label = "PNG", style = "margin-top: 40px;")
+            ),
+          ),
+          tags$hr(style = "border-color: black;"),
+          h4(strong("Morris sensitivity analysis"), style = "color: #888888;"),
+          fluidRow(
+            column(
+              width = 2, offset = 0.1,
+              numericInput(inputId = "numberOfSamplesMorris", label = h5("Number of samples"), value = 10)
+            ),
+            column(
+              width = 10, offset = 0.1,
+              actionButton(inputId = "startMorris", label = strong("Run Morris sensitivity analysis"), style = "margin-top: 40px; color: #ffffff; background-color: #41719C;"),
+              downloadButton(inputId = "getMorrisCode", outputId = "getMorrisCode", label = "Get code", style = "margin-top: 40px;"),
+              downloadButton(inputId = "saveMorrisResults", outputId = "saveMorrisResults", label = "Save Morris sensitivity analysis results", style = "margin-top: 40px;"),
+              downloadButton(inputId = "saveMorrisGGPLOT", outputId = "saveMorrisGGPLOT", label = "ggplot", style = "margin-top: 40px;"),
+              downloadButton(inputId = "saveMorrisPNG", outputId = "saveMorrisPNG", label = "PNG", style = "margin-top: 40px;")
+            )
+          )
+        ))
       )
     )
   )
-)
 
 
-shinyApp(ui, server)
+  shinyApp(ui, server)
 }
