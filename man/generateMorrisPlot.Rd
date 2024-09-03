@@ -4,10 +4,12 @@
 \alias{generateMorrisPlot}
 \title{generateMorrisPlot}
 \usage{
-generateMorrisPlot(morrisResults)
+generateMorrisPlot(morrisResults, logPlot = FALSE)
 }
 \arguments{
 \item{morrisResults}{Morris sensitivity results returned by \code{runMorris} function.}
+
+\item{logPlot}{Logical setting.  The Morris results are plotted on a logarithmic scale if \code{TRUE}.}
 }
 \value{
 A list of ggplots of Morris sensitivity analysis results, one corresponding to each output path/PK parameter combination.
