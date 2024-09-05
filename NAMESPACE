@@ -3,7 +3,6 @@
 export(LogNormalDistribution)
 export(LogUniformDistribution)
 export(NormalDistribution)
-export(SADistribution)
 export(SAOutput)
 export(SAParameter)
 export(UniformDistribution)
