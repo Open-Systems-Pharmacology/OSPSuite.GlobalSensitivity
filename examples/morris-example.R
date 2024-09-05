@@ -26,49 +26,49 @@ parametersList <- list(
                   path = skin$DERMAL_APPLICATION_AREA$skin_compartment$SC_skin_sublayer$SC_total_thickness$path,
                   displayName = "SC_thickness",
                   unit = ospUnits$Length$µm,
-                  parameterDistribution = distribution$Uniform(minimum = 13,maximum = 40)
+                  parameterDistribution = UniformDistribution$new(minimum = 13,maximum = 40)
   ),
   SAParameter$new(simulation = sim,
                   path = skin$DERMAL_APPLICATION_AREA$skin_compartment$`Hydrated SC`$path,
                   displayName = "SC_hydration",
                   unit = ospUnits$Dimensionless$Unitless,
-                  parameterDistribution = distribution$Uniform(minimum = 0,maximum = 1)
+                  parameterDistribution = UniformDistribution$new(minimum = 0,maximum = 1)
   ),
   SAParameter$new(simulation = sim,
                   path = skin$permeant$D_sc$path,
                   displayName = "D_sc",
                   unit = ospUnits$`Diffusion coefficient`$`dm²/min`,
-                  parameterDistribution = distribution$LogUniform(minimum = 1e-12,maximum = 1e-8)
+                  parameterDistribution = LogUniformDistribution$new(minimum = 1e-12,maximum = 1e-8)
   ),
   SAParameter$new(simulation = sim,
                   path = skin$permeant$K_sc$path,
                   displayName = "K_sc",
                   unit = ospUnits$Dimensionless$Unitless,
-                  parameterDistribution = distribution$LogUniform(minimum = 1,maximum = 100)
+                  parameterDistribution = LogUniformDistribution$new(minimum = 1,maximum = 100)
   ),
   SAParameter$new(simulation = sim,
                   path = skin$permeant$D_ed$path,
                   displayName = "D_ed",
                   unit = ospUnits$`Diffusion coefficient`$`dm²/min`,
-                  parameterDistribution = distribution$LogUniform(minimum = 1e-12,maximum = 1e-8)
+                  parameterDistribution = LogUniformDistribution$new(minimum = 1e-12,maximum = 1e-8)
   ),
   SAParameter$new(simulation = sim,
                   path = skin$permeant$K_ed$path,
                   displayName = "K_ed",
                   unit = ospUnits$Dimensionless$Unitless,
-                  parameterDistribution = distribution$LogUniform(minimum = 1,maximum = 100)
+                  parameterDistribution = LogUniformDistribution$new(minimum = 1,maximum = 100)
   ),
   SAParameter$new(simulation = sim,
                   path = skin$permeant$D_de$path,
                   displayName = "D_de",
                   unit = ospUnits$`Diffusion coefficient`$`dm²/min`,
-                  parameterDistribution = distribution$LogUniform(minimum = 1e-12,maximum = 1e-8)
+                  parameterDistribution = LogUniformDistribution$new(minimum = 1e-12,maximum = 1e-8)
   ),
   SAParameter$new(simulation = sim,
                   path = skin$permeant$K_de$path,
                   displayName = "K_de",
                   unit = ospUnits$Dimensionless$Unitless,
-                  parameterDistribution = distribution$LogUniform(minimum = 1,maximum = 100)
+                  parameterDistribution = LogUniformDistribution$new(minimum = 1,maximum = 100)
   )
 )
 

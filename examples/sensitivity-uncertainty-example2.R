@@ -13,12 +13,12 @@ parametersList <- list(
                   path = skin$DERMAL_APPLICATION_AREA$skin_compartment$SC_skin_sublayer$SC_total_thickness$path,
                   displayName = "SC_thickness",
                   unit = ospUnits$Length$µm,
-                  parameterDistribution = distribution$Uniform(minimum = 10,maximum = 40)  #******Maximum SC thickness = 40µm, minimum = 10µm
+                  parameterDistribution = UniformDistribution$new(minimum = 10,maximum = 40)  #******Maximum SC thickness = 40µm, minimum = 10µm
   ),
   SAParameter$new(simulation = sim,
                   path = skin$DERMAL_APPLICATION_AREA$skin_compartment$`Hydrated SC`$path,
                   displayName = "SC_hydration",
-                  parameterDistribution = distribution$Uniform(minimum = 0,maximum = 1) #******  0 = part hydrated, 1 =fully hydrated
+                  parameterDistribution = UniformDistribution$new(minimum = 0,maximum = 1) #******  0 = part hydrated, 1 =fully hydrated
   ),
   SAParameter$new(simulation = sim,
                   path = skin$permeant$D_sc$path,
