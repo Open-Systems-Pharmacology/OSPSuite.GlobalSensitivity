@@ -108,12 +108,12 @@ getLowryPlot <- function(df, outputDisplayName, pk) {
   return(plt)
 }
 
-#' @title pltGSABarGraph
+#' @title generateGSABarGraph
 #' @description Function to generate a bar graph of Sobol or EFAST sensitivity analysis results.
 #' @param df Sobol or EFAST results returned by the `runSobol` or `runFAST` functions, respectively.
 #' @return A list of ggplot bar graph plots, one corresponding to each output path/PK parameter combination.
 #' @export
-pltGSABarGraph <- function(df) {
+generateGSABarGraph <- function(df) {
   parameterOrder <- df[df$Measure == "FirstOrder", ]$Parameter[order(-df$Value[df$Measure == "FirstOrder"])]
   df$Parameter <- factor(df$Parameter, levels = parameterOrder)
   plt <- ggplot(data = df) +
