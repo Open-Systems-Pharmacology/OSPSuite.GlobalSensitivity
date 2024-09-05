@@ -853,7 +853,11 @@ runGUI <- function() {
         paste("TornadoGGPLOT_", results$dateTime, ".rds", sep = "")
       },
       content = function(file) {
-        plt <- generateTornadoPlot(sensitivityDataFrame = results$su$Results)
+        plt <- list()
+        plt$Sensitivity <- generateTornadoPlot(sensitivityDataFrame = results$su$Results)
+        if(input$runUncertaintyCheckbox){
+          plt$Uncertainty <- generateTornadoPlot(sensitivityDataFrame = results$su$Results,generateForUncertaintyAnalysis = TRUE)
+        }
         saveRDS(object = plt, file = file)
       }
     )
@@ -868,7 +872,7 @@ runGUI <- function() {
         fileNames <- NULL
         for (op in names(pltList)) {
           for (pk in names(pltList[[op]])) {
-            fname <- paste("TornadoPNG_", results$dateTime, ".png", sep = "")
+            fname <- paste("Sensitivity-TornadoPNG_", results$dateTime, ".png", sep = "")
             fname <- paste(op, pk, fname, sep = "_")
             fname <- gsub(pattern = "[|]", replacement = "-", x = fname)
             ggsave(
@@ -877,6 +881,23 @@ runGUI <- function() {
               device = "png"
             )
             fileNames <- c(fileNames, fname)
+          }
+        }
+
+        if(input$runUncertaintyCheckbox){
+          pltList <- generateTornadoPlot(sensitivityDataFrame = results$su$Results,generateForUncertaintyAnalysis = TRUE)
+          for (op in names(pltList)) {
+            for (pk in names(pltList[[op]])) {
+              fname <- paste("Uncertainty-TornadoPNG_", results$dateTime, ".png", sep = "")
+              fname <- paste(op, pk, fname, sep = "_")
+              fname <- gsub(pattern = "[|]", replacement = "-", x = fname)
+              ggsave(
+                filename = fname,
+                plot = pltList[[op]][[pk]], height = 7 * length(parameterPathsList$paths) / 4, width = 7, units = "in",
+                device = "png"
+              )
+              fileNames <- c(fileNames, fname)
+            }
           }
         }
 
