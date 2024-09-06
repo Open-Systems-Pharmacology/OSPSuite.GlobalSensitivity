@@ -1151,173 +1151,173 @@ tab.removeClass('disabled');
 }
 "
 
-  css <- "
+css <- "
 .nav li a.disabled {
 cursor: not-allowed !important;
 }"
 
-  ui <- fluidPage(
-    shinyjs::useShinyjs(),
-    shinyjs::extendShinyjs(text = jscode, functions = c("disableTab", "enableTab")),
-    shinyjs::inlineCSS(css),
-    tabsetPanel(
-      id = "mainTabPanel",
-      tabPanel(
-        title = "Start",
-        value = "Start",
-        column(12,
-          align = "right",
-          actionButton(inputId = "loadPKML", label = strong("Next"), style = "color: #ffffff; background-color: #41719C;")
-        ),
-        hr(),
-        fluidRow(
-          column(
-            3,
-            helpText(h4(strong("Simulation file")), style = "color: #888888;"),
-            fileInput(inputId = "selectPKML", label = NULL, placeholder = "Select file...", accept = ".pkml")
-          )
-        ),
-        fluidRow(
-          column(
-            3,
-            helpText(h4(strong("DDI simulation file (optional)")), style = "color: #888888;"),
-            fileInput(inputId = "DDIselectPKML", label = NULL, placeholder = "Select file...", accept = ".pkml")
-          )
+ui <- fluidPage(
+  shinyjs::useShinyjs(),
+  shinyjs::extendShinyjs(text = jscode, functions = c("disableTab", "enableTab")),
+  shinyjs::inlineCSS(css),
+  tabsetPanel(
+    id = "mainTabPanel",
+    tabPanel(
+      title = "Start",
+      value = "Start",
+      column(12,
+             align = "right",
+             actionButton(inputId = "loadPKML", label = strong("Next"), style = "color: #ffffff; background-color: #41719C;")
+      ),
+      hr(),
+      fluidRow(
+        column(
+          3,
+          helpText(h4(strong("Simulation file")), style = "color: #888888;"),
+          fileInput(inputId = "selectPKML", label = NULL, placeholder = "Select file...", accept = ".pkml")
         )
       ),
-      tabPanel(
-        title = "Parameters",
-        value = "Parameters",
-        br(),
-        column(12,
-          align = "right",
-          actionButton(inputId = "backToloadPKML", label = strong("Back"), style = "color: #ffffff; background-color: #41719C;"),
-          actionButton(inputId = "goToOutputs", label = strong("Next"), style = "color: #ffffff; background-color: #41719C;")
-        ),
-        hr(),
-        fluidRow(
-          column(
-            5,
-            h4(strong("Parameters tree"), style = "color: #888888;"),
-            shinyTree(outputId = "parameterTree", checkbox = TRUE)
-          ),
-          column(
-            7,
-            actionButton(inputId = "getPaths", label = strong("Specify distributions"), style = "color: #ffffff; background-color: #41719C;"),
-            br(),
-            br(),
-            uiOutput("interactionUI")
-          )
+      fluidRow(
+        column(
+          3,
+          helpText(h4(strong("DDI simulation file (optional)")), style = "color: #888888;"),
+          fileInput(inputId = "DDIselectPKML", label = NULL, placeholder = "Select file...", accept = ".pkml")
         )
+      )
+    ),
+    tabPanel(
+      title = "Parameters",
+      value = "Parameters",
+      br(),
+      column(12,
+             align = "right",
+             actionButton(inputId = "backToloadPKML", label = strong("Back"), style = "color: #ffffff; background-color: #41719C;"),
+             actionButton(inputId = "goToOutputs", label = strong("Next"), style = "color: #ffffff; background-color: #41719C;")
       ),
-      tabPanel(
-        title = "Outputs",
-        value = "Outputs",
-        br(),
-        column(12,
-          align = "right",
-          actionButton(inputId = "backToParameters", label = strong("Back"), style = "color: #ffffff; background-color: #41719C;"),
-          actionButton(inputId = "goToEvaluation", label = strong("Next"), style = "color: #ffffff; background-color: #41719C;")
-        ),
-        hr(),
+      hr(),
+      fluidRow(
         column(
           5,
-          h4(strong("Outputs tree"), style = "color: #888888;"),
-          shinyTree(outputId = "outputTree", checkbox = TRUE)
+          h4(strong("Parameters tree"), style = "color: #888888;"),
+          shinyTree(outputId = "parameterTree", checkbox = TRUE)
         ),
         column(
           7,
-          actionButton(inputId = "getOutputPaths", label = strong("Specify PK parameters"), style = "color: #ffffff; background-color: #41719C;"),
+          actionButton(inputId = "getPaths", label = strong("Specify distributions"), style = "color: #ffffff; background-color: #41719C;"),
           br(),
           br(),
-          uiOutput("outputsUI")
+          uiOutput("interactionUI")
         )
-      ),
-      tabPanel(
-        title = "Run sensitivity analyses", value = "Analyses",
-        column(12,
-          align = "right",
-          actionButton(inputId = "backToOutputs", label = strong("Back"), style = "color: #ffffff; background-color: #41719C")
-        ),
-        hr(),
-        verticalLayout(column(
-          12,
-          h3(strong("Local sensitivity analysis"), style = "color: #888888;"),
-          fluidRow(
-            column(width = 2, offset = 0.1, checkboxInput(inputId = "runSensitivityAnalysisForAllParameters", label = "Run for all constants", value = FALSE)),
-            column(width = 2, offset = 0.1, numericInput(inputId = "variationRangeNumericInput", label = h5("Variation range"), value = 0.2, min = 0, max = 1, step = 0.1)),
-            column(width = 2, offset = 0.1, numericInput(inputId = "numberOfStepsNumericInput", label = h5("Number of steps"), value = 2, min = 1, step = 1)),
-            column(width = 2, offset = 0.1, numericInput(inputId = "sensitivityThreshold", label = h5("Minimum sensitivity threshold"), value = 0.1, min = 0, step = 0.05))
-          ),
-          fluidRow(
-            column(width = 2, offset = 0.1, checkboxInput(inputId = "runUncertaintyCheckbox", label = "Run uncertainty analysis", value = FALSE)),
-            column(width = 2, offset = 0.1, numericInput(inputId = "numberOfUncertaintySamples", label = h5("Number of uncertainty analysis samples"), value = 100)),
-            column(width = 2, offset = 0.1, textInput("quantilesTestInput", label = h5("Quantiles for uncertainty analysis"), value = "0.05,0.25,0.5,0.75,0.95"))
-          ),
-          fluidRow(
-            column(
-              width = 10, offset = 0.1,
-              actionButton(inputId = "startLocalSA", label = strong("Run local sensitivity analysis"), style = "color: #ffffff; background-color: #41719C;"),
-              downloadButton(inputId = "getSUCode ", outputId = "getSUCode", label = "Get code"),
-              downloadButton(inputId = "saveLocalSAResults", outputId = "saveLocalSAResults", label = "Save local sensitivity analysis results"),
-              downloadButton(inputId = "saveTornadoGGPLOT", outputId = "saveTornadoGGPLOT", label = "ggplot"),
-              downloadButton(inputId = "saveTornadoPNG", outputId = "saveTornadoPNG", label = "PNG")
-            )
-          ),
-          tags$hr(style = "border-color: black;"),
-          h3(strong("Global sensitivity analysis"), style = "color: #888888;"),
-          h4(strong("Sobol"), style = "color: #888888;"),
-          fluidRow(
-            column(
-              width = 2, offset = 0.1,
-              numericInput(inputId = "numberOfSamplesGSA", label = h5("Number of samples"), value = 10)
-            ),
-            column(
-              width = 10, offset = 0.1,
-              actionButton(inputId = "startGSA", label = strong("Run Sobol"), style = "margin-top: 40px; color: #ffffff; background-color: #41719C;"),
-              downloadButton(inputId = "getSobolCode", outputId = "getSobolCode", label = "Get code", style = "margin-top: 40px;"),
-              downloadButton(inputId = "saveGSAResults", outputId = "saveGSAResults", label = "Save Sobol results", style = "margin-top: 40px;"),
-              downloadButton(inputId = "saveGSAGGPLOT", outputId = "saveGSAGGPLOT", label = "ggplot", style = "margin-top: 40px;"),
-              downloadButton(inputId = "saveGSAPNG", outputId = "saveGSAPNG", label = "PNG", style = "margin-top: 40px;")
-            )
-          ),
-          tags$hr(style = "border-color: black;"),
-          h4(strong("EFAST"), style = "color: #888888;"),
-          fluidRow(
-            column(
-              width = 2, offset = 0.1,
-              numericInput(inputId = "numberOfReSamplesEFAST", label = h5("Number of re-sampling runs"), value = 10)
-            ),
-            column(
-              width = 10, offset = 0.1,
-              actionButton(inputId = "startEFAST", label = strong("Run EFAST"), style = "margin-top: 40px; color: #ffffff; background-color: #41719C;"),
-              downloadButton(inputId = "getEFASTCode", outputId = "getEFASTCode", label = "Get code", style = "margin-top: 40px;"),
-              downloadButton(inputId = "saveEFASTResults", outputId = "saveEFASTResults", label = "Save EFAST results", style = "margin-top: 40px;"),
-              downloadButton(inputId = "saveEFASTGGPLOT", outputId = "saveEFASTGGPLOT", label = "ggplot", style = "margin-top: 40px;"),
-              downloadButton(inputId = "saveEFASTPNG", outputId = "saveEFASTPNG", label = "PNG", style = "margin-top: 40px;")
-            ),
-          ),
-          tags$hr(style = "border-color: black;"),
-          h4(strong("Morris sensitivity analysis"), style = "color: #888888;"),
-          fluidRow(
-            column(
-              width = 2, offset = 0.1,
-              numericInput(inputId = "numberOfSamplesMorris", label = h5("Number of samples"), value = 10)
-            ),
-            column(
-              width = 10, offset = 0.1,
-              actionButton(inputId = "startMorris", label = strong("Run Morris sensitivity analysis"), style = "margin-top: 40px; color: #ffffff; background-color: #41719C;"),
-              downloadButton(inputId = "getMorrisCode", outputId = "getMorrisCode", label = "Get code", style = "margin-top: 40px;"),
-              downloadButton(inputId = "saveMorrisResults", outputId = "saveMorrisResults", label = "Save Morris sensitivity analysis results", style = "margin-top: 40px;"),
-              downloadButton(inputId = "saveMorrisGGPLOT", outputId = "saveMorrisGGPLOT", label = "ggplot", style = "margin-top: 40px;"),
-              downloadButton(inputId = "saveMorrisPNG", outputId = "saveMorrisPNG", label = "PNG", style = "margin-top: 40px;")
-            )
-          )
-        ))
       )
+    ),
+    tabPanel(
+      title = "Outputs",
+      value = "Outputs",
+      br(),
+      column(12,
+             align = "right",
+             actionButton(inputId = "backToParameters", label = strong("Back"), style = "color: #ffffff; background-color: #41719C;"),
+             actionButton(inputId = "goToEvaluation", label = strong("Next"), style = "color: #ffffff; background-color: #41719C;")
+      ),
+      hr(),
+      column(
+        5,
+        h4(strong("Outputs tree"), style = "color: #888888;"),
+        shinyTree(outputId = "outputTree", checkbox = TRUE)
+      ),
+      column(
+        7,
+        actionButton(inputId = "getOutputPaths", label = strong("Specify PK parameters"), style = "color: #ffffff; background-color: #41719C;"),
+        br(),
+        br(),
+        uiOutput("outputsUI")
+      )
+    ),
+    tabPanel(
+      title = "Run sensitivity analyses", value = "Analyses",
+      column(12,
+             align = "right",
+             actionButton(inputId = "backToOutputs", label = strong("Back"), style = "color: #ffffff; background-color: #41719C")
+      ),
+      hr(),
+      verticalLayout(column(
+        12,
+        h3(strong("Local sensitivity analysis"), style = "color: #888888;"),
+        fluidRow(
+          column(width = 2, offset = 0.1, checkboxInput(inputId = "runSensitivityAnalysisForAllParameters", label = "Run for all constants", value = FALSE)),
+          column(width = 2, offset = 0.1, numericInput(inputId = "variationRangeNumericInput", label = h5("Variation range"), value = 0.2, min = 0, max = 1, step = 0.1)),
+          column(width = 2, offset = 0.1, numericInput(inputId = "numberOfStepsNumericInput", label = h5("Number of steps"), value = 2, min = 1, step = 1)),
+          column(width = 2, offset = 0.1, numericInput(inputId = "sensitivityThreshold", label = h5("Minimum sensitivity threshold"), value = 0.1, min = 0, step = 0.05))
+        ),
+        fluidRow(
+          column(width = 2, offset = 0.1, checkboxInput(inputId = "runUncertaintyCheckbox", label = "Run uncertainty analysis", value = FALSE)),
+          column(width = 2, offset = 0.1, numericInput(inputId = "numberOfUncertaintySamples", label = h5("Number of uncertainty analysis samples"), value = 100)),
+          column(width = 2, offset = 0.1, textInput("quantilesTestInput", label = h5("Quantiles for uncertainty analysis"), value = "0.05,0.25,0.5,0.75,0.95"))
+        ),
+        fluidRow(
+          column(
+            width = 10, offset = 0.1,
+            actionButton(inputId = "startLocalSA", label = strong("Run local sensitivity analysis"), style = "color: #ffffff; background-color: #41719C;"),
+            downloadButton(inputId = "getSUCode ", outputId = "getSUCode", label = "Get code"),
+            downloadButton(inputId = "saveLocalSAResults", outputId = "saveLocalSAResults", label = "Save local sensitivity analysis results"),
+            downloadButton(inputId = "saveTornadoGGPLOT", outputId = "saveTornadoGGPLOT", label = "ggplot"),
+            downloadButton(inputId = "saveTornadoPNG", outputId = "saveTornadoPNG", label = "PNG")
+          )
+        ),
+        tags$hr(style = "border-color: black;"),
+        h3(strong("Global sensitivity analysis"), style = "color: #888888;"),
+        h4(strong("Sobol"), style = "color: #888888;"),
+        fluidRow(
+          column(
+            width = 2, offset = 0.1,
+            numericInput(inputId = "numberOfSamplesGSA", label = h5("Number of samples"), value = 10)
+          ),
+          column(
+            width = 10, offset = 0.1,
+            actionButton(inputId = "startGSA", label = strong("Run Sobol"), style = "margin-top: 40px; color: #ffffff; background-color: #41719C;"),
+            downloadButton(inputId = "getSobolCode", outputId = "getSobolCode", label = "Get code", style = "margin-top: 40px;"),
+            downloadButton(inputId = "saveGSAResults", outputId = "saveGSAResults", label = "Save Sobol results", style = "margin-top: 40px;"),
+            downloadButton(inputId = "saveGSAGGPLOT", outputId = "saveGSAGGPLOT", label = "ggplot", style = "margin-top: 40px;"),
+            downloadButton(inputId = "saveGSAPNG", outputId = "saveGSAPNG", label = "PNG", style = "margin-top: 40px;")
+          )
+        ),
+        tags$hr(style = "border-color: black;"),
+        h4(strong("EFAST"), style = "color: #888888;"),
+        fluidRow(
+          column(
+            width = 2, offset = 0.1,
+            numericInput(inputId = "numberOfReSamplesEFAST", label = h5("Number of re-sampling runs"), value = 10)
+          ),
+          column(
+            width = 10, offset = 0.1,
+            actionButton(inputId = "startEFAST", label = strong("Run EFAST"), style = "margin-top: 40px; color: #ffffff; background-color: #41719C;"),
+            downloadButton(inputId = "getEFASTCode", outputId = "getEFASTCode", label = "Get code", style = "margin-top: 40px;"),
+            downloadButton(inputId = "saveEFASTResults", outputId = "saveEFASTResults", label = "Save EFAST results", style = "margin-top: 40px;"),
+            downloadButton(inputId = "saveEFASTGGPLOT", outputId = "saveEFASTGGPLOT", label = "ggplot", style = "margin-top: 40px;"),
+            downloadButton(inputId = "saveEFASTPNG", outputId = "saveEFASTPNG", label = "PNG", style = "margin-top: 40px;")
+          ),
+        ),
+        tags$hr(style = "border-color: black;"),
+        h4(strong("Morris sensitivity analysis"), style = "color: #888888;"),
+        fluidRow(
+          column(
+            width = 2, offset = 0.1,
+            numericInput(inputId = "numberOfSamplesMorris", label = h5("Number of samples"), value = 10)
+          ),
+          column(
+            width = 10, offset = 0.1,
+            actionButton(inputId = "startMorris", label = strong("Run Morris sensitivity analysis"), style = "margin-top: 40px; color: #ffffff; background-color: #41719C;"),
+            downloadButton(inputId = "getMorrisCode", outputId = "getMorrisCode", label = "Get code", style = "margin-top: 40px;"),
+            downloadButton(inputId = "saveMorrisResults", outputId = "saveMorrisResults", label = "Save Morris sensitivity analysis results", style = "margin-top: 40px;"),
+            downloadButton(inputId = "saveMorrisGGPLOT", outputId = "saveMorrisGGPLOT", label = "ggplot", style = "margin-top: 40px;"),
+            downloadButton(inputId = "saveMorrisPNG", outputId = "saveMorrisPNG", label = "PNG", style = "margin-top: 40px;")
+          )
+        )
+      ))
     )
   )
+)
 
 
-  shinyApp(ui, server)
+shinyApp(ui, server)
 }
