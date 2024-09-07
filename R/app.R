@@ -926,7 +926,7 @@ runGUI <- function() {
         paste("GSAGGPLOT_", results$dateTime, ".rds", sep = "")
       },
       content = function(file) {
-        plt <- generateLowryPlot(gsaResultsDataframe = results$sobol$Results)
+        plt <- generateGSABarGraph(gsaResultsDataframe = results$sobol$Results)
         saveRDS(object = plt, file = file)
       }
     )
@@ -937,7 +937,7 @@ runGUI <- function() {
         paste("GSAPNG_", results$dateTime, ".zip", sep = "")
       },
       content = function(file) {
-        pltList <- generateLowryPlot(gsaResultsDataframe = results$sobol$Results)
+        pltList <- generateGSABarGraph(gsaResultsDataframe = results$sobol$Results)
 
         fileNames <- NULL
         for (op in names(pltList)) {
@@ -966,7 +966,7 @@ runGUI <- function() {
         paste("EFASTGGPLOT_", results$dateTime, ".rds", sep = "")
       },
       content = function(file) {
-        plt <- generateLowryPlot(gsaResultsDataframe = results$efast$Results)
+        plt <- generateGSABarGraph(gsaResultsDataframe = results$efast$Results)
         saveRDS(object = plt, file = file)
       }
     )
@@ -977,7 +977,7 @@ runGUI <- function() {
         paste("EFASTPNG_", results$dateTime, ".zip", sep = "")
       },
       content = function(file) {
-        pltList <- generateLowryPlot(gsaResultsDataframe = results$efast$Results)
+        pltList <- generateGSABarGraph(gsaResultsDataframe = results$efast$Results)
 
         fileNames <- NULL
         for (op in names(pltList)) {
