@@ -365,7 +365,7 @@ generateMorrisPlot <- function(morrisResults, logPlot = FALSE) {
       df$legendLabel <- sapply( 1:nrow(df) , function(nn){ paste0( df$label[nn] , ": " , df$Parameter[nn] ) } )
       plt <- ggplot2::ggplot(data = df, mapping = aes(x = pltFn(mustar), y = pltFn(stdv), color = label, label = label)) +
         ggplot2::geom_point(size = 2) +
-        ggplot2::labs(x = paste0("\u03bc", "*"), y = "\u03c3", title = "Morris plot", subtitle = paste0("Output ", outputPath, "\nPK: ", pk)) +
+        ggplot2::labs(x = paste0("\u03bc", "*"), y = "\u03c3", title = "Morris sensitivity", subtitle = paste0("Output ", outputPath, "\nPK: ", pk)) +
         ggplot2::scale_color_discrete(name = "Parameter" , labels = df$legendLabel) +
         ggplot2::geom_text(hjust = 0, vjust = 0,size = 6,show.legend = FALSE)
       morrisPlots[[outputPath]][[pk]] <- plt
