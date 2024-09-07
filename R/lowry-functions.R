@@ -10,7 +10,7 @@ generateLowryPlot <- function(gsaResultsDataframe) {
     plotList[[op]] <- list()
     for (pk in unique(gsaResultsDataframe[["PK"]][gsaResultsDataframe[["Output"]] == op])) {
       df <- gsaResultsDataframe[gsaResultsDataframe$Output == op & gsaResultsDataframe$PK == pk, ]
-      outputDisplayName <- unique(df$OutputDisplayName)
+      outputDisplayName <- unique(df$OutputDisplayName)[1]
       plotList[[op]][[pk]] <- getLowryPlot(df, outputDisplayName, pk)
     }
   }
@@ -108,12 +108,37 @@ getLowryPlot <- function(df, outputDisplayName, pk) {
   return(plt)
 }
 
+
+
+
 #' @title generateGSABarGraph
 #' @description Function to generate a bar graph of Sobol or EFAST sensitivity analysis results.
-#' @param df Sobol or EFAST results returned by the `runSobol` or `runFAST` functions, respectively.
+#' @param gsaResultsDataframe Sobol or EFAST results returned by the `runSobol` or `runFAST` functions, respectively.
+#' @return A list of ggplot bar graphs, one corresponding to each output path/PK parameter combination.
+#' @export
+generateGSABarGraph <- function(gsaResultsDataframe) {
+  plotList <- list()
+  for (op in unique(gsaResultsDataframe[["Output"]])) {
+    plotList[[op]] <- list()
+    for (pk in unique(gsaResultsDataframe[["PK"]][gsaResultsDataframe[["Output"]] == op])) {
+      df <- gsaResultsDataframe[gsaResultsDataframe$Output == op & gsaResultsDataframe$PK == pk, ]
+      outputDisplayName <- unique(df$OutputDisplayName)[1]
+      plotList[[op]][[pk]] <- getGSABarGraph(df, outputDisplayName, pk)
+    }
+  }
+  return(plotList)
+}
+
+
+
+#' @title generateBarGraph
+#' @description Function to generate a bar graph of Sobol or EFAST sensitivity analysis results.
+#' @param df Sobol or EFAST results  dataframe.
+#' @param outputDisplayName String. The display name of the output.
+#' @param pk String. The name of the PK parameter
 #' @return A list of ggplot bar graph plots, one corresponding to each output path/PK parameter combination.
 #' @export
-generateGSABarGraph <- function(df) {
+getGSABarGraph <- function(df, outputDisplayName, pk) {
   parameterOrder <- df[df$Measure == "FirstOrder", ]$Parameter[order(-df$Value[df$Measure == "FirstOrder"])]
   df$Parameter <- factor(df$Parameter, levels = parameterOrder)
   plt <- ggplot(data = df) +
@@ -135,5 +160,6 @@ generateGSABarGraph <- function(df) {
   xlabels <- unique(df[, c("Parameter", "ParameterDisplayName")])$ParameterDisplayName
   names(xlabels) <- unique(df[, c("Parameter", "ParameterDisplayName")])$Parameter
   plt <- plt + scale_x_discrete(labels = xlabels)
+  plt <- plt + ggtitle(label = paste("Variance-based global sensitivity"), subtitle = paste0("Output: ", outputDisplayName, "\nPK: ", pk))
   return(plt)
 }
