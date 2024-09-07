@@ -4,13 +4,15 @@
 \alias{generateGSABarGraph}
 \title{generateGSABarGraph}
 \usage{
-generateGSABarGraph(df)
+generateGSABarGraph(gsaResultsDataframe, plottingFunction)
 }
 \arguments{
-\item{df}{Sobol or EFAST results returned by the \code{runSobol} or \code{runFAST} functions, respectively.}
+\item{gsaResultsDataframe}{Sobol or EFAST results returned by the \code{runSobol} or \code{runEFAST} functions, respectively.}
+
+\item{plottingFunction}{The name of the function to use for plotting. Choose either \code{getSobolBarGraph} for Sobol results or \code{getEFASTBarGraph} for EFAST results.}
 }
 \value{
-A list of ggplot bar graph plots, one corresponding to each output path/PK parameter combination.
+A list of ggplot bar graphs, one corresponding to each output path/PK parameter combination.
 }
 \description{
 Function to generate a bar graph of Sobol or EFAST sensitivity analysis results.

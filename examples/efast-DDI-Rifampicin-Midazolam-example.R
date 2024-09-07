@@ -60,7 +60,7 @@ efastResultsDf <- runEFAST(simulation = sim,
                            parameters = parametersList,
                            outputs = outputList,
                            numberOfResamples = numberOfResamples)
-plts <- generateLowryPlot(gsaResultsDataframe = efastResultsDf$Results)
+plts <- generateEFASTBarGraph(gsaResultsDataframe = efastResultsDf$Results)
 
 print(efastResultsDf)
 methods::show(plts)

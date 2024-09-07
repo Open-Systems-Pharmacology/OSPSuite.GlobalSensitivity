@@ -60,7 +60,7 @@ sobolResults <- runSobol(simulation = sim,
                          parameters = parametersList,
                          outputs = outputList,
                          numberOfSamples = numberOfSamples)
-plt <- generateLowryPlot(gsaResultsDataframe = sobolResults$Results)
+plt <- generateSobolBarGraph(gsaResultsDataframe = sobolResults$Results)
 print(sobolResults)
 methods::show(plt)
 saveRDS(object = sobolResults,file = paste0("N",numberOfSamples,"-ext-sobol-DDI-example.rds"))

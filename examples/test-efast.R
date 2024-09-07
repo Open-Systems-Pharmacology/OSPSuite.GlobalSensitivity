@@ -62,4 +62,4 @@ ED$addPKParameter(standardPKParameter = "C_max")
 outputList <- list(SC,ED)
 
 eFASTResults <- runEFAST(simulation = sim, parameters = parametersList , outputs = outputList, numberOfResamples = 2)
-lowryPlot <- generateLowryPlot(gsaResultsDataframe = eFASTResults$Results)
+lowryPlot <- generateEFASTBarGraph(gsaResultsDataframe = eFASTResults$Results)

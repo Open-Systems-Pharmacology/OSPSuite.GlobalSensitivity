@@ -65,7 +65,7 @@ numberOfSamples <- 10
 
 sobolResults <- runSobol(simulation = sim, parameters = parametersList , outputs = outputList , numberOfSamples = numberOfSamples)
 saveRDS(sobolResults,paste0("data/skin-sobol-results-df-",numberOfSamples,"-samples.rds"))
-lowryPlot <- generateLowryPlot(gsaResultsDataframe = sobolResults$Results)
-methods::show(lowryPlot$`DERMAL_APPLICATION_AREA|permeant|Stratum_corneum_observer`$C_max)
-methods::show(lowryPlot$`DERMAL_APPLICATION_AREA|permeant|Stratum_corneum_observer`$AUC_tEnd)
-methods::show(lowryPlot$`DERMAL_APPLICATION_AREA|permeant|Epidermis_observer`$C_max)
+plt <- generateSobolBarGraph(gsaResultsDataframe = sobolResults$Results)
+methods::show(plt$`DERMAL_APPLICATION_AREA|permeant|Stratum_corneum_observer`$C_max)
+methods::show(plt$`DERMAL_APPLICATION_AREA|permeant|Stratum_corneum_observer`$AUC_tEnd)
+methods::show(plt$`DERMAL_APPLICATION_AREA|permeant|Epidermis_observer`$C_max)
