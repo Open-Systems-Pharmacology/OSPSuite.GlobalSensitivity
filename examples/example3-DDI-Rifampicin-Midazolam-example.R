@@ -54,9 +54,7 @@ Y$addPKParameter(standardPKParameter = "C_max")
 Y$addPKParameter(standardPKParameter = "AUC_inf")
 outputList <- list(Y)
 
-numberOfSamples <- 100
-
-#****** RUN THE SENSITIVITY AND UNCERTAINTY ANALYSIS.
+#Run local sensitivity analysis and uncertainty analysis
 su <- runSU(simulation = sim,
             DDIsimulation = DDIsim,
             customParameters = parametersList,
@@ -68,7 +66,35 @@ su <- runSU(simulation = sim,
             sensitivityThreshold = 0,
             #Uncertainty analysis parameters:
             runUncertaintyAnalysis = TRUE,
-            numberOfUncertaintyAnalysisSamples = numberOfSamples,
+            numberOfUncertaintyAnalysisSamples = 100,
             quantiles = c(0.05,0.25,0.5,0.75,0.95))
-
 generateAndSaveSUSummaryDf(suResults = su,savePath = "data/su-DDI-summary-DF.xlsx")
+localSensitivityPlts <- generateTornadoPlot(sensitivityDataFrame = suResults$Results,generateForUncertaintyAnalysis = FALSE)
+uncertaintyPlts <- generateTornadoPlot(sensitivityDataFrame = suResults$Results,generateForUncertaintyAnalysis = TRUE)
+
+
+#Run Morris sensitivity analysis
+morrisResults <- runMorris(simulation = sim,
+                           DDIsimulation = DDIsim,
+                           parameters = parametersList,
+                           outputs = outputList,
+                           numberOfSamples = 100)
+morrisPlts <- generateMorrisPlot(morrisResults$Results)
+
+
+#Run Sobol sensitivity analysis
+sobolResults <- runSobol(simulation = sim,
+                         DDIsimulation = DDIsim,
+                         parameters = parametersList,
+                         outputs = outputList,
+                         numberOfSamples = 1000)
+sobolPlts <- generateSobolBarGraph(gsaResultsDataframe = sobolResults$Results)
+
+
+#Run EFAST sensitivity analysis
+efastResultsDf <- runEFAST(simulation = sim,
+                           DDIsimulation = DDIsim,
+                           parameters = parametersList,
+                           outputs = outputList,
+                           numberOfResamples = 1)
+efastPlts <- generateEFASTBarGraph(gsaResultsDataframe = efastResultsDf$Results)
