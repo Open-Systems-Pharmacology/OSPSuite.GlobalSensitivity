@@ -77,7 +77,7 @@ morrisResults <- runMorris(simulation = sim,
 sobolResults <- runSobol(simulation = sim,
                          parameters = parametersList,
                          outputs = outputList,
-                         numberOfSamples = 100,
+                         numberOfSamples = 2000,
                          saveResults = TRUE, saveFolder = "folder/path",saveFileName = "sobol-UVFilter.xlsx")
 #Specify saveFolder before running script ^^^^^^^^^^^^^^^^
 
