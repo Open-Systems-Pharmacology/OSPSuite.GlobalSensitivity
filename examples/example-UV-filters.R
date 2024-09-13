@@ -77,7 +77,7 @@ morrisResults <- runMorris(simulation = sim,
 sobolResults <- runSobol(simulation = sim,
                          parameters = parametersList,
                          outputs = outputList,
-                         numberOfSamples = 2000,
+                         numberOfSamples = 10000,
                          saveResults = TRUE, saveFolder = "folder/path",saveFileName = "sobol-UVFilter.xlsx")
 #Specify saveFolder before running script ^^^^^^^^^^^^^^^^
 
@@ -85,7 +85,7 @@ sobolResults <- runSobol(simulation = sim,
 efastResults <- runEFAST(simulation = sim,
                          parameters = parametersList,
                          outputs = outputList,
-                         numberOfResamples = 1,
+                         numberOfResamples = 10,
                          saveResults = TRUE, saveFolder = "folder/path",saveFileName = "efast-UVFilter.xlsx")
 #Specify saveFolder before running script ^^^^^^^^^^^^^^^^
 
