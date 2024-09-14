@@ -31,7 +31,7 @@ parametersList <- list(
                   path = "DERMAL_APPLICATION_AREA|vehicle|fraction_vehicle_volume_non_volatile",
                   displayName = "fraction_vehicle_volume_non_volatile",
                   unit = "",
-                  parameterDistribution = UniformDistribution$new(minimum = 0, maximum = 1)
+                  parameterDistribution = UniformDistribution$new(minimum = 0.2, maximum = 0.8)
   ),
   SAParameter$new(simulation = sim,
                   path = "DERMAL_APPLICATION_AREA|vehicle|beta",
