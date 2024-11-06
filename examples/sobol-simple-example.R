@@ -11,25 +11,25 @@ parametersList <- list(
                   path = tree$Comp$X1$path,
                   displayName = "X1",
                   unit = ospUnits$Dimensionless$Unitless,
-                  parameterDistribution = distribution$Uniform(minimum = 0,maximum = 1)
+                  parameterDistribution = UniformDistribution$new(minimum = 0,maximum = 1)
   ),
   SAParameter$new(simulation = sim,
                   path = tree$Comp$X2$path,
                   displayName = "X2",
                   unit = ospUnits$Dimensionless$Unitless,
-                  parameterDistribution = distribution$Uniform(minimum = 0,maximum = 1)
+                  parameterDistribution = UniformDistribution$new(minimum = 0,maximum = 1)
   ),
   SAParameter$new(simulation = sim,
                   path = tree$Comp$X3$path,
                   displayName = "X3",
                   unit = ospUnits$Dimensionless$Unitless,
-                  parameterDistribution = distribution$Uniform(minimum = 0,maximum = 1)
+                  parameterDistribution = UniformDistribution$new(minimum = 0,maximum = 1)
   ),
   SAParameter$new(simulation = sim,
                   path = tree$Comp$X4$path,
                   displayName = "X4",
                   unit = ospUnits$Dimensionless$Unitless,
-                  parameterDistribution = distribution$Uniform(minimum = 0,maximum = 1)
+                  parameterDistribution = UniformDistribution$new(minimum = 0,maximum = 1)
   )
 )
 
@@ -42,4 +42,4 @@ outputList <- list(Y)
 
 numberOfSamples <- 5
 sobolResults <- runSobol(simulation = sim, parameters = parametersList , outputs = outputList , numberOfSamples = numberOfSamples)
-plt <- generateLowryPlot(gsaResultsDataframe = sobolResults$Results)
+plt <- generateSobolBarGraph(gsaResultsDataframe = sobolResults$Results)

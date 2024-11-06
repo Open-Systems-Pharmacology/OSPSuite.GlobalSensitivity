@@ -1,6 +1,5 @@
 #' @title SADistribution
 #' @description R6 class defining a statistical distribution object
-#' @export
 SADistribution <- R6::R6Class(classname = "SADistribution")
 
 #' @title UniformDistribution

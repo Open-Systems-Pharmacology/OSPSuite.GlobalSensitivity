@@ -26,19 +26,19 @@ parametersList <- list(
                   path = skin$DERMAL_APPLICATION_AREA$skin_compartment$SC_skin_sublayer$SC_total_thickness$path,
                   displayName = "SC_thickness",
                   unit = ospUnits$Length$µm,
-                  parameterDistribution = distribution$Uniform(minimum = 13,maximum = 40)
+                  parameterDistribution = UniformDistribution$new(minimum = 13,maximum = 40)
   ),
   SAParameter$new(simulation = sim,
                   path = skin$DERMAL_APPLICATION_AREA$skin_compartment$`Hydrated SC`$path,
                   displayName = "SC_hydration",
                   unit = ospUnits$Dimensionless$Unitless,
-                  parameterDistribution = distribution$Uniform(minimum = 0,maximum = 1)
+                  parameterDistribution = UniformDistribution$new(minimum = 0,maximum = 1)
   ),
   SAParameter$new(simulation = sim,
                   path = skin$permeant$D_sc$path,
                   displayName = "D_sc",
                   unit = ospUnits$`Diffusion coefficient`$`dm²/min`,
-                  parameterDistribution = distribution$LogUniform(minimum = 1e-12,maximum = 1e-8)
+                  parameterDistribution = LogUniformDistribution$new(minimum = 1e-12,maximum = 1e-8)
   )
 )
 
@@ -65,7 +65,7 @@ numberOfSamples <- 10
 
 sobolResults <- runSobol(simulation = sim, parameters = parametersList , outputs = outputList , numberOfSamples = numberOfSamples)
 saveRDS(sobolResults,paste0("data/skin-sobol-results-df-",numberOfSamples,"-samples.rds"))
-lowryPlot <- generateLowryPlot(gsaResultsDataframe = sobolResults$Results)
-methods::show(lowryPlot$`DERMAL_APPLICATION_AREA|permeant|Stratum_corneum_observer`$C_max)
-methods::show(lowryPlot$`DERMAL_APPLICATION_AREA|permeant|Stratum_corneum_observer`$AUC_tEnd)
-methods::show(lowryPlot$`DERMAL_APPLICATION_AREA|permeant|Epidermis_observer`$C_max)
+plt <- generateSobolBarGraph(gsaResultsDataframe = sobolResults$Results)
+methods::show(plt$`DERMAL_APPLICATION_AREA|permeant|Stratum_corneum_observer`$C_max)
+methods::show(plt$`DERMAL_APPLICATION_AREA|permeant|Stratum_corneum_observer`$AUC_tEnd)
+methods::show(plt$`DERMAL_APPLICATION_AREA|permeant|Epidermis_observer`$C_max)

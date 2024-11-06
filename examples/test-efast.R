@@ -25,25 +25,25 @@ parametersList <- list(
                   path = skin$DERMAL_APPLICATION_AREA$skin_compartment$SC_skin_sublayer$SC_total_thickness$path,
                   displayName = "SC_thickness",
                   unit = ospUnits$Length$µm,
-                  parameterDistribution = distribution$Uniform(minimum = 13,maximum = 40)
+                  parameterDistribution = UniformDistribution$new(minimum = 13,maximum = 40)
   ),
   SAParameter$new(simulation = sim,
                   path = skin$DERMAL_APPLICATION_AREA$skin_compartment$`Hydrated SC`$path,
                   displayName = "SC_hydration",
                   unit = ospUnits$Dimensionless$Unitless,
-                  parameterDistribution = distribution$Uniform(minimum = 0,maximum = 1)
+                  parameterDistribution = UniformDistribution$new(minimum = 0,maximum = 1)
   ),
   SAParameter$new(simulation = sim,
                   path = skin$permeant$D_sc$path,
                   displayName = "D_sc",
                   unit = ospUnits$`Diffusion coefficient`$`dm²/min`,
-                  parameterDistribution = distribution$LogUniform(minimum = 1e-12,maximum = 1e-8)
+                  parameterDistribution = LogUniformDistribution$new(minimum = 1e-12,maximum = 1e-8)
   ),
   SAParameter$new(simulation = sim,
                   path = skin$permeant$D_ed$path,
                   displayName = "D_ed",
                   unit = ospUnits$`Diffusion coefficient`$`dm²/min`,
-                  parameterDistribution = distribution$LogUniform(minimum = 1e-9,maximum = 1e-8)
+                  parameterDistribution = LogUniformDistribution$new(minimum = 1e-9,maximum = 1e-8)
   )
 )
 
@@ -62,4 +62,4 @@ ED$addPKParameter(standardPKParameter = "C_max")
 outputList <- list(SC,ED)
 
 eFASTResults <- runEFAST(simulation = sim, parameters = parametersList , outputs = outputList, numberOfResamples = 2)
-lowryPlot <- generateLowryPlot(gsaResultsDataframe = eFASTResults$Results)
+lowryPlot <- generateEFASTBarGraph(gsaResultsDataframe = eFASTResults$Results)

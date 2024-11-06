@@ -346,19 +346,28 @@ runMorris <- function(simulation,
 #' @title generateMorrisPlot
 #' @description Function to generate a plot of Morris sensitivity analysis.
 #' @param morrisResults Morris sensitivity results returned by `runMorris` function.
+#' @param logPlot Logical setting.  The Morris results are plotted on a logarithmic scale if `TRUE`.
 #' @return A list of ggplots of Morris sensitivity analysis results, one corresponding to each output path/PK parameter combination.
 #' @export
-generateMorrisPlot <- function(morrisResults) {
+generateMorrisPlot <- function(morrisResults, logPlot = FALSE) {
+  pltFn <- function(x){x}
+  if(logPlot){
+    pltFn <- log10
+  }
   morrisPlots <- list()
   for (outputPath in unique(morrisResults$Output)) {
     morrisPlots[[outputPath]] <- list()
     for (pk in unique(morrisResults[morrisResults$Output == outputPath, ]$PK)) {
       df <- morrisResults[morrisResults$Output == outputPath & morrisResults$PK == pk, ]
-
-      plt <- ggplot2::ggplot(data = df, mapping = aes(x = mustar, y = stdv, color = Parameter, label = Parameter)) +
-        ggplot2::geom_point() +
-        ggplot2::labs(x = paste0("\u03bc", "*"), y = "\u03c3", title = "Morris plot", subtitle = paste0("Output ", outputPath, "\nPK: ", pk)) +
-        geom_text(hjust = 0, vjust = 0)
+      df <- df[rev(order(df$rankingNorm)),]
+      df$label <- seq_along(df$Parameter)
+      df$label <- as.factor(df$label)
+      df$legendLabel <- sapply( 1:nrow(df) , function(nn){ paste0( df$label[nn] , ": " , df$Parameter[nn] ) } )
+      plt <- ggplot2::ggplot(data = df, mapping = aes(x = pltFn(mustar), y = pltFn(stdv), color = label, label = label)) +
+        ggplot2::geom_point(size = 2) +
+        ggplot2::labs(x = paste0("\u03bc", "*"), y = "\u03c3", title = "Morris sensitivity", subtitle = paste0("Output: ", outputPath, "\nPK: ", pk)) +
+        ggplot2::scale_color_discrete(name = "Parameter" , labels = df$legendLabel) +
+        ggplot2::geom_text(hjust = 0, vjust = 0,size = 6,show.legend = FALSE)
       morrisPlots[[outputPath]][[pk]] <- plt
     }
   }

@@ -1,0 +1,291 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SimulationTransfer id="6TzNGsrdf0GnvfKrdVZLDg" version="16">
+  <Simulation id="ZQaTYJxSR0-TRQtgEjYYeg" name="getting-started-example" icon="Simulation">
+    <BuildConfiguration>
+      <Molecules id="aZ1M6uPaJ0qb9s3SWaptmg" name="Molecules" icon="Molecule" bbVersion="19">
+        <Creation createdAt="5250300549698626661" createdBy="ahamadeh" creationMode="New" origin="MoBi" version="11.2" internalVersion="16" />
+        <Builders>
+          <MoleculeBuilder id="UfaMNPOhEUyd860aTkiMqA" name="A" icon="DRUG" mode="Logical" containerType="Other" isFloating="0" quantityType="Drug" isXenobiotic="1" dim="Amount" defaultStartFormula="IcO02K3ZhUyK9l8vQH11Uw" displayUnit="µmol">
+            <Children>
+              <Parameter id="-F8L2LZGrkSkHtUjZ6m3_Q" name="Concentration" icon="Parameter" persistable="0" isFixedValue="0" dim="Concentration (molar)" quantityType="Parameter" negativeValuesAllowed="1" formula="ISECXU1FkEyCPfoKi8Tfuw" isDefault="0" displayUnit="µmol/l">
+                <Info flag="14" seq="1" ref="0" bb="2" group="143" />
+              </Parameter>
+              <Parameter id="m9ZMr7Mr-EioPsa1ueb0dA" name="X1" icon="Parameter" persistable="0" isFixedValue="0" quantityType="Parameter" negativeValuesAllowed="1" buildMode="Property" isDefault="0" value="1">
+                <Info flag="10" seq="1" ref="0" bb="2" group="143" />
+              </Parameter>
+              <Parameter id="-FNGjfWETEiVsDoiwVgx6A" name="X2" icon="Parameter" persistable="0" isFixedValue="0" quantityType="Parameter" negativeValuesAllowed="1" buildMode="Property" isDefault="0" value="1">
+                <Info flag="10" seq="1" ref="0" bb="2" group="143" />
+              </Parameter>
+              <Parameter id="8aIB6LCryUOvVXKP6RfUGA" name="X3" icon="Parameter" persistable="0" isFixedValue="0" quantityType="Parameter" negativeValuesAllowed="1" buildMode="Property" isDefault="0" value="1">
+                <Info flag="10" seq="1" ref="0" bb="2" group="143" />
+              </Parameter>
+              <Parameter id="Qk9Vqx71yUCnXiHVn2jrJA" name="X4" icon="Parameter" persistable="0" isFixedValue="0" quantityType="Parameter" negativeValuesAllowed="1" buildMode="Property" isDefault="0" value="1">
+                <Info flag="10" seq="1" ref="0" bb="2" group="143" />
+              </Parameter>
+            </Children>
+            <UsedCalculationMethods>
+              <UsedCalculationMethod category="DistributionCellular" calculationMethod="No Calculation Method" />
+              <UsedCalculationMethod category="DiffusionIntCell" calculationMethod="No Calculation Method" />
+              <UsedCalculationMethod category="DistributionInterstitial" calculationMethod="No Calculation Method" />
+              <UsedCalculationMethod category="IntestinalPermeability" calculationMethod="No Calculation Method" />
+            </UsedCalculationMethods>
+          </MoleculeBuilder>
+        </Builders>
+        <FormulaCache>
+          <Formulas>
+            <Formula id="ISECXU1FkEyCPfoKi8Tfuw" name="ConcFormula" dim="Concentration (molar)" formula="V&gt;0 ? M/V : 0">
+              <Paths>
+                <Path path="0" as="1" dim="2" />
+                <Path path="3" as="4" dim="5" />
+              </Paths>
+            </Formula>
+            <ConstantFormula id="IcO02K3ZhUyK9l8vQH11Uw" dim="Amount" value="0" />
+          </Formulas>
+          <StringMap>
+            <Map s=".." id="0" />
+            <Map s="M" id="1" />
+            <Map s="Amount" id="2" />
+            <Map s="..|..|Volume" id="3" />
+            <Map s="V" id="4" />
+            <Map s="Volume" id="5" />
+          </StringMap>
+        </FormulaCache>
+      </Molecules>
+      <Observers id="qQgb1aasOEeHAypl_80s6g" name="Observer" icon="Observer" bbVersion="24">
+        <Creation createdAt="5250300549698636634" createdBy="ahamadeh" creationMode="New" origin="MoBi" version="11.2" internalVersion="16" />
+        <Builders>
+          <ContainerObserverBuilder id="YQaIga4Nxk6SeoBWdmR6nA" name="Y" icon="Observer" formula="_eFqcBwJFUy4rRppGzEQ2w">
+            <ContainerCriteria operator="And">
+              <DescriptorConditions>
+                <MatchTagCondition tag="Organism" />
+              </DescriptorConditions>
+            </ContainerCriteria>
+            <MoleculeList forAll="1" />
+          </ContainerObserverBuilder>
+          <ContainerObserverBuilder id="22Rq4s0tkEuJnmdpteKgRQ" name="Z" icon="Observer" formula="5-DjPTCNUkKuflKeGMJUhA">
+            <ContainerCriteria operator="And">
+              <DescriptorConditions>
+                <MatchTagCondition tag="Organism" />
+              </DescriptorConditions>
+            </ContainerCriteria>
+            <MoleculeList forAll="1" />
+          </ContainerObserverBuilder>
+        </Builders>
+        <FormulaCache>
+          <Formulas>
+            <Formula id="_eFqcBwJFUy4rRppGzEQ2w" name="Y" formula="X1+X2">
+              <Paths>
+                <Path path="0" as="1" />
+                <Path path="2" as="3" />
+              </Paths>
+            </Formula>
+            <Formula id="5-DjPTCNUkKuflKeGMJUhA" name="Z" formula="X1+X2+(X3*X4)">
+              <Paths>
+                <Path path="0" as="1" />
+                <Path path="2" as="3" />
+                <Path path="4" as="5" />
+                <Path path="6" as="7" />
+              </Paths>
+            </Formula>
+          </Formulas>
+          <StringMap>
+            <Map s="A|X1" id="0" />
+            <Map s="X1" id="1" />
+            <Map s="A|X2" id="2" />
+            <Map s="X2" id="3" />
+            <Map s="A|X3" id="4" />
+            <Map s="X3" id="5" />
+            <Map s="A|X4" id="6" />
+            <Map s="X4" id="7" />
+          </StringMap>
+        </FormulaCache>
+      </Observers>
+      <EventGroups id="uI_KrC9S5kmz6aD6UHXGKg" name="Events" icon="EventGroup" bbVersion="0">
+        <Creation createdAt="5250300549698636634" createdBy="ahamadeh" creationMode="New" origin="MoBi" version="11.2" internalVersion="16" />
+      </EventGroups>
+      <PassiveTransports id="92ujmxnK0Uihd3IBI9j0uw" name="Passive Transports" icon="PassiveTransport" bbVersion="0">
+        <Creation createdAt="5250300549698626661" createdBy="ahamadeh" creationMode="New" origin="MoBi" version="11.2" internalVersion="16" />
+      </PassiveTransports>
+      <Reactions id="9Tg47-2u402yC1VpEPT0-A" name="Reaction" icon="Reaction" bbVersion="0">
+        <Creation createdAt="5250300549698626661" createdBy="ahamadeh" creationMode="New" origin="MoBi" version="11.2" internalVersion="16" />
+      </Reactions>
+      <SpatialStructure id="hhc3gEvvdUG7DCoOtkeVNg" name="Organism" icon="SpatialStructure" bbVersion="0">
+        <Creation createdAt="5250300549698626661" createdBy="ahamadeh" creationMode="New" origin="MoBi" version="11.2" internalVersion="16" />
+        <GlobalMoleculeDependentProperties id="7gSXIzJ-SU-OMHmGQJJ6gQ" name="MoleculeProperties" mode="Logical" containerType="Molecule" />
+        <TopContainers>
+          <Container id="dVtca8MV5kSitx3FbmGz4w" name="Organism" icon="ORGANISM" mode="Physical" containerType="Organism">
+            <Children>
+              <Parameter id="bam_Fh4MTUWHrKozUweM9Q" name="Volume" icon="Parameter" persistable="0" isFixedValue="0" dim="Volume" quantityType="Parameter" negativeValuesAllowed="1" isDefault="0" value="1" displayUnit="l">
+                <Info flag="10" seq="1" ref="0" bb="2" group="65" />
+              </Parameter>
+              <Container id="hhxXWfxmME64jMK73FI7aQ" name="MoleculeProperties" icon="OTHER" mode="Logical" containerType="Other" />
+            </Children>
+          </Container>
+        </TopContainers>
+        <NeighborhoodsContainer id="CccTvAS9n0iV-23ibt0SvQ" name="Neighborhoods" mode="Logical" containerType="Other" />
+      </SpatialStructure>
+      <ParameterStartValues id="1FTyevSsI0iX3WQc2K3iaA" name="PSV" icon="ParameterStartValues" bbVersion="0" spatialStructureId="tBaKNNHSZk6Mr22POZgstg" moleculeBuildingBlockId="bfQPTeh2XkCInaJGiNV-xw">
+        <Creation createdAt="5250300549698636634" createdBy="ahamadeh" creationMode="New" origin="MoBi" version="11.2" internalVersion="16" />
+        <Builders>
+          <ParameterStartValue id="RsLiHkiwYEGU5rwl66_hZQ" name="Volume" dimension="Volume" startValue="1" isDefault="0" displayUnit="l">
+            <ContainerPath path="0" />
+          </ParameterStartValue>
+        </Builders>
+        <FormulaCache>
+          <StringMap>
+            <Map s="Organism" id="0" />
+          </StringMap>
+        </FormulaCache>
+      </ParameterStartValues>
+      <MoleculeStartValues id="69whoJ9hGk2xJDGbgq8iHg" name="MSV" icon="MoleculeStartValues" bbVersion="0" spatialStructureId="tBaKNNHSZk6Mr22POZgstg" moleculeBuildingBlockId="bfQPTeh2XkCInaJGiNV-xw">
+        <Creation createdAt="5250300549698636634" createdBy="ahamadeh" creationMode="New" origin="MoBi" version="11.2" internalVersion="16" />
+        <Builders>
+          <MoleculeStartValue id="aEyP7hDbu0eeheCh_nnaZA" name="A" dimension="Amount" startValue="0" scaleDivisor="1" isPresent="1" negativeValuesAllowed="0" displayUnit="µmol">
+            <ContainerPath path="0" />
+          </MoleculeStartValue>
+        </Builders>
+        <FormulaCache>
+          <StringMap>
+            <Map s="Organism" id="0" />
+          </StringMap>
+        </FormulaCache>
+      </MoleculeStartValues>
+      <SimulationSettings id="ffLSWBbv2kCb_1pUK8Oa_g" name="Simulation Settings" icon="SimulationSettings" bbVersion="2" randomSeed="469527140">
+        <Creation createdAt="5250300549698636634" createdBy="ahamadeh" creationMode="New" origin="MoBi" version="11.2" internalVersion="16" />
+        <Solver id="M-4WfFhgX0m7A_YqbR_LlA" name="CVODES" mode="Logical" containerType="Other">
+          <Children>
+            <Parameter id="aU0TssVQykqE0PksGPJHtg" name="Absolute tolerance" icon="Parameter" persistable="0" isFixedValue="0" quantityType="Parameter" negativeValuesAllowed="1" isDefault="1" value="1E-09">
+              <Info flag="8" seq="1" ref="0" bb="2" group="100" />
+            </Parameter>
+            <Parameter id="0JnV9LvOiE2ZmfDeL-i0WA" name="Relative tolerance" icon="Parameter" persistable="0" isFixedValue="0" quantityType="Parameter" negativeValuesAllowed="1" isDefault="1" value="0.0001">
+              <Info flag="8" seq="1" ref="0" bb="2" group="100" />
+            </Parameter>
+            <Parameter id="O99_tuBx00u5l4hIDeRBZQ" name="Use Jacobian" icon="Parameter" persistable="0" isFixedValue="0" quantityType="Parameter" negativeValuesAllowed="1" isDefault="1" value="1">
+              <Info flag="8" seq="1" ref="0" bb="2" group="100" />
+            </Parameter>
+            <Parameter id="nYqhQz5QiUeId9kQEsDsQw" name="H0" icon="Parameter" persistable="0" isFixedValue="0" quantityType="Parameter" negativeValuesAllowed="1" isDefault="1" value="1E-10">
+              <Info flag="8" seq="1" ref="0" bb="2" group="100" />
+            </Parameter>
+            <Parameter id="CmjyIai0lUKQH1NHhz12Tw" name="HMin" icon="Parameter" persistable="0" isFixedValue="0" quantityType="Parameter" negativeValuesAllowed="1" isDefault="1" value="0">
+              <Info flag="8" seq="1" ref="0" bb="2" group="100" />
+            </Parameter>
+            <Parameter id="H7nZaCoCBUii0zBNcxKJ8w" name="HMax" icon="Parameter" persistable="0" isFixedValue="0" quantityType="Parameter" negativeValuesAllowed="1" isDefault="1" value="60">
+              <Info flag="8" seq="1" ref="0" bb="2" group="100" />
+            </Parameter>
+            <Parameter id="6wEpSiAnGkqxzP4i6_-SKw" name="MxStep" icon="Parameter" persistable="0" isFixedValue="0" quantityType="Parameter" negativeValuesAllowed="1" isDefault="1" value="100000">
+              <Info flag="8" seq="1" ref="0" bb="2" group="100" />
+            </Parameter>
+          </Children>
+        </Solver>
+        <OutputSchema id="AOXzDKgi3U-XG-HFnWUs-Q" name="Output schema" mode="Logical" containerType="Other">
+          <Children>
+            <OutputInterval id="sucMgfypIEqYjYzlENy8VA" name="Output interval" mode="Logical" containerType="Other">
+              <Children>
+                <Parameter id="4h3-VJFFFESbS1fk7AGp0g" name="Start time" icon="Parameter" persistable="0" isFixedValue="0" dim="Time" quantityType="Parameter" negativeValuesAllowed="1" isDefault="1" value="0" displayUnit="h">
+                  <Info min="0" flag="24" seq="1" ref="0" bb="2" group="98" />
+                </Parameter>
+                <Parameter id="5RsxoY0mvkqrsMjsv7GYOw" name="End time" icon="Parameter" persistable="0" isFixedValue="0" dim="Time" quantityType="Parameter" negativeValuesAllowed="1" isDefault="1" value="1440" displayUnit="h">
+                  <Info min="0" flag="24" seq="1" ref="0" bb="2" group="98" />
+                </Parameter>
+                <Parameter id="x4TaNOi10UW-codbrd6iaQ" name="Resolution" icon="Parameter" persistable="0" isFixedValue="0" dim="Resolution" quantityType="Parameter" negativeValuesAllowed="1" isDefault="1" value="0.0666666666666667" displayUnit="pts/h">
+                  <Info min="0" flag="8" seq="1" ref="0" bb="2" group="98" />
+                </Parameter>
+              </Children>
+            </OutputInterval>
+          </Children>
+        </OutputSchema>
+        <OutputSelections>
+          <AllOutputs>
+            <QuantitySelection path="Organism|A|Y" quantityType="Drug, Observer" />
+            <QuantitySelection path="Organism|A|Z" quantityType="Drug, Observer" />
+          </AllOutputs>
+        </OutputSelections>
+      </SimulationSettings>
+    </BuildConfiguration>
+    <Model id="IyiOpp_xq06iMvq0CRw5VA" name="getting-started-example" neighborhoods="6AIVeVf2Okmm6L-TZiSXqw">
+      <Root id="hK81we_2f0GCgztzcfz3Vg" name="getting-started-example" mode="Logical" containerType="Simulation">
+        <Tags>
+          <Tag value="RootContainer" />
+        </Tags>
+        <Children>
+          <Container id="EAlcGAnh7E6cZCWQPQ2j4w" name="Organism" icon="ORGANISM" mode="Physical" containerType="Organism">
+            <Children>
+              <Parameter id="HdWz-sREDEWD3_8gCD2Nng" name="Volume" icon="Parameter" persistable="0" isFixedValue="0" dim="Volume" quantityType="Parameter" negativeValuesAllowed="1" isDefault="0" value="1" displayUnit="l">
+                <Info flag="10" seq="1" ref="0" bb="2" group="65" />
+              </Parameter>
+              <MoleculeAmount id="sGPu5RPll0-U6MMRjrD92A" name="A" icon="DRUG" persistable="0" isFixedValue="0" dim="Amount" quantityType="Drug" negativeValuesAllowed="0" mode="Logical" scaleDivisor="1" value="0" displayUnit="µmol">
+                <Children>
+                  <Parameter id="fQRyj6B3Rk6S0h-IfgR3AA" name="Concentration" icon="Parameter" persistable="0" isFixedValue="0" dim="Concentration (molar)" quantityType="Parameter" negativeValuesAllowed="1" formula="BZxA7LmubUajCNZBnDUKRQ" isDefault="0" displayUnit="µmol/l">
+                    <Info flag="14" seq="1" ref="0" bb="2" group="143" />
+                  </Parameter>
+                  <Observer id="S7dzYPq9EUWlFXKytWXshg" name="Y" icon="Observer" persistable="1" isFixedValue="0" quantityType="Drug, Observer" negativeValuesAllowed="1" formula="D-8yAoUzcUuVVwy2pPPFjg" />
+                  <Observer id="HJXF3cje4UO3nEB23UyC0w" name="Z" icon="Observer" persistable="1" isFixedValue="0" quantityType="Drug, Observer" negativeValuesAllowed="1" formula="xWSSgT2XM0KbApfeMzv4LA" />
+                </Children>
+              </MoleculeAmount>
+            </Children>
+          </Container>
+          <Container id="6AIVeVf2Okmm6L-TZiSXqw" name="Neighborhoods" mode="Logical" containerType="Other" />
+          <Container id="9pOT54s__EO-CIjGaekZdg" name="A" icon="DRUG" mode="Logical" containerType="Molecule">
+            <Children>
+              <Parameter id="Kky8-Y7x9UW9CwM77EsS-w" name="X1" icon="Parameter" persistable="0" isFixedValue="0" quantityType="Parameter" negativeValuesAllowed="1" buildMode="Property" isDefault="0" value="1">
+                <Info flag="10" seq="1" ref="0" bb="2" group="143" />
+              </Parameter>
+              <Parameter id="YVEgt79S80OBQBheMImxkQ" name="X2" icon="Parameter" persistable="0" isFixedValue="0" quantityType="Parameter" negativeValuesAllowed="1" buildMode="Property" isDefault="0" value="1">
+                <Info flag="10" seq="1" ref="0" bb="2" group="143" />
+              </Parameter>
+              <Parameter id="GevSpNqygEqlT221Izmr1Q" name="X3" icon="Parameter" persistable="0" isFixedValue="0" quantityType="Parameter" negativeValuesAllowed="1" buildMode="Property" isDefault="0" value="1">
+                <Info flag="10" seq="1" ref="0" bb="2" group="143" />
+              </Parameter>
+              <Parameter id="Z-SQ8-S9xE2TT24yuzG2uw" name="X4" icon="Parameter" persistable="0" isFixedValue="0" quantityType="Parameter" negativeValuesAllowed="1" buildMode="Property" isDefault="0" value="1">
+                <Info flag="10" seq="1" ref="0" bb="2" group="143" />
+              </Parameter>
+            </Children>
+          </Container>
+        </Children>
+      </Root>
+      <FormulaCache>
+        <Formulas>
+          <Formula id="BZxA7LmubUajCNZBnDUKRQ" name="ConcFormula" dim="Concentration (molar)" formula="V&gt;0 ? M/V : 0" origin="dOF1VLwZm0OYa1QkD-sPVg">
+            <Paths>
+              <Path path="0" as="1" dim="2" />
+              <Path path="3" as="4" dim="5" />
+            </Paths>
+          </Formula>
+          <Formula id="D-8yAoUzcUuVVwy2pPPFjg" name="Y" formula="X1+X2" origin="aGxxjoq6Z0OjRX8PvtJrdA">
+            <Paths>
+              <Path path="6" as="7" />
+              <Path path="8" as="9" />
+            </Paths>
+          </Formula>
+          <Formula id="xWSSgT2XM0KbApfeMzv4LA" name="Z" formula="X1+X2+(X3*X4)" origin="Viv8oI8dSUCYEW5LJjc4Hg">
+            <Paths>
+              <Path path="6" as="7" />
+              <Path path="8" as="9" />
+              <Path path="10" as="11" />
+              <Path path="12" as="13" />
+            </Paths>
+          </Formula>
+        </Formulas>
+        <StringMap>
+          <Map s=".." id="0" />
+          <Map s="M" id="1" />
+          <Map s="Amount" id="2" />
+          <Map s="..|..|Volume" id="3" />
+          <Map s="V" id="4" />
+          <Map s="Volume" id="5" />
+          <Map s="getting-started-example|A|X1" id="6" />
+          <Map s="X1" id="7" />
+          <Map s="getting-started-example|A|X2" id="8" />
+          <Map s="X2" id="9" />
+          <Map s="getting-started-example|A|X3" id="10" />
+          <Map s="X3" id="11" />
+          <Map s="getting-started-example|A|X4" id="12" />
+          <Map s="X4" id="13" />
+        </StringMap>
+      </FormulaCache>
+    </Model>
+    <Creation createdAt="5250300549698626661" createdBy="ahamadeh" creationMode="New" origin="MoBi" version="11.2" internalVersion="16" />
+  </Simulation>
+  <Favorites />
+  <OutputMappings />
+</SimulationTransfer>

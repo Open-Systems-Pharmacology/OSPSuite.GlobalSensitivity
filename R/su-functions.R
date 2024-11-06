@@ -61,7 +61,6 @@ getSensitivityClass <- function(sensitivityValue) {
 #' @param simulation The simulation object which contains parameters at paths `parameterPaths`.
 #' @param variationRange The variation range used to define the log-uniform distribution of the parameters in `parameterPaths`.
 #' @return A list of `SAParameter` objects.
-#' @export
 getParameterListForUncertaintyAnalysis <- function(parameterPaths, simulation, variationRange = 0.1) {
   parameters <- list()
 
