@@ -30,9 +30,7 @@ getLowryPlot <- function(df, outputDisplayName, pk) {
   df$ParameterRanks <- sapply(df$Parameter, function(par) {
     which(sortedParameters == par)
   })
-
   df$Measure <- factor(df$Measure, levels = c("Total", "FirstOrder"))
-
   dfFirstOrder <- df[df$Measure == "FirstOrder", ][sortedParameterOrder, ]
   dfTotal <- df[df$Measure == "Total", ][sortedParameterOrder, ]
 
