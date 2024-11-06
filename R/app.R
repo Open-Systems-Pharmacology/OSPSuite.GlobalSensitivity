@@ -900,6 +900,7 @@ runGUI <- function() {
             }
           }
         }
+
         zip(file, files = fileNames)
         sapply(fileNames, file.remove)
       }
@@ -1150,7 +1151,7 @@ tab.removeClass('disabled');
 }
 "
 
-  css <- "
+css <- "
 .nav li a.disabled {
 cursor: not-allowed !important;
 }"
@@ -1205,7 +1206,7 @@ ui <- fluidPage(
           actionButton(inputId = "getPaths", label = strong("Specify distributions"), style = "color: #ffffff; background-color: #41719C;"),
           br(),
           br(),
-          uiOutput("outputsUI")
+          uiOutput("interactionUI")
         )
       )
     ),
@@ -1315,7 +1316,8 @@ ui <- fluidPage(
       ))
     )
   )
+)
 
 
-  shinyApp(ui, server)
+shinyApp(ui, server)
 }
