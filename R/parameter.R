@@ -32,7 +32,7 @@ SAParameter <- R6::R6Class(
 
       self$dimension <- ospParameter$dimension
 
-      self$unit <- unit %||% ospsuite::getBaseUnit(dimension = self$dimension)
+      self$unit <- unit %||% ospsuite::getBaseUnit(self$dimension)
 
       if (self$unit == "Unitless") {
         self$unit <- ""
