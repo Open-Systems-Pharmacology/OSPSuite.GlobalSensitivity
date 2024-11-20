@@ -23,7 +23,7 @@ SAOutput <- R6::R6Class(
 
       self$dimension <- ospQuantity$dimension
 
-      self$unit <- unit %||% ospsuite::getBaseUnit(dimension = self$dimension)
+      self$unit <- unit %||% ospsuite::getBaseUnit(self$dimension)
 
       if (self$unit == "Unitless") {
         self$unit <- ""
