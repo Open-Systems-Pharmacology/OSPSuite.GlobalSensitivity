@@ -238,6 +238,27 @@ runFFT2 <- function(outputs,
   }
   return(fftStructure)
 }
+
+summarizeParameterDisplayNames <- function(parametersList){
+  df <- NULL
+  for (par in parametersList){
+    df <- rbind.data.frame(df,data.frame(path = par$path,
+                                         displayName = par$displayName))
+  }
+  return(df)
+}
+
+summarizeOutputDisplayNames <- function(outputList){
+  df <- NULL
+  for (op in outputList){
+    df <- rbind.data.frame(df,data.frame(path = op$path,
+                                         displayName = op$displayName))
+  }
+  return(df)
+}
+
+
+
 #' @title runEFAST
 #' @description Run the EFAST algorithm.
 #' @param simulation PKML simulation object.
@@ -323,7 +344,7 @@ runEFAST <- function(simulation,
   }
 
   # For each parameter, will have a large freq wi while all other parameter freqs small
-
+  inputOutputDf <- NULL
   stepsSoFar <- 0
   for (parNo in seq_along(parameters)) {
     parameterFrequencies <- generateParameterFrequenciesTotal(parameters = parameters, parameterNumber = parNo)
@@ -341,9 +362,8 @@ runEFAST <- function(simulation,
     for (rsm in seq_len(numberOfResamples)) {
       fU_list <- getEvaluationMatrixStructure(outputs)
       fft_list <- getEvaluationMatrixStructure(outputs)
-      XPerturbed <- perturbHypercube(X)
-      XPerturbed <- mapHypercubeToParameterSpace(parameters = parameters, hypercube = XPerturbed)
-
+      XPerturbedUnitHypercube <- perturbHypercube(X)
+      XPerturbed <- mapHypercubeToParameterSpace(parameters = parameters, hypercube = XPerturbedUnitHypercube)
       # For each block of rows in hypercube dataframe
       for (sampleBlockNumber in seq_along(sampleBlocks)) {
         stepsSoFar <- stepsSoFar + 1
@@ -383,6 +403,18 @@ runEFAST <- function(simulation,
 
         tictoc::toc()
       }
+
+      # If build input output data frame for use in contour plots.
+      for (outPth in names(fU_list)) {
+        for (pk in names(fU_list[[outPth]])) {
+          df <- XPerturbedUnitHypercube
+          df$output <- outPth
+          df$pk <- pk
+          df$outputValues <-  fU_list[[outPth]][[pk]]
+          inputOutputDf <- rbind.data.frame(inputOutputDf,df)
+        }
+      }
+
 
       # If fewer than 50% of simulation runs failed, then interpolate between PK parameter values.  Else run has failed.
       for (outPth in names(fU_list)) {
@@ -431,14 +463,18 @@ runEFAST <- function(simulation,
   aggByNames <- c("Output", "PK", "Parameter", "Measure", "ParameterDisplayName", "OutputDisplayName")
 
   eFASTResultsDf <- aggregate(eFASTResultsDf$Value,
-    by = lapply(aggByNames, function(colnm) {
-      eFASTResultsDf[[colnm]]
-    }),
-    mean
+                              by = lapply(aggByNames, function(colnm) {
+                                eFASTResultsDf[[colnm]]
+                              }),
+                              mean
   )
   names(eFASTResultsDf) <- c(aggByNames, "Value")
   eFASTResultsDf <- eFASTResultsDf[, c("Output", "PK", "Parameter", "Measure", "Value", "ParameterDisplayName", "OutputDisplayName")]
-  eFASTResults <- list(Results = eFASTResultsDf, Settings = buildSettingsCMD(parameters = parameters, outputs = outputs))
+  eFASTResults <- list(Results = eFASTResultsDf,
+                       Settings = buildSettingsCMD(parameters = parameters, outputs = outputs),
+                       InputOutputDf = inputOutputDf,
+                       Parameters = summarizeParameterDisplayNames(parametersList = parameters),
+                       Outputs = summarizeOutputDisplayNames(outputList = outputs))
 
   if (saveResults) {
     dateTime <- paste0(format(Sys.Date(), "%Y%m%d"), "_", format(Sys.time(), "%H%M%S"))

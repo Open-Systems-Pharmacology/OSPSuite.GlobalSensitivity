@@ -21,7 +21,8 @@ Depends:
     SobolSequence,
     writexl,
     stats,
-    tictoc
+    tictoc,
+    akima
 Suggests: 
     knitr,
     rmarkdown,
