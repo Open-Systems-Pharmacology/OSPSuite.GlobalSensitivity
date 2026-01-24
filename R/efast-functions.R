@@ -41,7 +41,7 @@ getSampleRate <- function(parameterFrequencies) {
 #' @description Build a hypercube of points at which the model will be simulated.
 #' @param parameterFrequencies A vector of the frequencies associated with each parameter.
 #' @param samplingRate Maximal rate of sampling that satisfies Nyquist-Shannon with respect to the `parameterFrequencies`.
-#' @return A hypercube of points in [0,2*pi].
+#' @return A hypercube of points in \[0, 2*pi\].
 getSamplingHypercube <- function(parameterFrequencies, samplingRate) {
   # Create vector of sampling points based on sampling frequency, which is much greater than twice the maximum parameter frequency as per Nyquist-Shannon
   samplingPoints <- head(seq(0, 1, 1 / samplingRate), -1)
