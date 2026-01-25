@@ -18,7 +18,7 @@ Depends:
     shinyjs,
     dplyr,
     parallel,
-    SobolSequence,
+    randtoolbox,
     writexl,
     stats,
     tictoc,

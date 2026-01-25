@@ -160,7 +160,7 @@ runSobol <- function(simulation,
     )
   }
 
-  sobolSeq <- sobolSequence.points(dimR = 2 * numberOfParameters, count = numberOfSamples)
+  sobolSeq <- sobol(n = numberOfSamples, dim = 2 * numberOfParameters)
   A <- as.matrix(sobolSeq[, 1:numberOfParameters])
   B <- as.matrix(sobolSeq[, (numberOfParameters + 1):(2 * numberOfParameters)])
 
