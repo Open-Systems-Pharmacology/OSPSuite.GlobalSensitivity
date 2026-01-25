@@ -4,36 +4,53 @@
 \alias{getContourPlot}
 \title{Generate Response Surface Contour Plots for eFAST Results}
 \usage{
-getContourPlot(efastResults)
+getContourPlot(efastResults, jitterSize = 0, gridSize = 40, logScale = TRUE)
 }
 \arguments{
-\item{efastResults}{A list object containing the results of an eFAST sensitivity
+\item{efastResults}{A list object containing the complete results of an eFAST sensitivity
 analysis. Expected structure:
-\itemize{
-\item \code{InputOutputDf}: Data frame with inputs, \code{output}, \code{pk}, and \code{outputValues}.
-\item \code{Parameters}: Metadata including \code{path} and \code{displayName}.
-\item \code{Results}: Sensitivity indices including \code{Measure} and \code{Value}.
-\item \code{Outputs}: Metadata for output variables.
+\describe{
+\item{InputOutputDf}{Data frame containing simulation inputs, output paths, PK parameters, and calculated values.}
+\item{Parameters}{Data frame or list containing parameter metadata, specifically \code{path} and \code{displayName}.}
+\item{Results}{Data frame containing calculated sensitivity indices (\code{Measure}, \code{Value}, \code{ParameterDisplayName}).}
+\item{Outputs}{Data frame or list containing output metadata (\code{path}, \code{displayName}).}
 }}
+
+\item{jitterSize}{A numeric value representing the noise magnitude added during interpolation.
+Passed to \code{\link{getPairwiseGrid}}. Defaults to 0 (though \code{getPairwiseGrid} may apply a default if needed).}
+
+\item{gridSize}{An integer specifying the resolution of the contour grids. Defaults to 40.}
+
+\item{logScale}{Logical. If \code{TRUE} (default), the response variable (Z-axis) is log-transformed (log10)
+before plotting. This is recommended for PK data with large dynamic ranges. If data contains
+zeros or negative values, the function automatically falls back to a linear scale with a warning.}
 }
 \value{
 A nested list of \code{ggplot} objects, structured as:
-\code{plotList[[outputName]][[pkId]]}.
+\code{plotList[[outputName]][[pkParameter]]}.
+Each element is a complete ggplot object ready for printing or saving.
 }
 \description{
-Generates a matrix of contour plots visualizing the pairwise response surface
-of model outputs. The plots are organized by simulation timepoint/ID (\code{pk})
-and output variable.
+Generates a matrix of contour plots visualizing the pairwise response surfaces
+of model outputs based on eFAST sensitivity analysis results.
 }
 \details{
-The function performs the following steps:
+This function creates a visualization tool to identify parameter interactions and
+non-linearities. The process involves:
 \enumerate{
-\item Iterates through every unique Output and PK (time point) in the results.
-\item Interpolates the response surface for every pair of input parameters using
-\code{\link{getPairwiseGrid}}.
-\item Orders the parameters in the grid based on the Total Sensitivity index
-(most sensitive parameters appear first).
-\item Generates a \code{ggplot2} object using \code{geom_contour_filled},
-facetted by the parameter pairs.
+\item Iterating through every unique Output and PK parameter (e.g., "C_max", "AUC") in the results.
+\item For each Output/PK combination, extracting the relevant simulation data.
+\item Calling \code{\link{getPairwiseGrid}} to generate interpolated surfaces for all parameter pairs.
+\item Optionally applying a log-transformation to the response values (Z-axis) to handle wide dynamic ranges common in PK/PD.
+\item Ranking parameters based on their Total Sensitivity index ($S_T$) so that the most
+influential parameters appear in the top-left of the plot matrix.
+\item Constructing a \code{ggplot2} object using \code{geom_contour_filled} and
+\code{facet_grid} to display the full matrix of pairwise interactions.
+}
+
+The resulting plot is a scatterplot matrix where:
+\itemize{
+\item Off-diagonal cells display filled contours of the response surface for two parameters.
+\item Diagonal cells display the names of the parameters.
 }
 }
