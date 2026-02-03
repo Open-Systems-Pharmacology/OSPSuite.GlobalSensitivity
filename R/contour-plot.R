@@ -212,7 +212,7 @@ getContourPlot <- function(efastResults, jitterSize = 0, gridSize = 40, logScale
     })
 
     # C. Ensure Factors are ordered correctly so the diagonal is diagonal
-    totalSensitivityResults <- efastResults$Results[efastResults$Results$Measure == "Total", ]
+    totalSensitivityResults <- efastResults$Results[efastResults$Results$Measure == "Total" & efastResults$Results$Output == currOutput & efastResults$Results$PK == currPk, ]
     parameterTotalSensitivityRankOrder <- totalSensitivityResults$ParameterDisplayName[order(-totalSensitivityResults$Value)]
 
     longGridData$xLab <- factor(longGridData$xLab, levels = parameterTotalSensitivityRankOrder)
