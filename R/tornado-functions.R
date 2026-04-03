@@ -45,6 +45,9 @@ generateTornadoPlot <- function(sensitivityDataFrame, generateForUncertaintyAnal
           stat = "identity", aes(fill = signColumn),
           position = "identity", color = "black"
         ) +
+        scale_fill_manual(
+          values = c("-1" = "#F8766D", "0" = "black", "1" = "#00BFC4")
+        ) +
         coord_flip() +
         labs(
           title = paste("Tornado Diagram for", op, " - ", pk),
