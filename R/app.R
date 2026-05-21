@@ -258,7 +258,7 @@ runGUI <- function() {
           input_string <- distSelection(parameterPathsList$paths[[i]])
           output_string <- distParameterForm(parameterPathsList$paths[[i]])
           parameterDimension <- vals[[distValKey$dimension]]
-          baseUnit <- ospsuite::getBaseUnit(dimension = parameterDimension)
+          baseUnit <- ospsuite::getBaseUnit(parameterDimension)
           availableUnits <- names(ospsuite::ospUnits[[squareTheCircle(parameterDimension)]])
 
           observeEvent(input[[input_string]], {
