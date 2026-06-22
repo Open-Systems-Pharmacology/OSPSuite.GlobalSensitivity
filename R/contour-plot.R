@@ -194,6 +194,7 @@ getContourPlot <- function(efastResults, jitterSize = 0, gridSize = 40, logScale
 
     # B. Handle Log Scaling
     fillLabel <- "Value"
+    actuallyLogScaled <- FALSE
     if(logScale) {
       # Check for non-positive values which break log10
       if(any(longGridData$z <= 0, na.rm = TRUE)) {
@@ -201,6 +202,7 @@ getContourPlot <- function(efastResults, jitterSize = 0, gridSize = 40, logScale
       } else {
         longGridData$z <- log10(longGridData$z)
         fillLabel <- "Log10(Value)"
+        actuallyLogScaled <- TRUE
       }
     }
 
@@ -261,7 +263,7 @@ getContourPlot <- function(efastResults, jitterSize = 0, gridSize = 40, logScale
       facet_grid(yLab ~ xLab, scales = "free") +
 
       labs(
-        title = paste0("Response surface matrix: ",ifelse(test = logScale,yes = "Log10 ",no = ""), currPk),
+        title = paste0("Response surface matrix: ", if (actuallyLogScaled) "Log10 " else "", currPk),
         subtitle = efastResults$Outputs$displayName[efastResults$Outputs$path == currOutput]
       ) +
       theme_minimal() +
