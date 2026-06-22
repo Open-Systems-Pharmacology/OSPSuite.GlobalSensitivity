@@ -161,7 +161,7 @@ getContourPlot <- function(efastResults, jitterSize = 0, gridSize = 40, logScale
 
   paramColDisplayNames <- sapply(paramCols, function(pth){
     efastResults$Parameters$displayName[efastResults$Parameters$path == pth]
-  })
+  }, USE.NAMES = FALSE, simplify = TRUE)
 
   opPkDf <- unique(efastResults$InputOutputDf[, c("output", "pk")])
 
