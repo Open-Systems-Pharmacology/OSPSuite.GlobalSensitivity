@@ -217,7 +217,19 @@ getContourPlot <- function(efastResults, jitterSize = 0, gridSize = 40, logScale
     longGridData$yLab <- vapply(longGridData$yLab, mapDisplayName, FUN.VALUE = character(1), USE.NAMES = FALSE)
     # C. Ensure Factors are ordered correctly so the diagonal is diagonal
     totalSensitivityResults <- efastResults$Results[efastResults$Results$Measure == "Total" & efastResults$Results$Output == currOutput & efastResults$Results$PK == currPk, ]
-    parameterTotalSensitivityRankOrder <- totalSensitivityResults$ParameterDisplayName[order(-totalSensitivityResults$Value)]
+    if (nrow(totalSensitivityResults) > 0) {
+      parameterTotalSensitivityRankOrder <- totalSensitivityResults$ParameterDisplayName[
+        order(-totalSensitivityResults$Value)
+      ]
+    } else {
+      warning("No 'Total' sensitivity results found; using default parameter ordering for contour plot facets.")
+      combinedLabels <- unique(c(as.character(longGridData$xLab), as.character(longGridData$yLab)))
+      parameterTotalSensitivityRankOrder <- combinedLabels[!is.na(combinedLabels)]
+      # If we still have no parameters to order, skip this plot
+      if (length(parameterTotalSensitivityRankOrder) == 0) {
+        next
+      }
+    }
 
     longGridData$xLab <- factor(longGridData$xLab, levels = parameterTotalSensitivityRankOrder)
     longGridData$yLab <- factor(longGridData$yLab, levels = parameterTotalSensitivityRankOrder)
