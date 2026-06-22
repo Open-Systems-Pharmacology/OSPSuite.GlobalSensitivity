@@ -16,8 +16,8 @@ the input parameters (predictors) to be paired.}
 the response variable (Z-axis).}
 
 \item{jitterSize}{A numeric value specifying the magnitude of uniform noise added to
-parameters before interpolation to prevent collinearity errors. A default value is
-calculated inside the function if not specified, though the argument is available for tuning.}
+parameters before interpolation to prevent collinearity errors.
+inside the function if not specified, though the argument is available for tuning.}
 
 \item{gridSize}{An integer specifying the resolution of the interpolation grid
 (e.g., \code{40} results in a 40x40 grid).}
