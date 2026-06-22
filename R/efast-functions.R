@@ -418,18 +418,6 @@ runEFAST <- function(simulation,
         tictoc::toc()
       }
 
-      # If build input output data frame for use in contour plots.
-      for (outPth in names(fU_list)) {
-        for (pk in names(fU_list[[outPth]])) {
-          df <- XPerturbedUnitHypercube
-          df$output <- outPth
-          df$pk <- pk
-          df$outputValues <-  fU_list[[outPth]][[pk]]
-          inputOutputDf <- rbind.data.frame(inputOutputDf,df)
-        }
-      }
-
-
       # If fewer than 50% of simulation runs failed, then interpolate between PK parameter values.  Else run has failed.
       for (outPth in names(fU_list)) {
         for (pk in names(fU_list[[outPth]])) {
@@ -449,6 +437,18 @@ runEFAST <- function(simulation,
           } else {
             warning(paste0("EFAST sensitivity of ", pk, " of ", outPth, " with respect to parameter ", parameters[[parNo]]$path, " failed.  More than 50% of runs for PK parameter did not complete successfully."))
           }
+        }
+      }
+
+
+      # If build input output data frame for use in contour plots.
+      for (outPth in names(fU_list)) {
+        for (pk in names(fU_list[[outPth]])) {
+          df <- XPerturbedUnitHypercube
+          df$output <- outPth
+          df$pk <- pk
+          df$outputValues <-  fU_list[[outPth]][[pk]]
+          inputOutputDf <- rbind.data.frame(inputOutputDf,df)
         }
       }
 
