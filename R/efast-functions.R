@@ -240,20 +240,34 @@ runFFT2 <- function(outputs,
 }
 
 summarizeParameterDisplayNames <- function(parametersList){
-  df <- NULL
-  for (par in parametersList){
-    df <- rbind.data.frame(df,data.frame(path = par$path,
-                                         displayName = par$displayName))
+  if (length(parametersList) == 0L) {
+    return(data.frame(path = character(0),
+                      displayName = character(0),
+                      stringsAsFactors = FALSE))
   }
+  df_list <- lapply(parametersList, function(par) {
+    data.frame(path = par$path,
+               displayName = par$displayName,
+               stringsAsFactors = FALSE)
+  })
+  df <- do.call(rbind, df_list)
+  rownames(df) <- NULL
   return(df)
 }
 
 summarizeOutputDisplayNames <- function(outputList){
-  df <- NULL
-  for (op in outputList){
-    df <- rbind.data.frame(df,data.frame(path = op$path,
-                                         displayName = op$displayName))
+  if (length(outputList) == 0L) {
+    return(data.frame(path = character(0),
+                      displayName = character(0),
+                      stringsAsFactors = FALSE))
   }
+  df_list <- lapply(outputList, function(op) {
+    data.frame(path = op$path,
+               displayName = op$displayName,
+               stringsAsFactors = FALSE)
+  })
+  df <- do.call(rbind, df_list)
+  rownames(df) <- NULL
   return(df)
 }
 
