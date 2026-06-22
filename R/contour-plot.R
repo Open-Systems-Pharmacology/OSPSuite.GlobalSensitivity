@@ -204,13 +204,17 @@ getContourPlot <- function(efastResults, jitterSize = 0, gridSize = 40, logScale
       }
     }
 
-    longGridData$xLab <- sapply(longGridData$xLab, function(pth){
-      efastResults$Parameters$displayName[efastResults$Parameters$path == pth]
-    })
-    longGridData$yLab <- sapply(longGridData$yLab, function(pth){
-      efastResults$Parameters$displayName[efastResults$Parameters$path == pth]
-    })
+    mapDisplayName <- function(pth) {
+      matches <- efastResults$Parameters$displayName[efastResults$Parameters$path == pth]
+      if (length(matches) == 0L) {
+        NA_character_
+      } else {
+        matches[1L]
+      }
+    }
 
+    longGridData$xLab <- vapply(longGridData$xLab, mapDisplayName, FUN.VALUE = character(1), USE.NAMES = FALSE)
+    longGridData$yLab <- vapply(longGridData$yLab, mapDisplayName, FUN.VALUE = character(1), USE.NAMES = FALSE)
     # C. Ensure Factors are ordered correctly so the diagonal is diagonal
     totalSensitivityResults <- efastResults$Results[efastResults$Results$Measure == "Total" & efastResults$Results$Output == currOutput & efastResults$Results$PK == currPk, ]
     parameterTotalSensitivityRankOrder <- totalSensitivityResults$ParameterDisplayName[order(-totalSensitivityResults$Value)]
