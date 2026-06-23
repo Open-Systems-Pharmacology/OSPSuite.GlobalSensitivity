@@ -41,7 +41,7 @@ getSampleRate <- function(parameterFrequencies) {
 #' @description Build a hypercube of points at which the model will be simulated.
 #' @param parameterFrequencies A vector of the frequencies associated with each parameter.
 #' @param samplingRate Maximal rate of sampling that satisfies Nyquist-Shannon with respect to the `parameterFrequencies`.
-#' @return A hypercube of points in [0,2*pi].
+#' @return A hypercube of points in \[0, 2*pi\].
 getSamplingHypercube <- function(parameterFrequencies, samplingRate) {
   # Create vector of sampling points based on sampling frequency, which is much greater than twice the maximum parameter frequency as per Nyquist-Shannon
   samplingPoints <- head(seq(0, 1, 1 / samplingRate), -1)
@@ -238,6 +238,41 @@ runFFT2 <- function(outputs,
   }
   return(fftStructure)
 }
+
+summarizeParameterDisplayNames <- function(parametersList){
+  if (length(parametersList) == 0L) {
+    return(data.frame(path = character(0),
+                      displayName = character(0),
+                      stringsAsFactors = FALSE))
+  }
+  df_list <- lapply(parametersList, function(par) {
+    data.frame(path = par$path,
+               displayName = par$displayName,
+               stringsAsFactors = FALSE)
+  })
+  df <- do.call(rbind, df_list)
+  rownames(df) <- NULL
+  return(df)
+}
+
+summarizeOutputDisplayNames <- function(outputList){
+  if (length(outputList) == 0L) {
+    return(data.frame(path = character(0),
+                      displayName = character(0),
+                      stringsAsFactors = FALSE))
+  }
+  df_list <- lapply(outputList, function(op) {
+    data.frame(path = op$path,
+               displayName = op$displayName,
+               stringsAsFactors = FALSE)
+  })
+  df <- do.call(rbind, df_list)
+  rownames(df) <- NULL
+  return(df)
+}
+
+
+
 #' @title runEFAST
 #' @description Run the EFAST algorithm.
 #' @param simulation PKML simulation object.
@@ -323,7 +358,7 @@ runEFAST <- function(simulation,
   }
 
   # For each parameter, will have a large freq wi while all other parameter freqs small
-
+  inputOutputDf <- NULL
   stepsSoFar <- 0
   for (parNo in seq_along(parameters)) {
     parameterFrequencies <- generateParameterFrequenciesTotal(parameters = parameters, parameterNumber = parNo)
@@ -341,9 +376,8 @@ runEFAST <- function(simulation,
     for (rsm in seq_len(numberOfResamples)) {
       fU_list <- getEvaluationMatrixStructure(outputs)
       fft_list <- getEvaluationMatrixStructure(outputs)
-      XPerturbed <- perturbHypercube(X)
-      XPerturbed <- mapHypercubeToParameterSpace(parameters = parameters, hypercube = XPerturbed)
-
+      XPerturbedUnitHypercube <- perturbHypercube(X)
+      XPerturbed <- mapHypercubeToParameterSpace(parameters = parameters, hypercube = XPerturbedUnitHypercube)
       # For each block of rows in hypercube dataframe
       for (sampleBlockNumber in seq_along(sampleBlocks)) {
         stepsSoFar <- stepsSoFar + 1
@@ -406,6 +440,18 @@ runEFAST <- function(simulation,
         }
       }
 
+
+      # If build input output data frame for use in contour plots.
+      for (outPth in names(fU_list)) {
+        for (pk in names(fU_list[[outPth]])) {
+          df <- XPerturbedUnitHypercube
+          df$output <- outPth
+          df$pk <- pk
+          df$outputValues <-  fU_list[[outPth]][[pk]]
+          inputOutputDf <- rbind.data.frame(inputOutputDf,df)
+        }
+      }
+
       # For current resample, run fast Fourier transform on each output and PK parameter and extract absolute value of Fourier coefficients corresponding to each parameter
       fftEvaluationsList <- runFFT2(
         outputs = outputs,
@@ -431,14 +477,18 @@ runEFAST <- function(simulation,
   aggByNames <- c("Output", "PK", "Parameter", "Measure", "ParameterDisplayName", "OutputDisplayName")
 
   eFASTResultsDf <- aggregate(eFASTResultsDf$Value,
-    by = lapply(aggByNames, function(colnm) {
-      eFASTResultsDf[[colnm]]
-    }),
-    mean
+                              by = lapply(aggByNames, function(colnm) {
+                                eFASTResultsDf[[colnm]]
+                              }),
+                              mean
   )
   names(eFASTResultsDf) <- c(aggByNames, "Value")
   eFASTResultsDf <- eFASTResultsDf[, c("Output", "PK", "Parameter", "Measure", "Value", "ParameterDisplayName", "OutputDisplayName")]
-  eFASTResults <- list(Results = eFASTResultsDf, Settings = buildSettingsCMD(parameters = parameters, outputs = outputs))
+  eFASTResults <- list(Results = eFASTResultsDf,
+                       Settings = buildSettingsCMD(parameters = parameters, outputs = outputs),
+                       InputOutputDf = inputOutputDf,
+                       Parameters = summarizeParameterDisplayNames(parametersList = parameters),
+                       Outputs = summarizeOutputDisplayNames(outputList = outputs))
 
   if (saveResults) {
     dateTime <- paste0(format(Sys.Date(), "%Y%m%d"), "_", format(Sys.time(), "%H%M%S"))

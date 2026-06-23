@@ -12,7 +12,7 @@ getSamplingHypercube(parameterFrequencies, samplingRate)
 \item{samplingRate}{Maximal rate of sampling that satisfies Nyquist-Shannon with respect to the \code{parameterFrequencies}.}
 }
 \value{
-A hypercube of points in \link{0,2*pi}.
+A hypercube of points in [0, 2*pi].
 }
 \description{
 Build a hypercube of points at which the model will be simulated.
