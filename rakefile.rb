@@ -12,7 +12,7 @@ def sanitized_version(version)
 end
 
 def update_package_version(version) 
-  #Replace token Version: x.y.z with the version from appveyor
+  #Replace token Version: x.y.z with the version from CI
   replacement = {
     /Version: \d\.\d\.\d/ => "Version: #{version}"
   }

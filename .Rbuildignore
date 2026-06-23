@@ -2,7 +2,6 @@
 ^\.Rproj\.user$
 ^doc$
 ^Meta$
-^appveyor\.yml$
 ^README\.md$
 ^tools
 ^\.covrignore$
