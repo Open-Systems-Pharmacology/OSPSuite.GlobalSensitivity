@@ -18,9 +18,11 @@ Depends:
     shinyjs,
     dplyr,
     parallel,
+    randtoolbox,
     writexl,
     stats,
-    tictoc
+    tictoc,
+    interp
 Suggests: 
     knitr,
     rmarkdown,
