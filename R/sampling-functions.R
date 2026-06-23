@@ -40,7 +40,7 @@ getLogNormalSampleVector <- function(quantileVec, mean, CV) {
   sigmaSquared <- log((CV^2) + 1)
   mu <- log(mean) - (sigmaSquared / 2)
   sigma <- sqrt(sigmaSquared)
-  logSpaceQuantileVec <- getNormalSampleVector(quantileVec, mean = mu, stdv = sigma, truncate = FALSE)
+  logSpaceQuantileVec <- getNormalSampleVector(quantileVec, mean = mu, stdv = sigma, truncate = TRUE)
   return(exp(logSpaceQuantileVec))
 }
 
