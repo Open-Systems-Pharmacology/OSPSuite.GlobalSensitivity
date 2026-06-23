@@ -3,7 +3,7 @@
 <!-- badges: start -->
 
   [![Main-Workflow](https://github.com/Open-Systems-Pharmacology/OSPSuite.GlobalSensitivity/actions/workflows/main-workflow.yaml/badge.svg)](https://github.com/Open-Systems-Pharmacology/OSPSuite.GlobalSensitivity/actions/workflows/main-workflow.yaml)
-  [![codecov](https://codecov.io/gh/Open-Systems-Pharmacology/OSPSuite.GlobalSensitivity/branch/develop/graph/badge.svg)](https://codecov.io/gh/Open-Systems-Pharmacology/OSPSuite.GlobalSensitivity)
+  [![codecov](https://codecov.io/gh/Open-Systems-Pharmacology/OSPSuite.GlobalSensitivity/branch/main/graph/badge.svg)](https://codecov.io/gh/Open-Systems-Pharmacology/OSPSuite.GlobalSensitivity)
 
 
 <!-- badges: end -->
