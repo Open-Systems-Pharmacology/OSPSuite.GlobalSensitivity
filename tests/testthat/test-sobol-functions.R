@@ -7,6 +7,12 @@ test_that("getSobolSampleMatrices returns A and B with one column per parameter 
   expect_equal(dim(matrices$B), c(numberOfSamples, numberOfParameters))
 })
 
+test_that("getSobolSampleMatrices keeps n x k shape when numberOfSamples is 1", {
+  matrices <- getSobolSampleMatrices(numberOfParameters = 3, numberOfSamples = 1)
+  expect_equal(dim(matrices$A), c(1L, 3L))
+  expect_equal(dim(matrices$B), c(1L, 3L))
+})
+
 test_that("getSobolSampleMatrices produces low-discrepancy points strictly inside the unit interval", {
   matrices <- getSobolSampleMatrices(
     numberOfParameters = 2,

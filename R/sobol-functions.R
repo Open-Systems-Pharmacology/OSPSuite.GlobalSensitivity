@@ -6,8 +6,8 @@
 #' @keywords internal
 getSobolSampleMatrices <- function(numberOfParameters, numberOfSamples) {
   sobolSeq <- randtoolbox::sobol(n = numberOfSamples, dim = 2 * numberOfParameters)
-  A <- as.matrix(sobolSeq[, 1:numberOfParameters])
-  B <- as.matrix(sobolSeq[, (numberOfParameters + 1):(2 * numberOfParameters)])
+  A <- as.matrix(sobolSeq[, 1:numberOfParameters, drop = FALSE])
+  B <- as.matrix(sobolSeq[, (numberOfParameters + 1):(2 * numberOfParameters), drop = FALSE])
   list(A = A, B = B)
 }
 
