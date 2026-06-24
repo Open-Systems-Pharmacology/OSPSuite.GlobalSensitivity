@@ -46,6 +46,7 @@
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/getSamplingHypercube.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/getSensitivityClass.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/getSobolBarGraph.html</loc></url>
+<url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/getSobolSampleMatrices.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/getTrajectory.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/getUncertaintyAnalysisResults.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/getUncertaintyClass.html</loc></url>
