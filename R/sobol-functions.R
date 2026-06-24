@@ -1,3 +1,16 @@
+#' @title getSobolSampleMatrices
+#' @description Generates the two Sobol sample matrices `A` and `B` used as the base sample for Sobol sensitivity analysis. A single low-discrepancy sequence of dimension `2 * numberOfParameters` is generated and split into the first and second halves of its columns.
+#' @param numberOfParameters Number of parameters in the sensitivity analysis.
+#' @param numberOfSamples Number of sample points (rows) to generate.
+#' @return A list with matrices `A` and `B`, each with `numberOfSamples` rows and `numberOfParameters` columns.
+#' @keywords internal
+getSobolSampleMatrices <- function(numberOfParameters, numberOfSamples) {
+  sobolSeq <- randtoolbox::sobol(n = numberOfSamples, dim = 2 * numberOfParameters)
+  A <- as.matrix(sobolSeq[, 1:numberOfParameters])
+  B <- as.matrix(sobolSeq[, (numberOfParameters + 1):(2 * numberOfParameters)])
+  list(A = A, B = B)
+}
+
 #' @title runSobol
 #' @description Function to generate points in parameter space at which simulation will be run in Sobol sensitivity analysis.
 #' @param A A matrix consisting of a Sobol sequence with a number of columns equal to the number of parameter paths and a number of rows equal to the sample size.
@@ -160,9 +173,9 @@ runSobol <- function(simulation,
     )
   }
 
-  sobolSeq <- sobol(n = numberOfSamples, dim = 2 * numberOfParameters)
-  A <- as.matrix(sobolSeq[, 1:numberOfParameters])
-  B <- as.matrix(sobolSeq[, (numberOfParameters + 1):(2 * numberOfParameters)])
+  sobolMatrices <- getSobolSampleMatrices(numberOfParameters, numberOfSamples)
+  A <- sobolMatrices$A
+  B <- sobolMatrices$B
 
   for (i in seq_along(parameters)) {
     path <- parameterPaths[[i]]
