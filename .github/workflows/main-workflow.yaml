@@ -12,6 +12,10 @@ permissions:
   actions: read
   pull-requests: read
 
+env:
+  GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   bump-dev-version:
     if: github.event_name != 'pull_request'
