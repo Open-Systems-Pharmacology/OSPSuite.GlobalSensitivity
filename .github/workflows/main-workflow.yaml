@@ -10,6 +10,7 @@ permissions:
   contents: write
   packages: read
   actions: read
+  pull-requests: read
 
 jobs:
   bump-dev-version:
