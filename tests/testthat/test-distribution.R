@@ -50,3 +50,26 @@ test_that("the distribution factory builds the matching distribution objects", {
   expect_s3_class(distribution$Normal(mean = 0, stdv = 1), "NormalDistribution")
   expect_s3_class(distribution$LogNormal(mean = 1, CV = 1), "LogNormalDistribution")
 })
+
+test_that("LogNormalDistribution samples the vignette example (mean = 10, CV = 0.5) at its median", {
+  # "Getting started" vignette: a LogNormal parameter with mean 10 and CV 0.5.
+  dist <- LogNormalDistribution$new(mean = 10, CV = 0.5)
+  median <- 10 / sqrt(0.5^2 + 1)
+
+  expect_equal(dist$quantilesToSample(0.5), median)
+})
+
+test_that("distribution quantilesToSample is monotonically increasing across the unit interval", {
+  quantiles <- c(0, 0.25, 0.5, 0.75, 1)
+
+  expect_false(is.unsorted(UniformDistribution$new(minimum = 2, maximum = 6)$quantilesToSample(quantiles)))
+  expect_false(is.unsorted(LogUniformDistribution$new(minimum = 1, maximum = 100)$quantilesToSample(quantiles)))
+  expect_false(is.unsorted(LogNormalDistribution$new(mean = 10, CV = 0.5)$quantilesToSample(quantiles)))
+})
+
+test_that("LogUniformDistribution rejects non-numeric bounds", {
+  expect_error(
+    LogUniformDistribution$new(minimum = 1, maximum = "b"),
+    "must be of type 'numeric'"
+  )
+})

@@ -128,3 +128,41 @@ test_that("getDistValsList returns the field-to-input mapping for each distribut
   expect_equal(distValKey$Normal$mean, "normalMean_p")
   expect_equal(distValKey$dimension, "dimension_p")
 })
+
+test_that("the *Inputs helpers package the distribution parameters into named lists", {
+  expect_equal(uniformInputs(minimum = 0, maximum = 1), list(minimum = 0, maximum = 1))
+  expect_equal(logUniformInputs(minimum = 2, maximum = 8), list(minimum = 2, maximum = 8))
+  expect_equal(normalInputs(mean = 5, stdv = 2), list(mean = 5, stdv = 2))
+  expect_equal(logNormalInputs(mean = 10, CV = 0.5), list(mean = 10, CV = 0.5))
+})
+
+test_that("the *QuantilesToSamples wrappers read their inputs from the parameter list", {
+  quantiles <- c(0, 0.5, 1)
+
+  expect_equal(
+    uniformQuantilesToSamples(quantiles, list(minimum = 0, maximum = 10)),
+    getUniformSampleVector(quantiles, 0, 10)
+  )
+  expect_equal(
+    logUniformQuantilesToSamples(quantiles, list(minimum = 1, maximum = 100)),
+    getLogUniformSampleVector(quantiles, 1, 100)
+  )
+  expect_equal(
+    normalQuantilesToSamples(quantiles, list(mean = 5, stdv = 1)),
+    getNormalSampleVector(quantiles, 5, 1)
+  )
+  expect_equal(
+    logNormalQuantilesToSamples(quantiles, list(mean = 10, CV = 0.5)),
+    getLogNormalSampleVector(quantiles, 10, 0.5)
+  )
+})
+
+test_that("quantileTransformationFunctions exposes one transformation per distribution type", {
+  expect_named(quantileTransformationFunctions, c("Uniform", "LogUniform", "Normal", "LogNormal"))
+
+  quantiles <- c(0.1, 0.5, 0.9)
+  expect_equal(
+    quantileTransformationFunctions$LogUniform(quantiles, list(minimum = 2, maximum = 8)),
+    getLogUniformSampleVector(quantiles, 2, 8)
+  )
+})
