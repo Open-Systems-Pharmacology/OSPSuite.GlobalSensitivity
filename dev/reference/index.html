@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ospsuite.globalsensitivity</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.1.0.9003</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.1.0.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -16,6 +16,17 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Examples</h6></li>
+    <li><a class="dropdown-item" href="../articles/uv-filter-formulation.html">UV filter formulation example</a></li>
+    <li><a class="dropdown-item" href="../articles/midazolam-ddi.html">Midazolam DDI example</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Background</h6></li>
+    <li><a class="dropdown-item" href="../articles/variance-based-methods.html">Mathematical overview of variance-based methods</a></li>
+  </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Open-Systems-Pharmacology/OSPSuite.GlobalSensitivity/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -31,9 +42,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="running-sensitivity-analyses">Running sensitivity analyses<a class="anchor" aria-label="anchor" href="#running-sensitivity-analyses"></a></h2>
 
-
+      <div class="section-desc"><p>Functions to run the different global sensitivity analysis methods.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -42,38 +53,77 @@
 
       <dl><dt>
 
-          <code><a href="Bmat.html">Bmat()</a></code>
+          <code><a href="runSobol.html">runSobol()</a></code>
 
         </dt>
-        <dd>Bmat</dd>
+        <dd>runSobol</dd>
 
         <dt>
 
-          <code><a href="Dmat.html">Dmat()</a></code>
+          <code><a href="runEFAST.html">runEFAST()</a></code>
 
         </dt>
-        <dd>Dmat</dd>
+        <dd>runEFAST</dd>
 
         <dt>
 
-          <code><a href="J1mat.html">J1mat()</a></code>
+          <code><a href="runMorris.html">runMorris()</a></code>
 
         </dt>
-        <dd>J1mat</dd>
+        <dd>runMorris</dd>
 
         <dt>
 
-          <code><a href="Jmat.html">Jmat()</a></code>
+          <code><a href="runSU.html">runSU()</a></code>
 
         </dt>
-        <dd>Jmat</dd>
+        <dd>runSU</dd>
+      </dl></div><div class="section level2">
+      <h2 id="inputs">Inputs<a class="anchor" aria-label="anchor" href="#inputs"></a></h2>
+
+      <div class="section-desc"><p>Functions to define parameters and outputs of a sensitivity analysis.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="SAParameter.html">SAParameter</a></code>
+
+        </dt>
+        <dd>SAParameter</dd>
 
         <dt>
 
-          <code><a href="LogNormalDistribution.html">LogNormalDistribution</a></code>
+          <code><a href="SAOutput.html">SAOutput</a></code>
 
         </dt>
-        <dd>LogNormalDistribution</dd>
+        <dd>SAOutput</dd>
+      </dl></div><div class="section level2">
+      <h2 id="distributions">Distributions<a class="anchor" aria-label="anchor" href="#distributions"></a></h2>
+
+      <div class="section-desc"><p>Functions to define parameter distributions.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="distribution.html">distribution</a></code>
+
+        </dt>
+        <dd>distribution</dd>
+
+        <dt>
+
+          <code><a href="UniformDistribution.html">UniformDistribution</a></code>
+
+        </dt>
+        <dd>UniformDistribution</dd>
 
         <dt>
 
@@ -91,101 +141,26 @@
 
         <dt>
 
-          <code><a href="Pmat.html">Pmat()</a></code>
+          <code><a href="LogNormalDistribution.html">LogNormalDistribution</a></code>
 
         </dt>
-        <dd>Pmat</dd>
+        <dd>LogNormalDistribution</dd>
+      </dl></div><div class="section level2">
+      <h2 id="visualization">Visualization<a class="anchor" aria-label="anchor" href="#visualization"></a></h2>
 
-        <dt>
+      <div class="section-desc"><p>Functions to visualize the results of a sensitivity analysis.</p></div>
 
-          <code><a href="SADistribution.html">SADistribution</a></code>
+      <dl></dl></div><div class="section level2">
 
-        </dt>
-        <dd>SADistribution</dd>
 
-        <dt>
 
-          <code><a href="SAOutput.html">SAOutput</a></code>
 
-        </dt>
-        <dd>SAOutput</dd>
+      <dl><dt>
 
-        <dt>
-
-          <code><a href="SAParameter.html">SAParameter</a></code>
+          <code><a href="generateSobolBarGraph.html">generateSobolBarGraph()</a></code>
 
         </dt>
-        <dd>SAParameter</dd>
-
-        <dt>
-
-          <code><a href="UniformDistribution.html">UniformDistribution</a></code>
-
-        </dt>
-        <dd>UniformDistribution</dd>
-
-        <dt>
-
-          <code><a href="addLabelsSUDF.html">addLabelsSUDF()</a></code>
-
-        </dt>
-        <dd>addLabelsSUDF</dd>
-
-        <dt>
-
-          <code><a href="addNewPkParameter.html">addNewPkParameter()</a></code>
-
-        </dt>
-        <dd>addNewPkParameter</dd>
-
-        <dt>
-
-          <code><a href="buildSettingsCMD.html">buildSettingsCMD()</a></code>
-
-        </dt>
-        <dd>buildSettingsCMD</dd>
-
-        <dt>
-
-          <code><a href="checkOutputsExistInSimulation.html">checkOutputsExistInSimulation()</a></code>
-
-        </dt>
-        <dd>checkOutputsExistInSimulation</dd>
-
-        <dt>
-
-          <code><a href="checkParametersExistInSimulation.html">checkParametersExistInSimulation()</a></code>
-
-        </dt>
-        <dd>checkParametersExistInSimulation</dd>
-
-        <dt>
-
-          <code><a href="cleanUpSUDf.html">cleanUpSUDf()</a></code>
-
-        </dt>
-        <dd>cleanUpSUDf</dd>
-
-        <dt>
-
-          <code><a href="distributionStringsFnsList.html">distributionStringsFnsList</a></code>
-
-        </dt>
-        <dd>distributionStringsFnsList</dd>
-
-        <dt>
-
-          <code><a href="error.html">error()</a></code>
-
-        </dt>
-        <dd>error</dd>
-
-        <dt>
-
-          <code><a href="extractPKParametersFromBatchSimulationResults.html">extractPKParametersFromBatchSimulationResults()</a></code>
-
-        </dt>
-        <dd>extractPKParametersFromBatchSimulationResults</dd>
+        <dd>generateSobolBarGraph</dd>
 
         <dt>
 
@@ -196,52 +171,10 @@
 
         <dt>
 
-          <code><a href="generateGSABarGraph.html">generateGSABarGraph()</a></code>
-
-        </dt>
-        <dd>generateGSABarGraph</dd>
-
-        <dt>
-
-          <code><a href="generateLowryPlot.html">generateLowryPlot()</a></code>
-
-        </dt>
-        <dd>generateLowryPlot</dd>
-
-        <dt>
-
           <code><a href="generateMorrisPlot.html">generateMorrisPlot()</a></code>
 
         </dt>
         <dd>generateMorrisPlot</dd>
-
-        <dt>
-
-          <code><a href="generateOutputCode.html">generateOutputCode()</a></code>
-
-        </dt>
-        <dd>generateOutputCode</dd>
-
-        <dt>
-
-          <code><a href="generateParameterCode.html">generateParameterCode()</a></code>
-
-        </dt>
-        <dd>generateParameterCode</dd>
-
-        <dt>
-
-          <code><a href="generateParameterFrequenciesTotal.html">generateParameterFrequenciesTotal()</a></code>
-
-        </dt>
-        <dd>generateParameterFrequenciesTotal</dd>
-
-        <dt>
-
-          <code><a href="generateSobolBarGraph.html">generateSobolBarGraph()</a></code>
-
-        </dt>
-        <dd>generateSobolBarGraph</dd>
 
         <dt>
 
@@ -256,225 +189,25 @@
 
         </dt>
         <dd>Generate Response Surface Contour Plots for eFAST Results</dd>
+      </dl></div><div class="section level2">
+      <h2 id="graphical-user-interface">Graphical user interface<a class="anchor" aria-label="anchor" href="#graphical-user-interface"></a></h2>
 
-        <dt>
+      <div class="section-desc"><p>Functions to launch the graphical user interface.</p></div>
 
-          <code><a href="getEFASTBarGraph.html">getEFASTBarGraph()</a></code>
+      <dl></dl></div><div class="section level2">
 
-        </dt>
-        <dd>getEFASTBarGraph</dd>
 
-        <dt>
 
-          <code><a href="getEFASTResultsDf.html">getEFASTResultsDf()</a></code>
 
-        </dt>
-        <dd>getEFASTResultsDf</dd>
-
-        <dt>
-
-          <code><a href="getGSABarGraph.html">getGSABarGraph()</a></code>
-
-        </dt>
-        <dd>generateBarGraph</dd>
-
-        <dt>
-
-          <code><a href="getLocalSensitivity.html">getLocalSensitivity()</a></code>
-
-        </dt>
-        <dd>getLocalSensitivity</dd>
-
-        <dt>
-
-          <code><a href="getLowryPlot.html">getLowryPlot()</a></code>
-
-        </dt>
-        <dd>getLowryPlot</dd>
-
-        <dt>
-
-          <code><a href="getMixedMatrices.html">getMixedMatrices()</a></code>
-
-        </dt>
-        <dd>runSobol</dd>
-
-        <dt>
-
-          <code><a href="getParameterListForUncertaintyAnalysis.html">getParameterListForUncertaintyAnalysis()</a></code>
-
-        </dt>
-        <dd>getParameterListForUncertaintyAnalysis</dd>
-
-        <dt>
-
-          <code><a href="getSUSummaryDf.html">getSUSummaryDf()</a></code>
-
-        </dt>
-        <dd>getSUSummaryDf</dd>
-
-        <dt>
-
-          <code><a href="getSampleRate.html">getSampleRate()</a></code>
-
-        </dt>
-        <dd>getSampleRate</dd>
-
-        <dt>
-
-          <code><a href="getSamplingHypercube.html">getSamplingHypercube()</a></code>
-
-        </dt>
-        <dd>getSamplingHypercube</dd>
-
-        <dt>
-
-          <code><a href="getSensitivityClass.html">getSensitivityClass()</a></code>
-
-        </dt>
-        <dd>getSensitivityClass</dd>
-
-        <dt>
-
-          <code><a href="getSobolBarGraph.html">getSobolBarGraph()</a></code>
-
-        </dt>
-        <dd>getSobolBarGraph</dd>
-
-        <dt>
-
-          <code><a href="getTrajectory.html">getTrajectory()</a></code>
-
-        </dt>
-        <dd>getTrajectory</dd>
-
-        <dt>
-
-          <code><a href="getUncertaintyAnalysisResults.html">getUncertaintyAnalysisResults()</a></code>
-
-        </dt>
-        <dd>getUncertaintyAnalysisResults</dd>
-
-        <dt>
-
-          <code><a href="getUncertaintyClass.html">getUncertaintyClass()</a></code>
-
-        </dt>
-        <dd>getUncertaintyClass</dd>
-
-        <dt>
-
-          <code><a href="grapes-or-or-grapes.html">`%||%`</a></code>
-
-        </dt>
-        <dd><code>%||%</code></dd>
-
-        <dt>
-
-          <code><a href="mapHypercubeToParameterSpace.html">mapHypercubeToParameterSpace()</a></code>
-
-        </dt>
-        <dd>mapHypercubeToParameterSpace</dd>
-
-        <dt>
-
-          <code><a href="perturbHypercube.html">perturbHypercube()</a></code>
-
-        </dt>
-        <dd>perturbHypercube</dd>
-
-        <dt>
-
-          <code><a href="renameSUDf.html">renameSUDf()</a></code>
-
-        </dt>
-        <dd>renameSUDf</dd>
-
-        <dt>
-
-          <code><a href="runEFAST.html">runEFAST()</a></code>
-
-        </dt>
-        <dd>runEFAST</dd>
-
-        <dt>
-
-          <code><a href="runFFT2.html">runFFT2()</a></code>
-
-        </dt>
-        <dd>runFFT2</dd>
-
-        <dt>
+      <dl><dt>
 
           <code><a href="runGUI.html">runGUI()</a></code>
 
         </dt>
         <dd>runGUI</dd>
-
-        <dt>
-
-          <code><a href="runMorris.html">runMorris()</a></code>
-
-        </dt>
-        <dd>runMorris</dd>
-
-        <dt>
-
-          <code><a href="runSU.html">runSU()</a></code>
-
-        </dt>
-        <dd>runSU</dd>
-
-        <dt>
-
-          <code><a href="runSobol.html">runSobol()</a></code>
-
-        </dt>
-        <dd>runSobol</dd>
-
-        <dt>
-
-          <code><a href="varcalc.html">varcalc()</a></code>
-
-        </dt>
-        <dd>varcalc</dd>
-
-        <dt>
-
-          <code><a href="writeEFASTSensitivityFunctionToFile.html">writeEFASTSensitivityFunctionToFile()</a></code>
-
-        </dt>
-        <dd>writeEFASTSensitivityFunctionToFile</dd>
-
-        <dt>
-
-          <code><a href="writeMorrisSensitivityFunctionToFile.html">writeMorrisSensitivityFunctionToFile()</a></code>
-
-        </dt>
-        <dd>writeMorrisSensitivityFunctionToFile</dd>
-
-        <dt>
-
-          <code><a href="writeParametersAndOutputsToFile.html">writeParametersAndOutputsToFile()</a></code>
-
-        </dt>
-        <dd>writeParametersAndOutputsToFile</dd>
-
-        <dt>
-
-          <code><a href="writeSUFunctionToFile.html">writeSUFunctionToFile()</a></code>
-
-        </dt>
-        <dd>writeSUFunctionToFile</dd>
-
-        <dt>
-
-          <code><a href="writeSobolSensitivityFunctionToFile.html">writeSobolSensitivityFunctionToFile()</a></code>
-
-        </dt>
-        <dd>writeSobolSensitivityFunctionToFile</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

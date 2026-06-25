@@ -19,6 +19,10 @@ checkParametersExistInSimulation(
 
   A PKML simulation object.
 
+- parameterPaths:
+
+  A vector of strings of parameter paths.
+
 - simulationName:
 
   A descriptive name for the `simulation`.
@@ -27,10 +31,6 @@ checkParametersExistInSimulation(
 
   Logical value. When `TRUE`, results in an error when a parameter in
   `parameterPaths` is not found in `simulation`.
-
-- outputPaths:
-
-  A victor of strings of parameter paths.
 
 ## Value
 

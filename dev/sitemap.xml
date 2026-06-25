@@ -1,5 +1,10 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/LICENSE-text.html</loc></url>
+<url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/articles/getting-started.html</loc></url>
+<url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/articles/index.html</loc></url>
+<url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/articles/midazolam-ddi.html</loc></url>
+<url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/articles/uv-filter-formulation.html</loc></url>
+<url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/articles/variance-based-methods.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/authors.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/index.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/Bmat.html</loc></url>
@@ -20,6 +25,7 @@
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/checkOutputsExistInSimulation.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/checkParametersExistInSimulation.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/cleanUpSUDf.html</loc></url>
+<url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/distribution.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/distributionStringsFnsList.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/error.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/extractPKParametersFromBatchSimulationResults.html</loc></url>
@@ -53,6 +59,7 @@
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/grapes-or-or-grapes.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/index.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/mapHypercubeToParameterSpace.html</loc></url>
+<url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/ospsuite.globalsensitivity-package.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/perturbHypercube.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/renameSUDf.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/runEFAST.html</loc></url>
