@@ -52,3 +52,39 @@ test_that("addLabelsSUDF prepends Output/PKparameter columns labelled only on th
   expect_equal(labelled$Output, c("Plasma", "", ""))
   expect_equal(labelled$PKparameter, c("C_max", "", ""))
 })
+
+test_that("cleanUpSUDf groups parameters under their sensitivity-level header rows", {
+  # 'Parameter' variant (sensitivity-only summary, no uncertainty analysis)
+  df <- data.frame(
+    Index = c("High", "High", "Medium", "Negligible"),
+    Parameter = c("a", "b", "c", "d"),
+    stringsAsFactors = FALSE
+  )
+
+  cleaned <- cleanUpSUDf(df)
+
+  expect_named(cleaned, c("Index", "Parameter"))
+  # Every supplied parameter is retained somewhere in the summary
+  expect_setequal(intersect(cleaned$Parameter, c("a", "b", "c", "d")), c("a", "b", "c", "d"))
+  # Header rows are inserted for the sensitivity levels
+  expect_true(any(cleaned$Index == "High"))
+  expect_true(any(cleaned$Index == "Medium"))
+  expect_true(any(cleaned$Index == "Negligible"))
+})
+
+test_that("cleanUpSUDf places parameters into the matching uncertainty column", {
+  # Cross-tabulated variant: sensitivity level as rows, uncertainty as columns
+  df <- data.frame(
+    Index = c("High", "Medium"),
+    High = c("a", ""),
+    Medium = c("", "b"),
+    Low = c("", ""),
+    stringsAsFactors = FALSE
+  )
+
+  cleaned <- cleanUpSUDf(df)
+
+  expect_named(cleaned, c("Index", "High", "Medium", "Low"))
+  expect_true("a" %in% cleaned$High)
+  expect_true("b" %in% cleaned$Medium)
+})

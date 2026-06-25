@@ -2,6 +2,7 @@
 #' @description Function to construct the Bmat matrix as per Morris, 'Factorial Sampling Plans for Preliminary Computational Experiments', 1992.
 #' @param k The number of parameter paths.
 #' @return Bmat matrix as per Morris, 1991.
+#' @keywords internal
 Bmat <- function(k) {
   B <- matrix(rep(0, k), nrow = 1)
   for (n in 1:k) {
@@ -16,6 +17,7 @@ Bmat <- function(k) {
 #' @description Function to construct the Jmat matrix as per Morris, 'Factorial Sampling Plans for Preliminary Computational Experiments', 1992.
 #' @param k The number of parameter paths.
 #' @return Jmat matrix as per Morris, 1991.
+#' @keywords internal
 Jmat <- function(k) {
   return(matrix(rep(1, k * (k + 1)), ncol = k))
 }
@@ -24,6 +26,7 @@ Jmat <- function(k) {
 #' @description Function to construct the J1mat matrix as per Morris, 'Factorial Sampling Plans for Preliminary Computational Experiments', 1992.
 #' @param k The number of parameter paths.
 #' @return J1mat matrix as per Morris, 1991.
+#' @keywords internal
 J1mat <- function(k) {
   return(matrix(rep(1, k + 1), nrow = k + 1))
 }
@@ -32,6 +35,7 @@ J1mat <- function(k) {
 #' @description Function to construct the Dmat matrix as per Morris, 'Factorial Sampling Plans for Preliminary Computational Experiments', 1992.
 #' @param k The number of parameter paths.
 #' @return Dmat matrix as per Morris, 1991.
+#' @keywords internal
 Dmat <- function(k) {
   y <- sample(x = c(1, -1), size = k, replace = TRUE)
   return(diag(x = y, nrow = k))
@@ -41,6 +45,7 @@ Dmat <- function(k) {
 #' @description Function to construct the Pmat matrix as per Morris, 'Factorial Sampling Plans for Preliminary Computational Experiments', 1992.
 #' @param k The number of parameter paths.
 #' @return Pmat matrix as per Morris, 1991.
+#' @keywords internal
 Pmat <- function(k) {
   I <- diag(rep(1, k))
   orders <- sample(x = seq(k), size = k, replace = FALSE)
@@ -54,6 +59,7 @@ defaultNumberOfGridPartitions <- 8
 #' @param numberOfParameters The number of parameter paths.
 #' @param numberOfGridPartitions The number of grid partitions, equivalent to parameter `p` in Morris, 1991.
 #' @return Trajectory for model evaluations through parameter space as per Morris, 1991.
+#' @keywords internal
 getTrajectory <- function(numberOfParameters, numberOfGridPartitions = defaultNumberOfGridPartitions) {
   if (!(numberOfGridPartitions %% 2) == 0) {
     numberOfGridPartitions <- numberOfGridPartitions + 1

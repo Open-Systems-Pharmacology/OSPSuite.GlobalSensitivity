@@ -17,3 +17,4 @@ FFT results in data frame format.
 \description{
 Format the EFAST results into a data frame.
 }
+\keyword{internal}

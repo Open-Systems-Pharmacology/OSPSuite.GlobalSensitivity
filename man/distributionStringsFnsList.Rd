@@ -14,3 +14,4 @@ distributionStringsFnsList
 Generates a string listing the values of the distribution parameters for the \code{SAParameter} object \code{parameter}
 }
 \keyword{datasets}
+\keyword{internal}

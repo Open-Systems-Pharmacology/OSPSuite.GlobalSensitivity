@@ -15,3 +15,4 @@ Formatted table of sensitivity and uncertainty analysis results.
 \description{
 Rename headings in summary table of sensitivity and uncertainty analysis results.
 }
+\keyword{internal}

@@ -1,5 +1,6 @@
 #' @title distributionStringsFnsList
 #' @description Generates a string listing the values of the distribution parameters for the `SAParameter` object `parameter`
+#' @keywords internal
 distributionStringsFnsList <- list(
   Uniform = function(parameter) {
     paste0("distribution$Uniform(minimum = ", parameter$distribution$minimum, ", maximum = ", parameter$distribution$maximum, ")")
@@ -21,6 +22,7 @@ distributionStringsFnsList <- list(
 #' @param displayName A display name for the parameter in lieu of the parameter path.
 #' @param unit The units of the numerical values describing the parameter distribution, such as the mean and standard deviation of a normal distribution.
 #' @param parameterDistribution An SADistribution R6 object describing the distribution of the parameter.
+#' @keywords internal
 generateParameterCode <- function(path, displayName, unit, parameterDistribution) {
   code <- sprintf(
     "parametersList[[\"%s\"]] <- SAParameter$new(simulation = simulation, path = \"%s\", displayName = \"%s\", unit = \"%s\", parameterDistribution = %s)",
@@ -34,6 +36,7 @@ generateParameterCode <- function(path, displayName, unit, parameterDistribution
 #' @param path The parameter path in the simulation.
 #' @param displayName A display name for the parameter in lieu of the parameter path.
 #' @param pkParameterList A list of PK parameter names as strings, selected from among `ospsuite::allPKParameterNames()`
+#' @keywords internal
 generateOutputCode <- function(path, displayName, pkParameterList) {
   code <- sprintf(
     "outputsList[[\"%s\"]] <- SAOutput$new(simulation = simulation, path = \"%s\", displayName = \"%s\")\n",
@@ -52,6 +55,7 @@ generateOutputCode <- function(path, displayName, pkParameterList) {
 #' @description Writes code for generating the lists of parameters and outputs to file.
 #' @param parametersList A list of SAParameter R6 objects.
 #' @param outputsList A list of SAOutput R6 objects.
+#' @keywords internal
 writeParametersAndOutputsToFile <- function(parametersList, outputsList) {
   code <- NULL
   # PREAMBLE
@@ -109,6 +113,7 @@ writeParametersAndOutputsToFile <- function(parametersList, outputsList) {
 #' @param quantilesTestInput Quantiles at which to assess percentiles of PK parameters in the uncertainty analysis.
 #' @param numberOfUncertaintySamples Number of points at which to simulate the model in the uncertainty analysis
 #' @param runParallel Logical parameter setting whether to run the local sensitivity and uncertainty analyses in parallel.
+#' @keywords internal
 writeSUFunctionToFile <- function(runUncertaintyCheckbox,
                                   runSensitivityAnalysisForAllParameters,
                                   sensitivityThreshold,
@@ -138,6 +143,7 @@ writeSUFunctionToFile <- function(runUncertaintyCheckbox,
 #' @title writeSobolSensitivityFunctionToFile
 #' @description Write to file code for generating a Sobol sensitivity analyses.
 #' @param numberOfSamplesGSA Number of sampls to test in the parameter space.
+#' @keywords internal
 writeSobolSensitivityFunctionToFile <- function(numberOfSamplesGSA) {
   code <- NULL
   code <- append(x = code, values = "### Run Sobol sensitivity")
@@ -148,6 +154,7 @@ writeSobolSensitivityFunctionToFile <- function(numberOfSamplesGSA) {
 #' @title writeEFASTSensitivityFunctionToFile
 #' @description Write to file code for generating an EFAST sensitivity analyses.
 #' @param numberOfReSamplesEFAST Number of times to run the EFAST algorithm.
+#' @keywords internal
 writeEFASTSensitivityFunctionToFile <- function(numberOfReSamplesEFAST) {
   code <- NULL
   code <- append(x = code, values = "### Run EFAST sensitivity")
@@ -158,6 +165,7 @@ writeEFASTSensitivityFunctionToFile <- function(numberOfReSamplesEFAST) {
 #' @title writeMorrisSensitivityFunctionToFile
 #' @description Write to file code for generating an Morris sensitivity analyses.
 #' @param numberOfSamples Number of samples to run in Morris algorithm
+#' @keywords internal
 writeMorrisSensitivityFunctionToFile <- function(numberOfSamples) {
   code <- NULL
   code <- append(x = code, values = "### Run Morris sensitivity")

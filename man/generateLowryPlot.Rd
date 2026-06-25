@@ -15,3 +15,4 @@ A list of ggplot Lowry plots, one corresponding to each output path/PK parameter
 \description{
 Function to generate a Lowry plot of Sobol or EFAST sensitivity analysis results.
 }
+\keyword{internal}

@@ -75,3 +75,69 @@ test_that("summarizeOutputDisplayNames returns a path/displayName data frame", {
   expect_equal(summaryDf$path, "o1")
   expect_equal(summaryDf$displayName, "Plasma")
 })
+
+# Mock SAParameter-like object holding only the fields used by the EFAST
+# mapping: a path, a (dimensionless) dimension and an SADistribution.
+makeDistParameter <- function(path, distribution) {
+  list(path = path, dimension = "Dimensionless", unit = "", distribution = distribution)
+}
+
+test_that("mapHypercubeToParameterSpace maps quantiles via each parameter's inverse CDF", {
+  # As described in the variance-based-methods vignette (Figure 1), points in
+  # the unit hypercube of quantiles are mapped onto parameter space using the
+  # inverse cumulative distribution of each parameter.
+  parameters <- list(
+    makeDistParameter("a", UniformDistribution$new(minimum = 0, maximum = 10)),
+    makeDistParameter("b", LogUniformDistribution$new(minimum = 1, maximum = 100))
+  )
+  names(parameters) <- c("a", "b")
+
+  hypercube <- data.frame(a = c(0, 0.5, 1), b = c(0, 0.5, 1))
+
+  mapped <- mapHypercubeToParameterSpace(parameters, hypercube)
+
+  expect_equal(mapped$a, c(0, 5, 10))
+  expect_equal(mapped$b, c(1, 10, 100))
+})
+
+test_that("perturbHypercube implements the documented arcsin(sin()) EFAST curve", {
+  # Saltelli, Tarantola & Chan (1999): the search curve is
+  # 1/2 + (1/pi) * arcsin(sin(omega * theta + phi)) with a random phase phi.
+  quantiles <- c(0, 0.25, 0.5, 0.75)
+
+  set.seed(2024)
+  perturbed <- perturbHypercube(data.frame(p1 = quantiles))
+
+  set.seed(2024)
+  phase <- runif(1, 0, 2 * pi)
+  expected <- 0.5 + asin(sin(quantiles + phase)) / pi
+
+  expect_equal(perturbed$p1, expected)
+})
+
+test_that("getEFASTResultsDf produces FirstOrder and Total rows for every output and PK parameter", {
+  # getEFASTResultsDf is invoked once per parameter inside runEFAST, so each
+  # output/PK entry holds a single parameter; multiple outputs and PK parameters
+  # are exercised here.
+  fftEvaluationsList <- list(
+    out1 = list(
+      AUC = list(p1 = list(S1 = 0.4, St = 0.6)),
+      C_max = list(p1 = list(S1 = 0.2, St = 0.5))
+    ),
+    out2 = list(
+      C_max = list(p1 = list(S1 = 0.7, St = 0.8))
+    )
+  )
+  outputs <- list(out1 = NA, out2 = NA)
+
+  resultsDf <- getEFASTResultsDf(fftEvaluationsList, outputs)
+
+  expect_setequal(resultsDf$Measure, c("FirstOrder", "Total"))
+  expect_equal(nrow(resultsDf), 6L)
+  expect_setequal(unique(resultsDf$Output), c("out1", "out2"))
+  expect_setequal(unique(resultsDf$PK[resultsDf$Output == "out1"]), c("AUC", "C_max"))
+  expect_equal(
+    resultsDf$Value[resultsDf$Output == "out1" & resultsDf$PK == "C_max" & resultsDf$Measure == "Total"],
+    0.5
+  )
+})

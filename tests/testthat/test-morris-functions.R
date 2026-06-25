@@ -63,3 +63,57 @@ test_that("Morris summaryFunctions compute the elementary-effect summaries", {
     sqrt(mean(abs(effects))^2 + sd(effects)^2)
   )
 })
+
+# Morris results data frame in the shape returned by runMorris() and consumed by
+# generateMorrisPlot(), as illustrated in the "Getting started" vignette which
+# plots the elementary-effect summaries (mu*, sigma) for each parameter.
+makeMorrisResults <- function(output = "Out1", pk = "C_max") {
+  data.frame(
+    Output = output,
+    PK = pk,
+    Parameter = c("p1", "p2", "p3"),
+    mustar = c(3, 2, 1),
+    stdv = c(0.5, 1, 0.2),
+    rankingNorm = c(3, 2, 1),
+    stringsAsFactors = FALSE
+  )
+}
+
+test_that("generateMorrisPlot returns one ggplot per output/PK combination", {
+  morrisResults <- rbind(makeMorrisResults(pk = "C_max"), makeMorrisResults(pk = "AUC"))
+
+  morrisPlots <- generateMorrisPlot(morrisResults)
+
+  expect_named(morrisPlots, "Out1")
+  expect_named(morrisPlots$Out1, c("C_max", "AUC"))
+  expect_s3_class(morrisPlots$Out1$C_max, "ggplot")
+})
+
+test_that("generateMorrisPlot labels the mu* and sigma axes of the Morris plane", {
+  plt <- generateMorrisPlot(makeMorrisResults())$Out1$C_max
+
+  expect_equal(plt$labels$x, "\u03bc*")
+  expect_equal(plt$labels$y, "\u03c3")
+  expect_equal(plt$labels$title, "Morris sensitivity")
+})
+
+test_that("generateMorrisPlot ranks parameters by descending rankingNorm", {
+  plt <- generateMorrisPlot(makeMorrisResults())$Out1$C_max
+
+  # Parameters are reordered by decreasing rankingNorm before labelling 1..n
+  expect_equal(as.character(plt$data$Parameter), c("p1", "p2", "p3"))
+  expect_equal(as.character(plt$data$label), c("1", "2", "3"))
+})
+
+test_that("generateMorrisPlot applies a log10 transform to the axes when requested", {
+  morrisResults <- makeMorrisResults()
+
+  linearPlot <- generateMorrisPlot(morrisResults, logPlot = FALSE)$Out1$C_max
+  logPlot <- generateMorrisPlot(morrisResults, logPlot = TRUE)$Out1$C_max
+
+  linearX <- ggplot2::ggplot_build(linearPlot)$data[[1]]$x
+  logX <- ggplot2::ggplot_build(logPlot)$data[[1]]$x
+
+  expect_equal(sort(logX), sort(log10(morrisResults$mustar)))
+  expect_equal(sort(linearX), sort(morrisResults$mustar))
+})

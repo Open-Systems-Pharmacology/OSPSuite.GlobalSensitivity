@@ -1,0 +1,186 @@
+---
+title: "UV filter formulation example"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{UV filter formulation example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+This example uses a PBPK model of dermal absorption to examine the influence of
+formulation-specific descriptors on the *in vivo* exposure of two UV filter
+compounds, octocrylene and oxybenzone, that differ in their physical and chemical
+properties, but which are dermally applied via a common vehicle (A-lotion).
+
+Although octocrylene and oxybenzone are dermally applied via a common vehicle,
+their different physical and chemical properties result in different absorption
+profiles and different sensitivities in their respective plasma AUC to the
+formulation-specific parameters. This example corresponds to *Supplementary
+Materials 5* of the accompanying publication
+([Najjar et al., 2024](https://doi.org/10.1002/psp4.13256)) and is implemented in
+the file `examples/example-UV-filters.R` in the installed package folder.
+
+If you are new to the package, start with the
+[Getting started](getting-started.html) article, which explains each of the
+building blocks used below.
+
+## Parameters analyzed
+
+The sensitivity of the plasma AUC of each UV filter is evaluated with respect to
+four formulation-specific parameters:
+
+| Parameter | Description | Nominal | Uncertainty |
+|-----------|-------------|---------|-------------|
+| `scale_factor_vehicle_evaporation` ($k_{evap}^{frm}$) | Scaling of volatile vehicle components' evaporation rate | 1 | LogUniform(1/100, 100) |
+| `delta_trans` ($\Delta_{trans}$) | Fold change in permeability across stratum corneum lipid bilayers | 1 | LogUniform(1/10, 10) |
+| `fraction_vehicle_volume_non_volatile` ($\varphi_{non-vol}$) | Vehicle volume fraction that is non-volatile | 0.5 | Uniform(0.2, 0.8) |
+| `beta` ($\beta$) | Vehicle/water partitioning to lipophilicity ratio | 4.36 | LogUniform(4.36/1.1, 4.36×1.1) |
+
+## Loading the package and simulation
+
+To run this example, load the *OSP Global Sensitivity* package and the UV filter
+simulation for either octocrylene or oxybenzone:
+
+```{r load}
+rm(list = ls())
+# Load the OSP Global Sensitivity R package
+library(ospsuite.globalsensitivity)
+
+# Load octocrylene model simulation
+simFilePath <- system.file("extdata", "octocrylene-gsa.pkml", package = "ospsuite.globalsensitivity")
+sim <- loadSimulation(simFilePath)
+
+# OR
+
+# Load oxybenzone model simulation
+simFilePath <- system.file("extdata", "oxybenzone-gsa.pkml", package = "ospsuite.globalsensitivity")
+sim <- loadSimulation(simFilePath)
+```
+
+## Specifying the input parameters
+
+Specify the input parameters for which sensitivity is to be evaluated:
+
+```{r parameters}
+# Create a list of Parameter objects corresponding to parameters that exist in
+# the octocrylene model.
+parametersList <- list(
+  SAParameter$new(simulation = sim,
+                  path = "DERMAL_APPLICATION_AREA|vehicle|scale_factor_vehicle_evaporation",
+                  displayName = "scale_factor_vehicle_evaporation",
+                  unit = "",
+                  parameterDistribution = LogUniformDistribution$new(minimum = 1e-2, maximum = 1e2)
+  ),
+  SAParameter$new(simulation = sim,
+                  path = "DERMAL_APPLICATION_AREA|vehicle|delta_trans",
+                  displayName = "delta_trans",
+                  unit = ospUnits$Dimensionless$Unitless,
+                  parameterDistribution = LogUniformDistribution$new(minimum = 1e-1, maximum = 1e1)
+  ),
+  SAParameter$new(simulation = sim,
+                  path = "DERMAL_APPLICATION_AREA|vehicle|fraction_vehicle_volume_non_volatile",
+                  displayName = "fraction_vehicle_volume_non_volatile",
+                  unit = "",
+                  parameterDistribution = UniformDistribution$new(minimum = 0.2, maximum = 0.8)
+  ),
+  SAParameter$new(simulation = sim,
+                  path = "DERMAL_APPLICATION_AREA|vehicle|beta",
+                  displayName = "beta"
+  )
+)
+```
+
+## Specifying the model output
+
+Define the output and its PK parameter, for which sensitivity is to be analyzed.
+Here the whole-body concentration of the permeant is analyzed, with the AUC up to
+the end of the simulation (`AUC_tEnd`) as the PK parameter of interest:
+
+```{r outputs}
+# Create an Output object corresponding to a simulated quantity that exists in
+# the octocrylene model.
+Y <- SAOutput$new(simulation = sim,
+                  path = "DERMAL_APPLICATION_AREA|in_vivo_sink|permeant|whole_body_concentration",
+                  displayName = "whole_body_concentration")
+Y$addPKParameter(standardPKParameter = "AUC_tEnd")
+outputList <- list(Y)
+```
+
+## Running the sensitivity analyses
+
+Run the one-at-a-time (local and uncertainty) analyses followed by the Morris,
+Sobol, and EFAST global sensitivity analyses:
+
+```{r run}
+# Run local sensitivity analysis and uncertainty analysis
+su <- runSU(simulation = sim,
+            customParameters = parametersList,
+            outputs = outputList,
+            evaluateForAllParameters = FALSE,
+            # Sensitivity analysis parameters:
+            variationRange = 0.2,
+            numberOfSensitivityAnalysisSteps = 2,
+            sensitivityThreshold = 0,
+            # Uncertainty analysis parameters:
+            runUncertaintyAnalysis = TRUE,
+            numberOfUncertaintyAnalysisSamples = 100,
+            quantiles = c(0.05, 0.25, 0.5, 0.75, 0.95),
+            saveResults = TRUE, saveFolder = "folder/path", saveFileName = "SU-UVFilter.xlsx")
+
+# Run Morris sensitivity analysis
+morrisResults <- runMorris(simulation = sim,
+                           parameters = parametersList,
+                           outputs = outputList,
+                           numberOfSamples = 100,
+                           saveResults = TRUE, saveFolder = "folder/path", saveFileName = "morris-UVFilter.xlsx")
+
+# Run Sobol sensitivity analysis
+sobolResults <- runSobol(simulation = sim,
+                         parameters = parametersList,
+                         outputs = outputList,
+                         numberOfSamples = 2000,
+                         saveResults = TRUE, saveFolder = "folder/path", saveFileName = "sobol-UVFilter.xlsx")
+
+# Run EFAST sensitivity analysis
+efastResults <- runEFAST(simulation = sim,
+                         parameters = parametersList,
+                         outputs = outputList,
+                         numberOfResamples = 1,
+                         saveResults = TRUE, saveFolder = "folder/path", saveFileName = "efast-UVFilter.xlsx")
+```
+
+Before running the script, specify a valid `saveFolder` to which the Excel
+result files should be written.
+
+## Interpreting the results
+
+For octocrylene, the proportion of the vehicle volume that is non-volatile
+($\varphi_{non-vol}$) is a key influencing parameter in both the OAT and GSA
+analyses since, if a large proportion of the vehicle evaporates, the UV filter
+could concentrate within a thin film on the skin surface, resulting in high flux
+into the stratum corneum. On the other hand, the vehicle volatility scaling
+($k_{evap}^{frm}$) is of most influence on oxybenzone plasma AUC, as rapid
+evaporation of the vehicle results in rapid precipitation of the UV filter on the
+skin surface and reduced absorption.
+
+The local sensitivity analysis suggests that the plasma AUC of both octocrylene
+and oxybenzone are strongly influenced by the parameter $\beta$. However, the
+uncertainty analysis shows that when the influence of each parameter is examined
+over its entire range, $\beta$ has a relatively small influence. This relatively
+low overall impact of $\beta$ is also observed in the results of the three GSA
+methods. This contrast illustrates how global methods can identify influential
+parameters that may be over- or under-emphasized by a local sensitivity analysis
+alone.
+
+The plots of the results may be generated using `generateTornadoPlot()`,
+`generateMorrisPlot()`, `generateSobolBarGraph()`, and
+`generateEFASTBarGraph()`, as described in the
+[Getting started](getting-started.html) article.

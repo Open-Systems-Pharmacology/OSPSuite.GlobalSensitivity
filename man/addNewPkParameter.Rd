@@ -18,3 +18,4 @@ addNewPkParameter(pkParameterName, standardPKParameter, startTime, endTime)
 \description{
 Add a new PK parameter to the managed list of OSP PK parameters.
 }
+\keyword{internal}
