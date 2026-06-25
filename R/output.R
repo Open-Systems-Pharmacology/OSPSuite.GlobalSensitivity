@@ -140,7 +140,7 @@ addNewPkParameter <- function(pkParameterName, standardPKParameter, startTime, e
 
   newPKParameter <- ospsuite::addUserDefinedPKParameter(
     name = pkParameterName,
-    standardPKParameter = StandardPKParameter[[standardPKParameter]],
+    standardPKParameter = ospsuite::StandardPKParameter[[standardPKParameter]],
     displayName = pkParameterName
   )
 

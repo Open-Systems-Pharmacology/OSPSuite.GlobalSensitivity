@@ -22,7 +22,8 @@ Depends:
     writexl,
     stats,
     tictoc,
-    interp
+    interp,
+    utils
 Suggests: 
     knitr,
     rmarkdown,
