@@ -66,15 +66,15 @@ runGUI <- function() {
           ospParameter <- ospsuite::getParameter(path = parameterPathsList$paths[[i]], container = sim$obj)
           ospParameterValue <- ospParameter$value
           ospParameterDimension <- ospParameter$dimension
-          ospParameterUnit <- getBaseUnit(ospParameterDimension)
+          ospParameterUnit <- ospsuite::getBaseUnit(ospParameterDimension)
 
-          if (ospParameterDimension == ospDimensions$`Molecular weight`) {
-            ospParameterValue <- toUnit(
-              quantityOrDimension = ospDimensions$`Molecular weight`,
+          if (ospParameterDimension == ospsuite::ospDimensions$`Molecular weight`) {
+            ospParameterValue <- ospsuite::toUnit(
+              quantityOrDimension = ospsuite::ospDimensions$`Molecular weight`,
               values = ospParameterValue,
-              targetUnit = ospUnits$`Molecular weight`$`g/mol`
+              targetUnit = ospsuite::ospUnits$`Molecular weight`$`g/mol`
             )
-            ospParameterUnit <- ospUnits$`Molecular weight`$`g/mol`
+            ospParameterUnit <- ospsuite::ospUnits$`Molecular weight`$`g/mol`
           }
 
           distValKey <- getDistValsList(parameterPathsList$paths[[i]])
@@ -150,12 +150,12 @@ runGUI <- function() {
         DDIsim$obj <- ospsuite::loadSimulation(filePath = input$DDIselectPKML$datapath)
       }
 
-      parTree <- getSimulationTree(simulationOrFilePath = sim$obj, quantityType = "Parameter")
-      outTree <- getSimulationTree(simulationOrFilePath = sim$obj, quantityType = c("Molecule", "Observer"))
-      output$parameterTree <- renderTree({
+      parTree <- ospsuite::getSimulationTree(simulationOrFilePath = sim$obj, quantityType = "Parameter")
+      outTree <- ospsuite::getSimulationTree(simulationOrFilePath = sim$obj, quantityType = c("Molecule", "Observer"))
+      output$parameterTree <- shinyTree::renderTree({
         parTree
       })
-      output$outputTree <- renderTree({
+      output$outputTree <- shinyTree::renderTree({
         outTree
       })
       updateTabsetPanel(inputId = "mainTabPanel", selected = "Parameters")
@@ -901,7 +901,7 @@ runGUI <- function() {
           }
         }
 
-        zip(file, files = fileNames)
+        utils::zip(file, files = fileNames)
         sapply(fileNames, file.remove)
       }
     )
@@ -954,7 +954,7 @@ runGUI <- function() {
           }
         }
 
-        zip(file, files = fileNames)
+        utils::zip(file, files = fileNames)
         sapply(fileNames, file.remove)
       }
     )
@@ -994,7 +994,7 @@ runGUI <- function() {
           }
         }
 
-        zip(file, files = fileNames)
+        utils::zip(file, files = fileNames)
         sapply(fileNames, file.remove)
       }
     )
@@ -1127,7 +1127,7 @@ runGUI <- function() {
           }
         }
 
-        zip(file, files = fileNames)
+        utils::zip(file, files = fileNames)
         sapply(fileNames, file.remove)
       }
     )
@@ -1199,7 +1199,7 @@ ui <- fluidPage(
         column(
           5,
           h4(strong("Parameters tree"), style = "color: #888888;"),
-          shinyTree(outputId = "parameterTree", checkbox = TRUE)
+          shinyTree::shinyTree(outputId = "parameterTree", checkbox = TRUE)
         ),
         column(
           7,
@@ -1223,7 +1223,7 @@ ui <- fluidPage(
       column(
         5,
         h4(strong("Outputs tree"), style = "color: #888888;"),
-        shinyTree(outputId = "outputTree", checkbox = TRUE)
+        shinyTree::shinyTree(outputId = "outputTree", checkbox = TRUE)
       ),
       column(
         7,

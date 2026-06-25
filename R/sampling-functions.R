@@ -92,6 +92,12 @@ logNormalInputs <- function(mean, CV) {
   return(list(mean = mean, CV = CV))
 }
 
+#' @title distribution
+#' @description A named list of distribution constructors used to create
+#'   distribution objects for global sensitivity analyses. Each element is a
+#'   constructor function returning a distribution object: `Uniform`,
+#'   `LogUniform`, `Normal` and `LogNormal`.
+#' @format A named `list` of distribution constructor functions.
 #' @export
 distribution <- list(
   "Uniform" = UniformDistribution$new,

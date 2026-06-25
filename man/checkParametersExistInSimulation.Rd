@@ -14,11 +14,11 @@ checkParametersExistInSimulation(
 \arguments{
 \item{simulation}{A PKML simulation object.}
 
+\item{parameterPaths}{A vector of strings of parameter paths.}
+
 \item{simulationName}{A descriptive name for the \code{simulation}.}
 
 \item{stopIfNotFound}{Logical value. When \code{TRUE}, results in an error when a parameter in \code{parameterPaths} is not found in \code{simulation}.}
-
-\item{outputPaths}{A victor of strings of parameter paths.}
 }
 \value{
 A list of logical values indicating whether each outut path in \code{parameterPaths} is found in \code{simulation}.
