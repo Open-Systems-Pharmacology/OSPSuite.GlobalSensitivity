@@ -2,6 +2,7 @@
 #' @description Function to generate a Lowry plot of Sobol or EFAST sensitivity analysis results.
 #' @param gsaResultsDataframe Sobol or EFAST results returned by the `runSobol` or `runFAST` functions, respectively.
 #' @return A list of ggplot Lowry plots, one corresponding to each output path/PK parameter combination.
+#' @keywords internal
 generateLowryPlot <- function(gsaResultsDataframe) {
   plotList <- list()
 
@@ -23,6 +24,7 @@ generateLowryPlot <- function(gsaResultsDataframe) {
 #' @param outputDisplayName String. The display name of the output.
 #' @param pk String. The name of the PK parameter
 #' @return A ggplot Lowry plot for a specific output path and PK parameter combination.
+#' @keywords internal
 getLowryPlot <- function(df, outputDisplayName, pk) {
   sortedParameterOrder <- order(-df[df$Measure == "FirstOrder", ]$Value)
   sortedParameters <- df[df$Measure == "FirstOrder", ][sortedParameterOrder, ]$Parameter
@@ -136,6 +138,7 @@ generateEFASTBarGraph <- function(gsaResultsDataframe) {
 #' @param gsaResultsDataframe Sobol or EFAST results returned by the `runSobol` or `runEFAST` functions, respectively.
 #' @param plottingFunction The name of the function to use for plotting. Choose either `getSobolBarGraph` for Sobol results or `getEFASTBarGraph` for EFAST results.
 #' @return A list of ggplot bar graphs, one corresponding to each output path/PK parameter combination.
+#' @keywords internal
 generateGSABarGraph <- function(gsaResultsDataframe,plottingFunction) {
   plotList <- list()
   for (op in unique(gsaResultsDataframe[["Output"]])) {
@@ -157,6 +160,7 @@ generateGSABarGraph <- function(gsaResultsDataframe,plottingFunction) {
 #' @param outputDisplayName String. The display name of the output.
 #' @param pk String. The name of the PK parameter
 #' @return A list of ggplot bar graph plots, one corresponding to each output path/PK parameter combination.
+#' @keywords internal
 getGSABarGraph <- function(df, outputDisplayName, pk) {
   parameterOrder <- df[df$Measure == "FirstOrder", ]$Parameter[order(-df$Value[df$Measure == "FirstOrder"])]
   df$Parameter <- factor(df$Parameter, levels = parameterOrder)
@@ -189,6 +193,7 @@ getGSABarGraph <- function(df, outputDisplayName, pk) {
 #' @param outputDisplayName String. The display name of the output.
 #' @param pk String. The name of the PK parameter
 #' @return A list of ggplot bar graph plots, one corresponding to each output path/PK parameter combination.
+#' @keywords internal
 getSobolBarGraph <- function(df, outputDisplayName, pk) {
   plt <- getGSABarGraph(df, outputDisplayName, pk)
   plt <- plt + ggtitle(label = paste("Sobol sensitivity"), subtitle = paste0("Output: ", outputDisplayName, "\nPK: ", pk))
@@ -201,6 +206,7 @@ getSobolBarGraph <- function(df, outputDisplayName, pk) {
 #' @param outputDisplayName String. The display name of the output.
 #' @param pk String. The name of the PK parameter
 #' @return A list of ggplot bar graph plots, one corresponding to each output path/PK parameter combination.
+#' @keywords internal
 getEFASTBarGraph <- function(df, outputDisplayName, pk) {
   plt <- getGSABarGraph(df, outputDisplayName, pk)
   plt <- plt + ggtitle(label = paste("EFAST sensitivity"), subtitle = paste0("Output: ", outputDisplayName, "\nPK: ", pk))

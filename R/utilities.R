@@ -3,6 +3,7 @@
 #' @param lhs argument
 #' @param rhs argument
 #' @return `lhs` if not null, otherwise `rhs`
+#' @keywords internal
 `%||%` <- function(lhs, rhs) {
   if (is.null(lhs)) {
     return(rhs)
@@ -14,6 +15,7 @@
 #' @description Stops if `condition` is `TRUE`
 #' @param condition A logical condition
 #' @param errorMessage Message to be printed before stopping in case `condition` is `TRUE`
+#' @keywords internal
 error <- function(condition, errorMessage = NULL) {
   if (condition) {
     stop(errorMessage)
@@ -28,6 +30,7 @@ error <- function(condition, errorMessage = NULL) {
 #' @param parameters A list of `SAParameter` objects.
 #' @param outputs A list of `SAOutput` objects.
 #' @return A summary of all parameter and outputs selected for a sensitivity analysis
+#' @keywords internal
 buildSettingsCMD <- function(parameters, outputs) {
   resultsSettings <- NULL
 
@@ -81,6 +84,7 @@ buildSettingsCMD <- function(parameters, outputs) {
 #' @param simulationName A descriptive name for the `simulation`.
 #' @param stopIfNotFound Logical value. When `TRUE`, results in an error when a parameter in `parameterPaths` is not found in `simulation`.
 #' @return A list of logical values indicating whether each outut path in `parameterPaths` is found in `simulation`.
+#' @keywords internal
 checkParametersExistInSimulation <- function(simulation, parameterPaths, simulationName = NULL, stopIfNotFound = FALSE) {
   responseFn <- warning
   if (stopIfNotFound) {
@@ -108,6 +112,7 @@ checkParametersExistInSimulation <- function(simulation, parameterPaths, simulat
 #' @param simulationName A descriptive name for the `simulation`.
 #' @param stopIfNotFound Logical value. When `TRUE`, results in an error when an output in `outputPaths` is not found in `simulation`.
 #' @return A list of logical values indicating whether each outut path in `outputPaths` is found in `simulation`.
+#' @keywords internal
 checkOutputsExistInSimulation <- function(simulation, outputPaths, simulationName, stopIfNotFound = FALSE) {
   responseFn <- warning
   if (stopIfNotFound) {

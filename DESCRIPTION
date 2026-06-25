@@ -21,7 +21,8 @@ Depends:
     randtoolbox,
     writexl,
     stats,
-    tictoc,
+    tictoc
+Imports:
     interp,
     utils
 Suggests: 

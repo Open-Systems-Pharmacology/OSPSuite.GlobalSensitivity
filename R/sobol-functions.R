@@ -17,6 +17,7 @@ getSobolSampleMatrices <- function(numberOfParameters, numberOfSamples) {
 #' @param B A matrix consisting of a Sobol sequence with a number of columns equal to the number of parameter paths and a number of rows equal to the sample size.
 #' @param parameterPaths A vector of strings of parameter names.
 #' @return A list of matrices, one for each parameter path in `parameterPaths`.  The i'th matrix consists of matrix `B` with its i'th column replaced with the corresponding column from matrix `A`.
+#' @keywords internal
 getMixedMatrices <- function(A, B, parameterPaths) {
   U <- list()
   for (pthNumber in seq_along(parameterPaths)) {
@@ -32,6 +33,7 @@ getMixedMatrices <- function(A, B, parameterPaths) {
 #' @param fU_list A list of model evaluations for different Sobol sequence matrices.  Evaluations correspond to each output/PK parameter combination.
 #' @param outputList A vector of strings of parameter names.
 #' @return First order and total effect Sobol indices for each parameter path/output path/PK parameter combination.
+#' @keywords internal
 varcalc <- function(fU_list, outputList) {
   parameterPathsAB <- names(fU_list)
   parameterPaths <- setdiff(parameterPathsAB, c("A", "B"))

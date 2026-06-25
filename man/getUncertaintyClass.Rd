@@ -15,3 +15,4 @@ Uncertainty class.
 \description{
 Function to classify uncertainty analysis result.
 }
+\keyword{internal}

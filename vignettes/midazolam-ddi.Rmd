@@ -70,7 +70,7 @@ rm(list = ls())
 # Load the OSP Global Sensitivity R package
 library(ospsuite.globalsensitivity)
 
-# Load Midazolam model simulation excluding Rifampicin
+# Load Midazolam model simulation including Rifampicin
 simFilePath <- system.file("extdata", "DDI Control - Midazolam - Backman 1996 - with Rif.pkml",
                            package = "ospsuite.globalsensitivity")
 sim <- loadSimulation(simFilePath)

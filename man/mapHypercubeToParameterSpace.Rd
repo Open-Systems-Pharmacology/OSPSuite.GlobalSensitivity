@@ -17,3 +17,4 @@ A list of points in the domain of each parameter at which the model is to be eva
 \description{
 Use parameter distributions to map points in the sampling hypercube to values within the domain of each parameter's distribution.
 }
+\keyword{internal}

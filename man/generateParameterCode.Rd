@@ -18,3 +18,4 @@ generateParameterCode(path, displayName, unit, parameterDistribution)
 \description{
 Generate code for setting up a SAParameter R6 object
 }
+\keyword{internal}

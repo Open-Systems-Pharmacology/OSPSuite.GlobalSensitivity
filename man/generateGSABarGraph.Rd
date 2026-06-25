@@ -17,3 +17,4 @@ A list of ggplot bar graphs, one corresponding to each output path/PK parameter 
 \description{
 Function to generate a bar graph of Sobol or EFAST sensitivity analysis results.
 }
+\keyword{internal}

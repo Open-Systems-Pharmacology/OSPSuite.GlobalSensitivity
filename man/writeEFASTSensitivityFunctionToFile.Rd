@@ -12,3 +12,4 @@ writeEFASTSensitivityFunctionToFile(numberOfReSamplesEFAST)
 \description{
 Write to file code for generating an EFAST sensitivity analyses.
 }
+\keyword{internal}

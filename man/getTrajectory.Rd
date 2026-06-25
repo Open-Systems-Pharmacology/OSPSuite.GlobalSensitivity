@@ -20,3 +20,4 @@ Trajectory for model evaluations through parameter space as per Morris, 1991.
 \description{
 Function to construct a trajectory for model evaluations through parameter space as per Morris, 'Factorial Sampling Plans for Preliminary Computational Experiments', 1992.
 }
+\keyword{internal}

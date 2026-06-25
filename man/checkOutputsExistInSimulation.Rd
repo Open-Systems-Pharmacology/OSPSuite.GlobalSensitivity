@@ -26,3 +26,4 @@ A list of logical values indicating whether each outut path in \code{outputPaths
 \description{
 Function to verify that a list of output paths exists in a simulation.
 }
+\keyword{internal}

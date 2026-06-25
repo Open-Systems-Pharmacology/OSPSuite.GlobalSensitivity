@@ -21,10 +21,36 @@ articles:
     contents:
       - variance-based-methods
 
-#reference:
-#- title: "XXXXXXXXXXXXXXXXXXX"
-#  desc: "XXXXXXXXXXXXXXXXXXXXXX"
-#  contents:
-#  - matches("XXXXX")
-#  - starts_with("XXXXXX")
-#  - has_concept("XXXXXXXXXX")
+reference:
+- title: "Running sensitivity analyses"
+  desc: "Functions to run the different global sensitivity analysis methods."
+  contents:
+  - runSobol
+  - runEFAST
+  - runMorris
+  - runSU
+- title: "Inputs"
+  desc: "Functions to define parameters and outputs of a sensitivity analysis."
+  contents:
+  - SAParameter
+  - SAOutput
+- title: "Distributions"
+  desc: "Functions to define parameter distributions."
+  contents:
+  - distribution
+  - UniformDistribution
+  - LogUniformDistribution
+  - NormalDistribution
+  - LogNormalDistribution
+- title: "Visualization"
+  desc: "Functions to visualize the results of a sensitivity analysis."
+  contents:
+  - generateSobolBarGraph
+  - generateEFASTBarGraph
+  - generateMorrisPlot
+  - generateTornadoPlot
+  - getContourPlot
+- title: "Graphical user interface"
+  desc: "Functions to launch the graphical user interface."
+  contents:
+  - runGUI
