@@ -13,8 +13,7 @@ permissions:
   pull-requests: read
 
 env:
-  GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PKGCACHE_HTTP_VERSION: "1.1"
 
 jobs:
   bump-dev-version:
