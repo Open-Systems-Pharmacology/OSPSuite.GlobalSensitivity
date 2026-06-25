@@ -6,12 +6,20 @@ template:
 development:
   mode: auto
 
-#articles:
-#  - title: XXXXXX
-#    navbar: XXXXXX
-#    desc: XXXXXX
-#    contents:
-#    - vignette1_XXXXXXXXXXXXXXXXXXXXX
+articles:
+  - title: Get started
+    navbar: ~
+    contents:
+      - getting-started
+  - title: Examples
+    navbar: Examples
+    contents:
+      - uv-filter-formulation
+      - midazolam-ddi
+  - title: Background
+    navbar: Background
+    contents:
+      - variance-based-methods
 
 #reference:
 #- title: "XXXXXXXXXXXXXXXXXXX"
