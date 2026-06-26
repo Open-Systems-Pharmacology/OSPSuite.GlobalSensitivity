@@ -1,4 +1,4 @@
-# ospsuite.globalsensitivity: XXXXXXXXX
+## OSP Suite Global Sensitivity R package
 
 <!-- badges: start -->
 
@@ -8,15 +8,15 @@
 
 <!-- badges: end -->
 
-TODO
+## Overview
+
+The OSP Global Sensitivity package (**ospsuite.globalsensitivity**) facilitates the implementation of one-at-a-time (**OAT**) and global sensitivity analyses (**GSA**) of physiologically based pharmacokinetic (PBPK) models built in the Open Systems Pharmacology Suite. The package evaluates the sensitivity of user-selected pharmacokinetic (PK) parameters, such as the maximal concentration (**C<sub>max</sub>**) and the area under the curve (**AUC**), for user-selected model output time profiles, with respect to user-selected model input parameters.
 
 ## Installation
 
-TODO 
+See the [installation instructions](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/articles/getting-started.html#installation). 
 
 ## Documentation
-
-TODO
 
 A detailed account of existing functions and articles on how to use them can be found on the [dedicated website](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/).
 
@@ -31,12 +31,16 @@ conduct](https://github.com/Open-Systems-Pharmacology/Suite/blob/master/CODE_OF_
 
 We encourage contribution to the Open Systems Pharmacology community.
 Before getting started please read the [contribution
-guidelines](https://github.com/Open-Systems-Pharmacology/Suite/blob/master/CONTRIBUTING.md).
+guidelines](https://github.com/Open-Systems-Pharmacology/Suite/blob/master/CONTRIBUTING.md).<br>
 If you are contributing code, please be familiar with the [coding
-standards](https://github.com/Open-Systems-Pharmacology/Suite/blob/master/CODING_STANDARDS_R.md).
+standards](https://dev.open-systems-pharmacology.org/r-development-resources/coding_standards_r).
 
 ## License
 
-TLF Library is released under the [GPLv2 License](LICENSE).
+OSP Suite Global Sensitivity package is released under the [GPLv2 License](LICENSE).
 
 All trademarks within this document belong to their legitimate owners.
+
+## References
+
+[1] _Najjar A, Hamadeh A, Krause S, Schepky A, Edginton A. Global sensitivity analysis of Open Systems Pharmacology Suite physiologically based pharmacokinetic models. CPT Pharmacometrics Syst Pharmacol. 2024;13:2052-2067. doi: [10.1002/psp4.13256](https://doi.org/10.1002/psp4.13256)_
