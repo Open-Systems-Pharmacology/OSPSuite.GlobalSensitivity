@@ -1,7 +1,7 @@
 Type: Package
 Package: ospsuite.globalsensitivity
 Title: Open Systems Pharmacology Global Sensitivity Package
-Version: 1.0.0
+Version: 1.1.0.9000
 Author: Abdullah Hamadeh (Systems In Silico Ltd.)
 Maintainer: Abdullah Hamadeh <ahamadeh@systemsinsilico.com>
 Description: A global sensitivity analysis for Open Systems Pharmacology models.
@@ -36,9 +36,9 @@ Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)
 Remotes:
-    ospsuite=Open-Systems-Pharmacology/OSPSuite-R@*release,
-    rSharp=Open-Systems-Pharmacology/rSharp@*release,
-    ospsuite.utils=Open-Systems-Pharmacology/OSPSuite.RUtils@*release,
-    tlf=Open-Systems-Pharmacology/TLF-Library@*release,
-    ospsuite.plots=Open-Systems-Pharmacology/OSPSuite.Plots@*release
+    ospsuite=Open-Systems-Pharmacology/OSPSuite-R,
+    rSharp=Open-Systems-Pharmacology/rSharp,
+    ospsuite.utils=Open-Systems-Pharmacology/OSPSuite.RUtils,
+    tlf=Open-Systems-Pharmacology/TLF-Library,
+    ospsuite.plots=Open-Systems-Pharmacology/OSPSuite.Plots
 Config/roxygen2/version: 8.0.0
