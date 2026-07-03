@@ -1,0 +1,133 @@
+# OSP Suite Global Sensitivity R package
+
+# Overview
+
+The OSP Global Sensitivity package (**ospsuite.globalsensitivity**)
+facilitates the implementation of one-at-a-time (**OAT**) and global
+sensitivity analyses (**GSA**) of physiologically based pharmacokinetic
+(PBPK) models built in the Open Systems Pharmacology Suite. The package
+evaluates the sensitivity of user-selected pharmacokinetic (PK)
+parameters, such as the maximal concentration (**C_(max)**) and the area
+under the curve (**AUC**), for user-selected model output time profiles,
+with respect to user-selected model input parameters.
+
+# Installation
+
+See the [installation
+instructions](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/articles/getting-started.html#installation).
+
+# Documentation
+
+A detailed account of existing functions and articles on how to use them
+can be found on the [dedicated
+website](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/).
+
+# Code of conduct
+
+Everyone interacting in the Open Systems Pharmacology community
+(codebases, issue trackers, chat rooms, mailing lists etc.) is expected
+to follow the Open Systems Pharmacology [code of
+conduct](https://github.com/Open-Systems-Pharmacology/Suite/blob/master/CODE_OF_CONDUCT.md).
+
+# Contribution
+
+We encourage contribution to the Open Systems Pharmacology community.
+Before getting started please read the [contribution
+guidelines](https://github.com/Open-Systems-Pharmacology/Suite/blob/master/CONTRIBUTING.md).  
+If you are contributing code, please be familiar with the [coding
+standards](https://dev.open-systems-pharmacology.org/r-development-resources/coding_standards_r).
+
+# License
+
+OSP Suite Global Sensitivity package is released under the [GPLv2
+License](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/LICENSE).
+
+All trademarks within this document belong to their legitimate owners.
+
+# References
+
+\[1\] *Najjar A, Hamadeh A, Krause S, Schepky A, Edginton A. Global
+sensitivity analysis of Open Systems Pharmacology Suite physiologically
+based pharmacokinetic models. CPT Pharmacometrics Syst Pharmacol.
+2024;13:2052-2067. doi:
+[10.1002/psp4.13256](https://doi.org/10.1002/psp4.13256)*
+
+# Package index
+
+## Running sensitivity analyses
+
+Functions to run the different global sensitivity analysis methods.
+
+- [`runSobol()`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/runSobol.md)
+  : runSobol
+- [`runEFAST()`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/runEFAST.md)
+  : runEFAST
+- [`runMorris()`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/runMorris.md)
+  : runMorris
+- [`runSU()`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/runSU.md)
+  : runSU
+
+## Inputs
+
+Functions to define parameters and outputs of a sensitivity analysis.
+
+- [`SAParameter`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/SAParameter.md)
+  : SAParameter
+- [`SAOutput`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/SAOutput.md)
+  : SAOutput
+
+## Distributions
+
+Functions to define parameter distributions.
+
+- [`distribution`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/distribution.md)
+  : distribution
+- [`UniformDistribution`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/UniformDistribution.md)
+  : UniformDistribution
+- [`LogUniformDistribution`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/LogUniformDistribution.md)
+  : LogUniformDistribution
+- [`NormalDistribution`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/NormalDistribution.md)
+  : NormalDistribution
+- [`LogNormalDistribution`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/LogNormalDistribution.md)
+  : LogNormalDistribution
+
+## Visualization
+
+Functions to visualize the results of a sensitivity analysis.
+
+- [`generateSobolBarGraph()`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/generateSobolBarGraph.md)
+  : generateSobolBarGraph
+- [`generateEFASTBarGraph()`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/generateEFASTBarGraph.md)
+  : generateEFASTBarGraph
+- [`generateMorrisPlot()`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/generateMorrisPlot.md)
+  : generateMorrisPlot
+- [`generateTornadoPlot()`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/generateTornadoPlot.md)
+  : generateTornadoPlot
+- [`getContourPlot()`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/getContourPlot.md)
+  : Generate Response Surface Contour Plots for eFAST Results
+
+## Graphical user interface
+
+Functions to launch the graphical user interface.
+
+- [`runGUI()`](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/reference/runGUI.md)
+  : runGUI
+
+# Articles
+
+### Get started
+
+- [Getting
+  started](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/articles/getting-started.md):
+
+### Examples
+
+- [UV filter formulation
+  example](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/articles/uv-filter-formulation.md):
+- [Midazolam DDI
+  example](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/articles/midazolam-ddi.md):
+
+### Background
+
+- [Mathematical overview of variance-based
+  methods](https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/articles/variance-based-methods.md):
