@@ -101,17 +101,26 @@ summaryFunctions <- list(
 
 
 #' @title runMorris
-#' @description Function to run Morris sensitivity analysis.
+#' @description Function to run Morris sensitivity analysis, robust to individual ODE-solver failures.
 #' @param simulation PKML simulation object.
 #' @param DDIsimulation DDI PKML simulation object.
 #' @param parameters List of `SAParameter` objects.
 #' @param outputs List of `SAOutput` objects.
-#' @param numberOfSamples The number of runs of the Morris algorithm to perform.
+#' @param numberOfSamples The number of *valid* Morris trajectories to collect.
 #' @param runParallel  Logical value.  Morris computation is run in parallel when `TRUE`.
 #' @param updateProgress Logical value.  Updates shiny app GUI with Morris algorithm progress when `TRUE`.
 #' @param saveResults  Logical value.  If `TRUE`, the results will be saved.
 #' @param saveFolder String indicating the path to the folder in which the results are to be saved.
 #' @param saveFileName String indicating the file name to use when saving the results.
+#' @param resampleOnFailure Logical.  If `TRUE` (default), a trajectory that fails to
+#'   solve (or yields non-finite PK parameters) is discarded and a fresh trajectory is
+#'   drawn to replace it, so the final result still contains `numberOfSamples` valid
+#'   trajectories.  If `FALSE`, failed trajectories are simply dropped and the effective
+#'   sample size is reduced.
+#' @param maxRunAttempts Integer.  Hard cap on the total number of trajectories attempted.
+#'   Defaults to `3 * numberOfSamples` when `resampleOnFailure = TRUE`.
+#' @param maxConsecutiveFailures Integer.  If this many trajectories fail back-to-back,
+#'   abort with an informative error (guards against a globally broken setup).
 #' @return Morris sensitivity analysis results.
 #' @export
 runMorris <- function(simulation,
@@ -123,229 +132,267 @@ runMorris <- function(simulation,
                       updateProgress = NULL,
                       saveResults = FALSE,
                       saveFolder = NULL,
-                      saveFileName = NULL) {
-  trajectoryQuantiles <- list()
-  A <- list()
-  morrisResult <- list()
+                      saveFileName = NULL,
+                      resampleOnFailure = TRUE,
+                      maxRunAttempts = NULL,
+                      maxConsecutiveFailures = 20) {
   elementaryEffects <- NULL
   numberOfParameters <- length(parameters)
+  numberOfTrajectorySteps <- numberOfParameters + 1
 
-  parameterPaths <- sapply(parameters, function(par) {
-    par$path
-  })
+  parameterPaths <- sapply(parameters, function(par) par$path)
   names(parameters) <- parameterPaths
 
-  outputPaths <- sapply(outputs, function(op) {
-    op$path
-  })
+  outputPaths <- sapply(outputs, function(op) op$path)
   names(outputs) <- outputPaths
 
   checkParametersExistInSimulation(
-    simulation = simulation,
-    parameterPaths = parameterPaths,
-    simulationName = "simulation",
-    stopIfNotFound = TRUE
+    simulation = simulation, parameterPaths = parameterPaths,
+    simulationName = "simulation", stopIfNotFound = TRUE
   )
-
   checkOutputsExistInSimulation(
-    simulation = simulation,
-    outputPaths = outputPaths,
-    simulationName = "simulation",
-    stopIfNotFound = TRUE
+    simulation = simulation, outputPaths = outputPaths,
+    simulationName = "simulation", stopIfNotFound = TRUE
   )
 
   if (!is.null(DDIsimulation)) {
     checkParametersExistInSimulation(
-      simulation = DDIsimulation,
-      parameterPaths = parameterPaths,
-      simulationName = "DDI simulation",
-      stopIfNotFound = TRUE
+      simulation = DDIsimulation, parameterPaths = parameterPaths,
+      simulationName = "DDI simulation", stopIfNotFound = TRUE
     )
-
     checkOutputsExistInSimulation(
-      simulation = DDIsimulation,
-      outputPaths = outputPaths,
-      simulationName = "DDI simulation",
-      stopIfNotFound = TRUE
+      simulation = DDIsimulation, outputPaths = outputPaths,
+      simulationName = "DDI simulation", stopIfNotFound = TRUE
     )
   }
 
   simulation$outputSelections$clear()
-  ospsuite::addOutputs(
-    quantitiesOrPaths = outputPaths,
-    simulation = simulation
-  )
-
+  ospsuite::addOutputs(quantitiesOrPaths = outputPaths, simulation = simulation)
   if (!is.null(DDIsimulation)) {
-    ospsuite::addOutputs(
-      quantitiesOrPaths = outputPaths,
-      simulation = DDIsimulation
-    )
+    ospsuite::addOutputs(quantitiesOrPaths = outputPaths, simulation = DDIsimulation)
   }
 
   simBatches <- getSimulationBatches(
-    simulation = simulation,
-    parameterPaths = parameterPaths,
+    simulation = simulation, parameterPaths = parameterPaths,
     numberParallelThreads = numberOfParameters + 1
   )
-
   if (!is.null(DDIsimulation)) {
     DDIsimBatches <- getSimulationBatches(
-      simulation = DDIsimulation,
-      parameterPaths = parameterPaths,
+      simulation = DDIsimulation, parameterPaths = parameterPaths,
       numberParallelThreads = numberOfParameters + 1
     )
   }
 
-  for (runNumber in 1:numberOfSamples) {
+  # --- helper: NULL-safe check that every batch produced a solved result --------
+  allBatchesSolved <- function(res) {
+    if (is.null(res) || length(res) == 0) return(FALSE)
+    all(vapply(res, function(x) {
+      r <- tryCatch(x[[1]], error = function(e) NULL)
+      !is.null(r) && !is.null(r$count) && isTRUE(r$count > 0)
+    }, logical(1)))
+  }
+
+  if (is.null(maxRunAttempts)) {
+    maxRunAttempts <- if (isTRUE(resampleOnFailure)) 3 * numberOfSamples else numberOfSamples
+  }
+  if (!isTRUE(resampleOnFailure)) {
+    maxRunAttempts <- numberOfSamples
+  }
+
+  successfulRuns    <- 0
+  attempt           <- 0
+  failedAttempts    <- 0
+  consecutiveFails  <- 0
+
+  while (successfulRuns < numberOfSamples && attempt < maxRunAttempts) {
+    attempt   <- attempt + 1
+    runNumber <- successfulRuns + 1
+
     if (is.function(updateProgress)) {
       progressText <- paste("\nWorking on subset", runNumber, "of", numberOfSamples)
       updateProgress(value = runNumber / numberOfSamples, detail = progressText)
     }
+    print(paste0("Working on Morris run number ", runNumber, " of ", numberOfSamples,
+                 " (attempt ", attempt, " of at most ", maxRunAttempts, ")"))
 
-    print(paste("Working on Morris run number", runNumber, "of", numberOfSamples))
-    trajectoryQuantiles[[runNumber]] <- getTrajectory(numberOfParameters = numberOfParameters)
-    A[[runNumber]] <- trajectoryQuantiles[[runNumber]]
-    morrisResult[[runNumber]] <- list()
+    # --- one trajectory attempt, fully wrapped so nothing here can abort the SA ---
+    attemptResult <- tryCatch({
+      # 1. draw trajectory in quantile space, transform to sampled parameter values
+      traj <- getTrajectory(numberOfParameters = numberOfParameters)
+      Arun <- traj
+      for (i in seq_along(parameters)) {
+        Arun[, i] <- parameters[[i]]$distribution$quantilesToSample(quantiles = Arun[, i])
+        if (!(parameters[[i]]$dimension %in% "Dimensionless")) {
+          Arun[, i] <- ospsuite::toBaseUnit(
+            quantityOrDimension = parameters[[i]]$dimension,
+            values = Arun[, i], unit = parameters[[i]]$unit
+          )
+        }
+      }
 
-    # Generate quantile trajectory for current run and transform quantiles to samples from distributions
-    for (i in seq_along(parameters)) {
-      A[[runNumber]][, i] <- parameters[[i]]$distribution$quantilesToSample(quantiles = A[[runNumber]][, i])
-      if (!(parameters[[i]]$dimension %in% "Dimensionless")) {
-        A[[runNumber]][, i] <- ospsuite::toBaseUnit(
-          quantityOrDimension = parameters[[i]]$dimension,
-          values = A[[runNumber]][, i],
-          unit = parameters[[i]]$unit
+      # 2. queue run values on each batch (one per trajectory step)
+      for (trajectoryStep in 1:numberOfTrajectorySteps) {
+        simBatches[[trajectoryStep]]$addRunValues(parameterValues = Arun[trajectoryStep, ])
+        if (!is.null(DDIsimulation)) {
+          DDIsimBatches[[trajectoryStep]]$addRunValues(parameterValues = Arun[trajectoryStep, ])
+        }
+      }
+
+      # 3. simulate
+      runResults    <- ospsuite::runSimulationBatches(simulationBatches = simBatches)
+      DDIrunResults <- NULL
+      if (!is.null(DDIsimulation)) {
+        DDIrunResults <- ospsuite::runSimulationBatches(simulationBatches = DDIsimBatches)
+      }
+
+      # 4. NULL-safe solver-success check (this is where the old code crashed)
+      solved <- allBatchesSolved(runResults) &&
+        (is.null(DDIsimulation) || allBatchesSolved(DDIrunResults))
+      if (!solved) {
+        stop("At least one trajectory step failed to integrate (CVODES failure).")
+      }
+
+      # 5. gather results + PK parameters for each step of the trajectory
+      thisRun <- vector("list", length(runResults))
+      for (r in seq_along(runResults)) {
+        node <- list()
+        node$simulationResults <- runResults[[r]][[1]]
+        if (!is.null(DDIsimulation)) node$DDIsimulationResults <- DDIrunResults[[r]][[1]]
+
+        node$inputParameters <- setNames(
+          lapply(seq_along(parameterPaths), function(pn) Arun[r, pn]), parameterPaths
         )
-      }
-    }
 
-    # Update each simulation batch with a set of parameter values corresponding to a step in the trajectory
-    for (trajectoryStep in 1:(numberOfParameters + 1)) {
-      simBatches[[trajectoryStep]]$addRunValues(parameterValues = A[[runNumber]][trajectoryStep, ])
+        pkRes <- pkAnalysesToDataFrame(
+          ospsuite::calculatePKAnalyses(results = node$simulationResults)
+        )
+        if (!is.null(DDIsimulation)) {
+          DDIpkRes <- pkAnalysesToDataFrame(
+            ospsuite::calculatePKAnalyses(results = node$DDIsimulationResults)
+          )
+        }
 
-      if (!is.null(DDIsimulation)) {
-        DDIsimBatches[[trajectoryStep]]$addRunValues(parameterValues = A[[runNumber]][trajectoryStep, ])
-      }
-    }
-
-    # Simulate model at each step of trajectory for current run
-    runResults <- ospsuite::runSimulationBatches(simulationBatches = simBatches)
-    if (any(sapply(runResults, function(x) {
-      x[[1]]$count
-    }) == 0)) {
-      stop()
-    }
-
-    if (!is.null(DDIsimulation)) {
-      DDIrunResults <- ospsuite::runSimulationBatches(simulationBatches = DDIsimBatches)
-      if (any(sapply(runResults, function(x) {
-        x[[1]]$count
-      }) == 0)) {
-        stop()
-      }
-    }
-
-    # Gather results for current run
-    for (r in seq_along(runResults)) {
-      morrisResult[[runNumber]][[r]] <- list()
-      morrisResult[[runNumber]][[r]]$simulationResults <- runResults[[r]][[1]]
-
-      if (!is.null(DDIsimulation)) {
-        morrisResult[[runNumber]][[r]]$DDIsimulationResults <- DDIrunResults[[r]][[1]]
+        node$outputs <- list()
+        for (outPth in names(outputs)) {
+          node$outputs[[outPth]] <- list()
+          for (pk in outputs[[outPth]]$pkParameterList) {
+            val <- pkRes$Value[pkRes$QuantityPath == outPth & pkRes$Parameter == pk]
+            # a solved ODE can still yield no / non-finite PK row -> treat as failure
+            if (length(val) != 1 || !is.finite(val)) {
+              stop(paste0("Missing or non-finite PK parameter '", pk,
+                          "' for output '", outPth, "'."))
+            }
+            node$outputs[[outPth]][[pk]] <- val
+            if (!is.null(DDIsimulation)) {
+              dval <- DDIpkRes$Value[DDIpkRes$QuantityPath == outPth & DDIpkRes$Parameter == pk]
+              ratio <- if (length(dval) == 1 && is.finite(dval)) dval / val else NA_real_
+              node$outputs[[outPth]][[paste0(pk, "-DDI-ratio")]] <- ratio
+            }
+          }
+        }
+        thisRun[[r]] <- node
       }
 
-      morrisResult[[runNumber]][[r]]$inputParameters <- lapply(seq_along(parameterPaths), function(parameterNumber) {
-        A[[runNumber]][r, parameterNumber]
-      })
-      names(morrisResult[[runNumber]][[r]]$inputParameters) <- parameterPaths
+      # 6. elementary effects for this trajectory
+      eeList <- list()
+      for (r in 1:(length(runResults) - 1)) {
+        changingInput <- which(traj[r + 1, ] - traj[r, ] != 0)
+        currentDelta  <- traj[r + 1, changingInput] - traj[r, changingInput]
+        changingInputParameterPath        <- parameters[[changingInput]]$path
+        changingInputParameterDisplayName <- parameters[[changingInput]]$displayName
 
-      pkRes <- pkAnalysesToDataFrame(ospsuite::calculatePKAnalyses(results = morrisResult[[runNumber]][[r]]$simulationResults))
-
-      if (!is.null(DDIsimulation)) {
-        DDIpkRes <- pkAnalysesToDataFrame(ospsuite::calculatePKAnalyses(results = morrisResult[[runNumber]][[r]]$DDIsimulationResults))
-      }
-
-      morrisResult[[runNumber]][[r]]$outputs <- list()
-      for (outPth in names(outputs)) {
-        morrisResult[[runNumber]][[r]]$outputs[[outPth]] <- list()
-        for (pk in outputs[[outPth]]$pkParameterList) {
-          morrisResult[[runNumber]][[r]]$outputs[[outPth]][[pk]] <- pkRes$Value[pkRes$QuantityPath == outPth & pkRes$Parameter == pk]
-          if (!is.null(DDIsimulation)) {
-            morrisResult[[runNumber]][[r]]$outputs[[outPth]][[paste0(pk, "-DDI-ratio")]] <- DDIpkRes$Value[DDIpkRes$QuantityPath == outPth & DDIpkRes$Parameter == pk] / pkRes$Value[pkRes$QuantityPath == outPth & pkRes$Parameter == pk]
+        for (outPth in names(outputs)) {
+          outputDisplayName <- outputs[[outPth]]$displayName
+          for (pk in names(thisRun[[r]]$outputs[[outPth]])) {
+            ee <- (thisRun[[r + 1]]$outputs[[outPth]][[pk]] -
+                     thisRun[[r]]$outputs[[outPth]][[pk]]) / currentDelta
+            eeList[[length(eeList) + 1]] <- data.frame(
+              runNumber                         = runNumber,
+              changingInputParameterPath        = changingInputParameterPath,
+              changingInputParameterDisplayName = changingInputParameterDisplayName,
+              currentDelta                      = currentDelta,
+              outputPath                        = outPth,
+              outputDisplayName                 = outputDisplayName,
+              pkParameter                       = pk,
+              elementaryEffect                  = ee,
+              stringsAsFactors                  = FALSE
+            )
           }
         }
       }
-    }
+      do.call(rbind, eeList)
+    },
+    error = function(e) {
+      structure(list(message = conditionMessage(e)), class = "morrisRunFailure")
+    })
 
-    for (r in 1:(length(runResults) - 1)) {
-      changingInput <- which(trajectoryQuantiles[[runNumber]][r + 1, ] - trajectoryQuantiles[[runNumber]][r, ] != 0)
-      currentDelta <- trajectoryQuantiles[[runNumber]][r + 1, changingInput] - trajectoryQuantiles[[runNumber]][r, changingInput]
-      changingInputParameterPath <- parameters[[changingInput]]$path
-      changingInputParameterDisplayName <- parameters[[changingInput]]$displayName
-
-      for (outPth in names(outputs)) {
-        outputDisplayName <- outputs[[outPth]]$displayName
-        for (pk in names(morrisResult[[runNumber]][[r]]$outputs[[outPth]])) {
-          # CHECK
-          # for (pk in outputs[[outPth]]$pkParameterList) {
-          ee <- ((morrisResult[[runNumber]][[r + 1]]$outputs[[outPth]][[pk]] - morrisResult[[runNumber]][[r]]$outputs[[outPth]][[pk]])) / (currentDelta)
-          df <- data.frame(
-            runNumber = runNumber,
-            changingInputParameterPath = changingInputParameterPath,
-            changingInputParameterDisplayName = changingInputParameterDisplayName,
-            currentDelta = currentDelta,
-            outputPath = outPth,
-            outputDisplayName = outputDisplayName,
-            pkParameter = pk,
-            elementaryEffect = ee
-          )
-          elementaryEffects <- rbind.data.frame(elementaryEffects, df)
-        }
+    # --- outcome handling ---------------------------------------------------------
+    if (inherits(attemptResult, "morrisRunFailure")) {
+      failedAttempts   <- failedAttempts + 1
+      consecutiveFails <- consecutiveFails + 1
+      warning(paste0("Morris trajectory (attempt ", attempt, ") discarded: ",
+                     attemptResult$message))
+      if (consecutiveFails >= maxConsecutiveFailures) {
+        stop(paste0(consecutiveFails, " consecutive Morris trajectories failed. ",
+                    "Aborting - check parameter ranges / model stability. ",
+                    "Last error: ", attemptResult$message))
       }
+      next
     }
+
+    # success
+    elementaryEffects <- rbind.data.frame(elementaryEffects, attemptResult)
+    successfulRuns    <- successfulRuns + 1
+    consecutiveFails  <- 0
   }
 
-  elementaryEffectsSummary <- aggregate(elementaryEffects$elementaryEffect, by = list(
-    elementaryEffects$changingInputParameterDisplayName,
-    elementaryEffects$outputDisplayName,
-    elementaryEffects$pkParameter
-  ), FUN = function(x) {
-    x
-  })
+  if (successfulRuns == 0 || is.null(elementaryEffects)) {
+    stop("Morris analysis produced no valid trajectories - every attempt failed.")
+  }
+  if (successfulRuns < numberOfSamples) {
+    warning(paste0("Requested ", numberOfSamples, " Morris samples but only ",
+                   successfulRuns, " valid trajectories were obtained after ",
+                   attempt, " attempts (", failedAttempts, " failed)."))
+  } else if (failedAttempts > 0) {
+    message(paste0("Morris analysis complete: ", successfulRuns,
+                   " valid trajectories (", failedAttempts,
+                   " failed trajectories were discarded and resampled)."))
+  }
+
+  elementaryEffectsSummary <- aggregate(
+    elementaryEffects$elementaryEffect,
+    by = list(
+      elementaryEffects$changingInputParameterDisplayName,
+      elementaryEffects$outputDisplayName,
+      elementaryEffects$pkParameter
+    ),
+    FUN = function(x) x
+  )
   names(elementaryEffectsSummary) <- c("Parameter", "Output", "PK", "x")
 
   for (fnName in names(summaryFunctions)) {
     EEX <- as.matrix(elementaryEffectsSummary$x)
     elementaryEffectsSummary[[fnName]] <- sapply(1:nrow(EEX), function(rowNumber) {
-      EEX[rowNumber, ] %>%
-        summaryFunctions[[fnName]]() %>%
-        return()
+      EEX[rowNumber, ] %>% summaryFunctions[[fnName]]() %>% return()
     })
   }
   elementaryEffectsSummary$x <- NULL
-  morrisResults <- list(Results = elementaryEffectsSummary, Settings = buildSettingsCMD(parameters = parameters, outputs = outputs))
+  morrisResults <- list(
+    Results  = elementaryEffectsSummary,
+    Settings = buildSettingsCMD(parameters = parameters, outputs = outputs)
+  )
 
   if (saveResults) {
     dateTime <- paste0(format(Sys.Date(), "%Y%m%d"), "_", format(Sys.time(), "%H%M%S"))
-
-    if (is.null(saveFileName)) {
-      saveFileName <- paste0("morris-summary-", dateTime, ".xlsx")
-    }
-
-    if (is.null(saveFolder)) {
-      saveFolder <- getwd()
-    }
-
-    writexl::write_xlsx(
-      x = morrisResults,
-      path = file.path(saveFolder, saveFileName)
-    )
+    if (is.null(saveFileName)) saveFileName <- paste0("morris-summary-", dateTime, ".xlsx")
+    if (is.null(saveFolder))   saveFolder   <- getwd()
+    writexl::write_xlsx(x = morrisResults, path = file.path(saveFolder, saveFileName))
   }
 
   print(morrisResults)
   return(morrisResults)
 }
+
 
 
 
