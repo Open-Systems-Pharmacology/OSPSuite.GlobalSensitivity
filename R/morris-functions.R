@@ -279,7 +279,13 @@ runMorris <- function(simulation,
             node$outputs[[outPth]][[pk]] <- val
             if (!is.null(DDIsimulation)) {
               dval <- DDIpkRes$Value[DDIpkRes$QuantityPath == outPth & DDIpkRes$Parameter == pk]
-              ratio <- if (length(dval) == 1 && is.finite(dval)) dval / val else NA_real_
+              if (length(dval) != 1 || !is.finite(dval) || val == 0) {
+                stop(paste0("Invalid DDI ratio for PK parameter '", pk, "' and output '", outPth, "'."))
+              }
+              ratio <- dval / val
+              if (!is.finite(ratio)) {
+                stop(paste0("Non-finite DDI ratio for PK parameter '", pk, "' and output '", outPth, "'."))
+              }
               node$outputs[[outPth]][[paste0(pk, "-DDI-ratio")]] <- ratio
             }
           }
@@ -300,6 +306,9 @@ runMorris <- function(simulation,
           for (pk in names(thisRun[[r]]$outputs[[outPth]])) {
             ee <- (thisRun[[r + 1]]$outputs[[outPth]][[pk]] -
                      thisRun[[r]]$outputs[[outPth]][[pk]]) / currentDelta
+            if (length(ee) != 1 || !is.finite(ee)) {
+              stop(paste0("Non-finite elementary effect for PK parameter '", pk, "' and output '", outPth, "'."))
+            }
             eeList[[length(eeList) + 1]] <- data.frame(
               runNumber                         = runNumber,
               changingInputParameterPath        = changingInputParameterPath,
