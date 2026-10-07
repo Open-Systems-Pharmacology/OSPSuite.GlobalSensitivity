@@ -58,6 +58,9 @@ getUncertaintyAnalysisResults <- function(simulation,
   # Track solver / PK-analysis failures per parameter so that lost Monte Carlo
   # draws are reported at the end rather than silently dropped.
   failureCount <- stats::setNames(rep(0L, length(sensitiveParameterPaths)), sensitiveParameterPaths)
+  # Draws whose simulation and PK analysis succeeded but where at least one PK
+  # value or DDI ratio could not be extracted or was invalid.
+  partialFailureCount <- failureCount
 
   numberParallelThreads <- 1
   if (runParallel) {
@@ -176,11 +179,15 @@ getUncertaintyAnalysisResults <- function(simulation,
           failureCount[[pth]] <- failureCount[[pth]] + 1L
         }
 
-        # Append exactly one value per draw to every leaf (NA when the draw
-        # failed or the PK parameter could not be extracted) so that each
-        # accumulated vector stays the same length as, and aligned 1:1 with, the
+        # Append exactly one value per draw to every PK value and DDI ratio vector
+        # (NA when the draw failed or the PK parameter could not be extracted) so
+        # that each vector stays the same length as, and aligned 1:1 with, the
         # sampled parameter column U_list[[pth]].  This is what keeps the final
         # assembly from crashing / recycling when a solver failure occurs.
+        # pkValueFailed records whether any PK value or DDI ratio of an otherwise
+        # successful draw was set to NA, so that the draw is counted once however
+        # many of its values failed.
+        pkValueFailed <- FALSE
         for (outPth in names(outputs)) {
           for (pk in outputs[[outPth]]$pkParameterList) {
             newPK <- NA_real_
@@ -191,6 +198,8 @@ getUncertaintyAnalysisResults <- function(simulation,
               if (length(extracted) == 1L && is.finite(extracted)) {
                 newPK <- extracted
                 denom <- extracted
+              } else {
+                pkValueFailed <- TRUE
               }
             }
             fU_list[[pth]][[outPth]][[pk]] <- c(fU_list[[pth]][[outPth]][[pk]], newPK)
@@ -201,12 +210,24 @@ getUncertaintyAnalysisResults <- function(simulation,
               if (!failed) {
                 numer <- DDIpkRes$Value[DDIpkRes$QuantityPath == outPth & DDIpkRes$Parameter == pk]
                 if (length(numer) == 1L && is.finite(numer) && is.finite(denom) && denom != 0) {
-                  newRatio <- numer / denom
+                  ratio <- numer / denom
+                  # Finite, non-zero operands can still overflow to Inf when denom
+                  # is very small, so validate the ratio itself.
+                  if (is.finite(ratio)) {
+                    newRatio <- ratio
+                  }
+                }
+                if (is.na(newRatio)) {
+                  pkValueFailed <- TRUE
                 }
               }
               fU_list[[pth]][[outPth]][[ratioKey]] <- c(fU_list[[pth]][[outPth]][[ratioKey]], newRatio)
             }
           }
+        }
+
+        if (!failed && pkValueFailed) {
+          partialFailureCount[[pth]] <- partialFailureCount[[pth]] + 1L
         }
       }
     }
@@ -232,22 +253,50 @@ getUncertaintyAnalysisResults <- function(simulation,
     }
   }
 
+  totalPartialFailures <- sum(partialFailureCount)
+  if (totalPartialFailures > 0) {
+    print(paste0(
+      "Uncertainty analysis: ", totalPartialFailures, " further draws evaluated but had ",
+      "at least one PK value or DDI ratio that was missing or invalid (recorded as NA)."
+    ))
+  }
+
+  # NA counts per parameter / output / PK parameter. Each vector holds exactly
+  # one entry per draw, so counting NAs gives the number of draws lost for that
+  # output / PK parameter, including whole-draw failures. This shows which
+  # metric is responsible for the losses.
+  if (totalFailures > 0 || totalPartialFailures > 0) {
+    print("Uncertainty analysis: NA count per parameter / output / PK parameter:")
+    for (pth in sensitiveParameterPaths) {
+      for (outPth in names(fU_list[[pth]])) {
+        for (pk in names(fU_list[[pth]][[outPth]])) {
+          nNA <- sum(is.na(fU_list[[pth]][[outPth]][[pk]]))
+          if (nNA > 0) {
+            print(paste0(
+              "  ", pth, " / ", outPth, " / ", pk, ": ", nNA, "/", numberOfUncertaintyAnalysisSamples
+            ))
+          }
+        }
+      }
+    }
+  }
+
   uncertaintyResults <- NULL
   for (parPth in names(fU_list)) {
     for (outPth in names(fU_list[[parPth]])) {
       for (pk in names(fU_list[[parPth]][[outPth]])) {
         values <- fU_list[[parPth]][[outPth]][[pk]]
-
-        # Alignment guard: every leaf must hold exactly one value per draw.  With
-        # the NA handling above this always holds; the guard is defensive so that
-        # if it were ever violated we pad/trim with NA rather than letting the
-        # data.frame recycle and silently misalign parameter values with PK values.
+        # Alignment guard: every vector must hold exactly one value per draw. The NA
+        # handling above should guarantee this. If it ever fails, we cannot tell which
+        # draws are missing, so padding or trimming could misalign parameter values
+        # with PK values. Abort instead.
         if (length(values) != numberOfUncertaintyAnalysisSamples) {
-          warning(paste0(
-            "Uncertainty analysis: length mismatch for '", parPth, "' / '", outPth, "' / '", pk,
-            "' (", length(values), " vs ", numberOfUncertaintyAnalysisSamples, "); padding with NA."
-          ))
-          length(values) <- numberOfUncertaintyAnalysisSamples
+          stop(
+            "Uncertainty analysis (internal error): length mismatch for '",
+            parPth, "' / '", outPth, "' / '", pk, "' (",
+            length(values), " values vs ", numberOfUncertaintyAnalysisSamples, " draws).",
+            call. = FALSE
+          )
         }
 
         df <- data.frame(
