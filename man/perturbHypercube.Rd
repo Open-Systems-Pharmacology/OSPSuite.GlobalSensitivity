@@ -15,3 +15,4 @@ A perturbation to the points of the original \code{hypercube}.
 \description{
 Perturb the points within the sampling hypercube as per Saltelli, Tarantola & Chan, 1999.
 }
+\keyword{internal}

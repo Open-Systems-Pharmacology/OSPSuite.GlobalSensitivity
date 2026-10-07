@@ -9,6 +9,7 @@
 #' @param runParallel  Logical value.  Sensitivity analysis computation is run in parallel when `TRUE`.
 #' @param updateProgress Logical value.  Updates shiny app GUI with sensitivity analysis progress when `TRUE`.
 #' @return description
+#' @keywords internal
 getLocalSensitivity <- function(simulation,
                                 DDIsimulation = NULL,
                                 parameterPaths,

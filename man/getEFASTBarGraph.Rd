@@ -19,3 +19,4 @@ A list of ggplot bar graph plots, one corresponding to each output path/PK param
 \description{
 Function to generate a bar graph of EFAST sensitivity analysis results.
 }
+\keyword{internal}

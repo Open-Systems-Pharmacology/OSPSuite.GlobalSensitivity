@@ -2,6 +2,7 @@
 #' @description Function to classify uncertainty analysis result.
 #' @param uncertaintyValue is a non-negative numeric value.
 #' @return Uncertainty class.
+#' @keywords internal
 getUncertaintyClass <- function(uncertaintyValue) {
   if (is.na(uncertaintyValue)) {
     return(NA)
@@ -28,6 +29,7 @@ getUncertaintyClass <- function(uncertaintyValue) {
 #' @description Function to classify sensitivity analysis result.
 #' @param sensitivityValue is a non-negative numeric value.
 #' @return Sensitivity class.
+#' @keywords internal
 getSensitivityClass <- function(sensitivityValue) {
   if (is.na(sensitivityValue)) {
     return(NA)
@@ -61,6 +63,7 @@ getSensitivityClass <- function(sensitivityValue) {
 #' @param simulation The simulation object which contains parameters at paths `parameterPaths`.
 #' @param variationRange The variation range used to define the log-uniform distribution of the parameters in `parameterPaths`.
 #' @return A list of `SAParameter` objects.
+#' @keywords internal
 getParameterListForUncertaintyAnalysis <- function(parameterPaths, simulation, variationRange = 0.1) {
   parameters <- list()
 
@@ -407,6 +410,7 @@ sensitivityLevels <- c("High", "Medium", "Low", "Negligible", NA)
 #' @description Format a summary table of sensitivity and uncertainty analysis results.
 #' @param df Un-formatted table of sensitivity and uncertainty analysis results.
 #' @return Formatted table of sensitivity and uncertainty analysis results.
+#' @keywords internal
 cleanUpSUDf <- function(df) {
   newDf <- NULL
   for (sen in sensitivityLevels) {
@@ -446,6 +450,7 @@ cleanUpSUDf <- function(df) {
 #' @description Rename headings in summary table of sensitivity and uncertainty analysis results.
 #' @param df Un-formatted table of sensitivity and uncertainty analysis results.
 #' @return Formatted table of sensitivity and uncertainty analysis results.
+#' @keywords internal
 renameSUDf <- function(df) {
   names(df)[names(df) == "High"] <- "High uncertainty"
   names(df)[names(df) == "Medium"] <- "Medium uncertainty"
@@ -464,6 +469,7 @@ renameSUDf <- function(df) {
 #' @param output String. Output name.
 #' @param pkParameter String. PK parameter name.
 #' @return Formatted table of sensitivity and uncertainty analysis results.
+#' @keywords internal
 addLabelsSUDF <- function(df, output, pkParameter) {
   nr <- nrow(df)
   outputCol <- rep("", nr)
@@ -477,6 +483,7 @@ addLabelsSUDF <- function(df, output, pkParameter) {
 #' @description Function to summarize and categorize sensitivity and uncertainty analysis results in a table.
 #' @param su Sensitivity and uncertainty analysis results
 #' @return A list of data frames, one for each output/PK parameter combination, where each table categorizes the sensitivity and uncertainty of each parameter as high/medium/low.
+#' @keywords internal
 getSUSummaryDf <- function(su) {
   sumlist <- list()
   counter <- 0

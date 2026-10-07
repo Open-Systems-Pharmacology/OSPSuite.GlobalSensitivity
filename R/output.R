@@ -133,6 +133,7 @@ SAOutput <- R6::R6Class(
 #' @param standardPKParameter The standard PK parameter on which the PK parameter to be added is based, selected from among the list of strings in `ospsuite::allPKParameterNames()`.
 #' @param startTime Start time within the simulation run for calculation of the PK parameter.
 #' @param endTime End time within the simulation run for calculation of the PK parameter.
+#' @keywords internal
 addNewPkParameter <- function(pkParameterName, standardPKParameter, startTime, endTime) {
   if (pkParameterName %in% ospsuite::allPKParameterNames()) {
     return()
@@ -140,7 +141,7 @@ addNewPkParameter <- function(pkParameterName, standardPKParameter, startTime, e
 
   newPKParameter <- ospsuite::addUserDefinedPKParameter(
     name = pkParameterName,
-    standardPKParameter = StandardPKParameter[[standardPKParameter]],
+    standardPKParameter = ospsuite::StandardPKParameter[[standardPKParameter]],
     displayName = pkParameterName
   )
 

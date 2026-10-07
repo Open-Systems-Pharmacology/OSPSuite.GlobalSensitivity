@@ -26,3 +26,4 @@ Evaluation of PK parameters from batch simulation results.
 \description{
 Evaluate the PK parameters corresponding to each output in the simulation results obtained from batch mode simulation.
 }
+\keyword{internal}

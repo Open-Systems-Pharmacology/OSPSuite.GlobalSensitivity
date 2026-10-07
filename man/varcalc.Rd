@@ -17,3 +17,4 @@ First order and total effect Sobol indices for each parameter path/output path/P
 \description{
 Function to calculate Sobol indices from simulated model evaluations.
 }
+\keyword{internal}

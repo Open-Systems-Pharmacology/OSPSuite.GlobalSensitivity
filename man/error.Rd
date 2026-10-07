@@ -14,3 +14,4 @@ error(condition, errorMessage = NULL)
 \description{
 Stops if \code{condition} is \code{TRUE}
 }
+\keyword{internal}

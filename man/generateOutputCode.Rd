@@ -16,3 +16,4 @@ generateOutputCode(path, displayName, pkParameterList)
 \description{
 Generate code for setting up a SAOutput R6 object
 }
+\keyword{internal}

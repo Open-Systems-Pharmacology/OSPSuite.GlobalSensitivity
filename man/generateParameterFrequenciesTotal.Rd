@@ -17,3 +17,4 @@ A vector of the frequencies associated with each parameter.
 \description{
 Generate a set of frequencies with each parameter as per Saltelli, Tarantola & Chan, 1999.
 }
+\keyword{internal}

@@ -3,6 +3,7 @@
 #' @param parameters List of `SAParameter` objects.
 #' @param parameterNumber An integer pointing to a specific parameter in the list of `parameters`.
 #' @return A vector of the frequencies associated with each parameter.
+#' @keywords internal
 generateParameterFrequenciesTotal <- function(parameters, parameterNumber) {
   M <- 4
   parameterFrequencies <- NULL
@@ -28,6 +29,7 @@ generateParameterFrequenciesTotal <- function(parameters, parameterNumber) {
 #' @description Select a sampling rate within the parameter space as per Saltelli, Tarantola & Chan, 1999.
 #' @param parameterFrequencies A vector of the frequencies associated with each parameter.
 #' @return A maximal rate of sampling that satisfies Nyquist-Shannon with respect to the `parameterFrequencies`.
+#' @keywords internal
 getSampleRate <- function(parameterFrequencies) {
   # Ensure that the sampling rate is significantly higher than twice the maximum frequency of the parameters to satisfy the Nyquist-Shannon sampling theorem.
   # Eqns 21 and 24 in Saltelli, Tarantola, Chan, 1999
@@ -42,6 +44,7 @@ getSampleRate <- function(parameterFrequencies) {
 #' @param parameterFrequencies A vector of the frequencies associated with each parameter.
 #' @param samplingRate Maximal rate of sampling that satisfies Nyquist-Shannon with respect to the `parameterFrequencies`.
 #' @return A hypercube of points in \[0, 2*pi\].
+#' @keywords internal
 getSamplingHypercube <- function(parameterFrequencies, samplingRate) {
   # Create vector of sampling points based on sampling frequency, which is much greater than twice the maximum parameter frequency as per Nyquist-Shannon
   samplingPoints <- head(seq(0, 1, 1 / samplingRate), -1)
@@ -59,6 +62,7 @@ getSamplingHypercube <- function(parameterFrequencies, samplingRate) {
 #' @param parameters List of `SAParameter` objects.
 #' @param hypercube A hypercube of points in the percentile space (0,1) that is to be mapped onto the domain of each parameter's distribution.
 #' @return A list of points in the domain of each parameter at which the model is to be evaluated.
+#' @keywords internal
 mapHypercubeToParameterSpace <- function(parameters, hypercube) {
   X <- hypercube
   for (i in seq_along(parameters)) {
@@ -82,6 +86,7 @@ mapHypercubeToParameterSpace <- function(parameters, hypercube) {
 #' @description Perturb the points within the sampling hypercube as per Saltelli, Tarantola & Chan, 1999.
 #' @param hyperCube Hypercube of points in parameter space at which model will be evaluated.
 #' @return A perturbation to the points of the original `hypercube`.
+#' @keywords internal
 perturbHypercube <- function(hyperCube) {
   for (colnm in names(hyperCube)) {
     hyperCube[[colnm]] <- (hyperCube[[colnm]] + runif(1, 0, 2 * pi))
@@ -96,6 +101,7 @@ perturbHypercube <- function(hyperCube) {
 #' @param fftEvaluationsList List of evaluated first order and total effect indices.
 #' @param outputs List of `SAOutput` objects.
 #' @return FFT results in data frame format.
+#' @keywords internal
 getEFASTResultsDf <- function(fftEvaluationsList, outputs) {
   eFASTResultsDf <- NULL
 
@@ -134,6 +140,7 @@ getEFASTResultsDf <- function(fftEvaluationsList, outputs) {
 #' @param pkEvaluationsList An empty structured list to be updated with the PK parameter evaluations.
 #' @param outputs List of `SAOutput` objects.
 #' @return Evaluation of PK parameters from batch simulation results.
+#' @keywords internal
 extractPKParametersFromBatchSimulationResults <- function(batchSimulationResults, DDIbatchSimulationResults, outputs, pkEvaluationsList) {
   for (r in seq_along(batchSimulationResults)) {
     failed <- FALSE
@@ -193,6 +200,7 @@ extractPKParametersFromBatchSimulationResults <- function(batchSimulationResults
 #' @param parameterFrequencies A vector of the frequencies associated with each parameter.
 #' @param addHarmonicsForParameterNumber Parameter number for which first order index is to be calculated
 #' @return First order and total effect indices of EFAST evaluation.
+#' @keywords internal
 runFFT2 <- function(outputs,
                     pkEvaluationsList,
                     parameters,

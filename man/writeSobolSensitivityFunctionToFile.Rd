@@ -12,3 +12,4 @@ writeSobolSensitivityFunctionToFile(numberOfSamplesGSA)
 \description{
 Write to file code for generating a Sobol sensitivity analyses.
 }
+\keyword{internal}

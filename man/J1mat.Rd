@@ -15,3 +15,4 @@ J1mat matrix as per Morris, 1991.
 \description{
 Function to construct the J1mat matrix as per Morris, 'Factorial Sampling Plans for Preliminary Computational Experiments', 1992.
 }
+\keyword{internal}

@@ -19,3 +19,4 @@ A ggplot Lowry plot for a specific output path and PK parameter combination.
 \description{
 Function to build a Lowry plot in ggplot for a spcific output and PK parameter.
 }
+\keyword{internal}
