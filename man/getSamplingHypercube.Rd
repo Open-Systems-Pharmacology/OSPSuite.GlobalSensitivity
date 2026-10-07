@@ -17,4 +17,3 @@ A hypercube of points in [0, 2*pi].
 \description{
 Build a hypercube of points at which the model will be simulated.
 }
-\keyword{internal}

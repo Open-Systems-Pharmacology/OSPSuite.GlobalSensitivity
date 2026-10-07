@@ -38,4 +38,3 @@ description
 \description{
 Function to run local sensitivity analysis
 }
-\keyword{internal}

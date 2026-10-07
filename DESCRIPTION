@@ -1,7 +1,7 @@
 Type: Package
 Package: ospsuite.globalsensitivity
 Title: Open Systems Pharmacology Global Sensitivity Package
-Version: 1.1.0.9001
+Version: 0.1.0
 Author: Abdullah Hamadeh (Systems In Silico Ltd.)
 Maintainer: Abdullah Hamadeh <ahamadeh@systemsinsilico.com>
 Description: A global sensitivity analysis for Open Systems Pharmacology models.
@@ -21,17 +21,13 @@ Depends:
     randtoolbox,
     writexl,
     stats,
-    tictoc
-Imports:
-    interp,
-    utils
+    tictoc,
+    interp
 Suggests: 
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
-VignetteBuilder: knitr
 Config/testthat/edition: 3
-Config/testthat/parallel: true
 Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)

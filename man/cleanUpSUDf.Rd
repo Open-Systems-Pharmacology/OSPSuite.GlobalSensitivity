@@ -15,4 +15,3 @@ Formatted table of sensitivity and uncertainty analysis results.
 \description{
 Format a summary table of sensitivity and uncertainty analysis results.
 }
-\keyword{internal}

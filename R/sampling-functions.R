@@ -40,7 +40,7 @@ getLogNormalSampleVector <- function(quantileVec, mean, CV) {
   sigmaSquared <- log((CV^2) + 1)
   mu <- log(mean) - (sigmaSquared / 2)
   sigma <- sqrt(sigmaSquared)
-  logSpaceQuantileVec <- getNormalSampleVector(quantileVec, mean = mu, stdv = sigma, truncate = TRUE)
+  logSpaceQuantileVec <- getNormalSampleVector(quantileVec, mean = mu, stdv = sigma, truncate = FALSE)
   return(exp(logSpaceQuantileVec))
 }
 
@@ -92,12 +92,6 @@ logNormalInputs <- function(mean, CV) {
   return(list(mean = mean, CV = CV))
 }
 
-#' @title distribution
-#' @description A named list of distribution constructors used to create
-#'   distribution objects for global sensitivity analyses. Each element is a
-#'   constructor function returning a distribution object: `Uniform`,
-#'   `LogUniform`, `Normal` and `LogNormal`.
-#' @format A named `list` of distribution constructor functions.
 #' @export
 distribution <- list(
   "Uniform" = UniformDistribution$new,

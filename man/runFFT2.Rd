@@ -35,4 +35,3 @@ First order and total effect indices of EFAST evaluation.
 \description{
 Run the Fast Fourier Transform and the sensitivity indices.
 }
-\keyword{internal}

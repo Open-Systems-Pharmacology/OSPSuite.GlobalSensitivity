@@ -14,4 +14,3 @@ writeParametersAndOutputsToFile(parametersList, outputsList)
 \description{
 Writes code for generating the lists of parameters and outputs to file.
 }
-\keyword{internal}

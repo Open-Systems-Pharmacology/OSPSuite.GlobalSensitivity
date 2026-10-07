@@ -17,4 +17,3 @@ lhs \%||\% rhs
 \description{
 Function to select RHS argument in case LHS is NULL.  See purrr::\%||\%
 }
-\keyword{internal}

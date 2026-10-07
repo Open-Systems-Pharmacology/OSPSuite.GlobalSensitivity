@@ -23,4 +23,3 @@ A list of \code{SAParameter} objects.
 \description{
 This function assigns a log-uniform distribution with a variation range given by \code{variationRange} for parameters with a previously unspecified distribution.
 }
-\keyword{internal}

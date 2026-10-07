@@ -19,4 +19,3 @@ A list of matrices, one for each parameter path in \code{parameterPaths}.  The i
 \description{
 Function to generate points in parameter space at which simulation will be run in Sobol sensitivity analysis.
 }
-\keyword{internal}

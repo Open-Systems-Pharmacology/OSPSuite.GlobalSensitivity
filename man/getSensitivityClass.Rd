@@ -15,4 +15,3 @@ Sensitivity class.
 \description{
 Function to classify sensitivity analysis result.
 }
-\keyword{internal}

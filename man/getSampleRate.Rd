@@ -15,4 +15,3 @@ A maximal rate of sampling that satisfies Nyquist-Shannon with respect to the \c
 \description{
 Select a sampling rate within the parameter space as per Saltelli, Tarantola & Chan, 1999.
 }
-\keyword{internal}

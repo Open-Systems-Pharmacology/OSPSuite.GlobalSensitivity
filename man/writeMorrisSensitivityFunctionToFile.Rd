@@ -12,4 +12,3 @@ writeMorrisSensitivityFunctionToFile(numberOfSamples)
 \description{
 Write to file code for generating an Morris sensitivity analyses.
 }
-\keyword{internal}

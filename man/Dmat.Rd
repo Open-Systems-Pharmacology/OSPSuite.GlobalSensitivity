@@ -15,4 +15,3 @@ Dmat matrix as per Morris, 1991.
 \description{
 Function to construct the Dmat matrix as per Morris, 'Factorial Sampling Plans for Preliminary Computational Experiments', 1992.
 }
-\keyword{internal}
