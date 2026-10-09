@@ -35,4 +35,5 @@ Config/testthat/parallel: true
 Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)
+Additional_repositories: https://open-systems-pharmacology.r-universe.dev
 Config/roxygen2/version: 8.0.0
