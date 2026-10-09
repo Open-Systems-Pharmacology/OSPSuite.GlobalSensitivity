@@ -6,6 +6,7 @@
 \description{
 R6 class defining a statistical distribution object
 }
+\keyword{internal}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -30,4 +31,3 @@ The objects of this class are cloneable with this method.
 }
 }
 }
-\keyword{internal}
