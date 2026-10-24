@@ -184,10 +184,11 @@ runMorris <- function(simulation,
   }
 
   # --- helper: NULL-safe check that every batch produced a solved result --------
-  allBatchesSolved <- function(res) {
-    if (is.null(res) || length(res) == 0) return(FALSE)
-    all(vapply(res, function(x) {
-      r <- tryCatch(x[[1]], error = function(e) NULL)
+  # Results are looked up by run values id (see getBatchRunResult).
+  allBatchesSolved <- function(res, runValuesIds) {
+    if (is.null(res) || length(res) != length(runValuesIds)) return(FALSE)
+    all(vapply(seq_along(runValuesIds), function(i) {
+      r <- getBatchRunResult(res, i, runValuesIds[i])
       !is.null(r) && !is.null(r$count) && isTRUE(r$count > 0)
     }, logical(1)))
   }
@@ -230,11 +231,14 @@ runMorris <- function(simulation,
         }
       }
 
-      # 2. queue run values on each batch (one per trajectory step)
+      # 2. queue run values on each batch (one per trajectory step), keeping the
+      #    ids so each step's result is looked up by id rather than position
+      runValuesIds    <- character(numberOfTrajectorySteps)
+      DDIrunValuesIds <- character(numberOfTrajectorySteps)
       for (trajectoryStep in 1:numberOfTrajectorySteps) {
-        simBatches[[trajectoryStep]]$addRunValues(parameterValues = Arun[trajectoryStep, ])
+        runValuesIds[trajectoryStep] <- simBatches[[trajectoryStep]]$addRunValues(parameterValues = Arun[trajectoryStep, ])
         if (!is.null(DDIsimulation)) {
-          DDIsimBatches[[trajectoryStep]]$addRunValues(parameterValues = Arun[trajectoryStep, ])
+          DDIrunValuesIds[trajectoryStep] <- DDIsimBatches[[trajectoryStep]]$addRunValues(parameterValues = Arun[trajectoryStep, ])
         }
       }
 
@@ -246,8 +250,8 @@ runMorris <- function(simulation,
       }
 
       # 4. NULL-safe solver-success check (this is where the old code crashed)
-      solved <- allBatchesSolved(runResults) &&
-        (is.null(DDIsimulation) || allBatchesSolved(DDIrunResults))
+      solved <- allBatchesSolved(runResults, runValuesIds) &&
+        (is.null(DDIsimulation) || allBatchesSolved(DDIrunResults, DDIrunValuesIds))
       if (!solved) {
         stop("At least one trajectory step failed to integrate (CVODES failure).")
       }
@@ -256,8 +260,8 @@ runMorris <- function(simulation,
       thisRun <- vector("list", length(runResults))
       for (r in seq_along(runResults)) {
         node <- list()
-        node$simulationResults <- runResults[[r]][[1]]
-        if (!is.null(DDIsimulation)) node$DDIsimulationResults <- DDIrunResults[[r]][[1]]
+        node$simulationResults <- getBatchRunResult(runResults, r, runValuesIds[r])
+        if (!is.null(DDIsimulation)) node$DDIsimulationResults <- getBatchRunResult(DDIrunResults, r, DDIrunValuesIds[r])
 
         node$inputParameters <- setNames(
           lapply(seq_along(parameterPaths), function(pn) Arun[r, pn]), parameterPaths
@@ -345,6 +349,20 @@ runMorris <- function(simulation,
         stop(paste0(consecutiveFails, " consecutive Morris trajectories failed. ",
                     "Aborting - check parameter ranges / model stability. ",
                     "Last error: ", attemptResult$message))
+      }
+      # ospsuite only clears queued run values after a successful run.  The attempt
+      # may have failed while queuing or inside either runSimulationBatches call,
+      # leaving this trajectory's values queued; recreate the batches so they
+      # cannot run alongside, and be read in place of, the next trajectory.
+      simBatches <- getSimulationBatches(
+        simulation = simulation, parameterPaths = parameterPaths,
+        numberParallelThreads = numberOfTrajectorySteps
+      )
+      if (!is.null(DDIsimulation)) {
+        DDIsimBatches <- getSimulationBatches(
+          simulation = DDIsimulation, parameterPaths = parameterPaths,
+          numberParallelThreads = numberOfTrajectorySteps
+        )
       }
       next
     }

@@ -25,6 +25,52 @@ getUncertaintyClass <- function(uncertaintyValue) {
   return("Low")
 }
 
+#' @title getUncertaintyStatistics
+#' @description Function to summarize the Monte Carlo draws of one parameter / output / PK parameter combination.
+#' Failed draws (`NA`) are excluded.  If fewer than `minimumValidDraws` draws remain, every statistic is `NA`
+#' (undefined): missing evidence is never reported as zero uncertainty.
+#' @param values Numeric vector with one entry per draw, `NA` for draws that failed.
+#' @param minimumValidDraws Minimum number of valid draws required to compute the statistics.
+#' @param quantiles Additional quantiles to evaluate.
+#' @return A list with `defined`, `ValidDraws`, `Mean`, `Percentile_2.5`, `Median`, `Percentile_97.5`,
+#' `UncertaintyRatio` and `quantileValues` (named by `as.character(quantiles)`).
+#' @keywords internal
+getUncertaintyStatistics <- function(values, minimumValidDraws, quantiles = NULL) {
+  validValues <- values[is.finite(values)]
+  numberOfValidDraws <- length(validValues)
+
+  quantileValues <- stats::setNames(as.list(rep(NA_real_, length(quantiles))), as.character(quantiles))
+  uaStats <- list(
+    defined = FALSE,
+    ValidDraws = numberOfValidDraws,
+    Mean = NA_real_,
+    Percentile_2.5 = NA_real_,
+    Median = NA_real_,
+    Percentile_97.5 = NA_real_,
+    UncertaintyRatio = NA_real_,
+    quantileValues = quantileValues
+  )
+
+  if (numberOfValidDraws < minimumValidDraws || numberOfValidDraws < 2) {
+    return(uaStats)
+  }
+
+  uaStats$defined <- TRUE
+  uaStats$Mean <- mean(validValues)
+  uaStats$Percentile_2.5 <- unname(stats::quantile(validValues, 0.025))
+  uaStats$Median <- unname(stats::quantile(validValues, 0.5))
+  uaStats$Percentile_97.5 <- unname(stats::quantile(validValues, 0.975))
+  spread <- uaStats$Percentile_97.5 - uaStats$Percentile_2.5
+  # Zero spread among enough valid draws is genuinely zero uncertainty, even when
+  # the median is also zero (0 / 0).  A non-zero spread around a zero median is
+  # left as +/-Inf, i.e. unbounded relative uncertainty.
+  uaStats$UncertaintyRatio <- if (spread == 0) 0 else spread / uaStats$Median
+  for (qv in quantiles) {
+    uaStats$quantileValues[[as.character(qv)]] <- unname(stats::quantile(validValues, qv))
+  }
+  return(uaStats)
+}
+
 #' @title getSensitivityClass
 #' @description Function to classify sensitivity analysis result.
 #' @param sensitivityValue is a non-negative numeric value.
@@ -112,6 +158,7 @@ getParameterListForUncertaintyAnalysis <- function(parameterPaths, simulation, v
 #' @param runUncertaintlyOnlyForSensitiveParameters  Logical value.  If `TRUE`, uncertainty analysis will only be run for the parameters for which sensitivity exceeds `sensitivityThreshold`.
 #' @param numberOfUncertaintyAnalysisSamples Positive integer value giving the number of Monte Carlo runs for each parameter.
 #' @param quantiles  Vector of numerical values between 0 and 1.  The `quantiles` input sets the percentiles of the PK parameters to be evaluated in addition to the 50% and 95% percentiles, which are computed by default.
+#' @param minimumValidDrawFraction Numeric value in (0, 1].  Minimum fraction of the `numberOfUncertaintyAnalysisSamples` draws that must evaluate successfully for a parameter / output / PK parameter combination.  Below this (or below 2 valid draws), the uncertainty summary statistics and `UncertaintyRatio` are reported as `NA` (undefined) rather than computed from the surviving draws.
 #' Save settings:
 #' @param saveResults  Logical value.  If `TRUE`, the results will be saved.
 #' @param saveFolder String indicating the path to the folder in which the results are to be saved.
@@ -136,6 +183,7 @@ runSU <- function(simulation,
                   runUncertaintlyOnlyForSensitiveParameters = TRUE,
                   numberOfUncertaintyAnalysisSamples = 100,
                   quantiles = c(0.05, 0.5, 0.95),
+                  minimumValidDrawFraction = 0.9,
                   ## Save settings
                   saveResults = FALSE,
                   saveFolder = NULL,
@@ -151,6 +199,7 @@ runSU <- function(simulation,
   error(!(numberOfSensitivityAnalysisSteps > 0), paste0("Argument 'numberOfSensitivityAnalysisSteps' must be positive."))
   error(any(quantiles > 1), "Elements of the vector 'quantiles' must be less than 1.")
   error(any(quantiles < 0), "Elements of the vector 'quantiles' must be greater than 0.")
+  error(!(is.numeric(minimumValidDrawFraction) && length(minimumValidDrawFraction) == 1 && minimumValidDrawFraction > 0 && minimumValidDrawFraction <= 1), "Argument 'minimumValidDrawFraction' must be a single number in (0, 1].")
 
   # Set nominal parameter values in simulation based on any customParameters
   parameterPaths <- NULL
@@ -289,6 +338,11 @@ runSU <- function(simulation,
     )
   }
 
+  # A summary is only computed from draws that evaluated successfully; below this
+  # count the result is reported as undefined rather than from a small survivor set.
+  minimumValidDraws <- max(2L, ceiling(minimumValidDrawFraction * numberOfUncertaintyAnalysisSamples))
+  undefinedUncertaintyResults <- list()
+
   # Build summary of sensitivity and uncertainty results
   allSUResults <- NULL
   suResultsList <- list()
@@ -326,29 +380,27 @@ runSU <- function(simulation,
 
 
         if (runUncertaintyAnalysis) {
-          uncertaintyVec <- na.omit(uncertaintyAnalysisResults$value[uncertaintyAnalysisResults$parameterPath == pth & uncertaintyAnalysisResults$outputPath == outPth & uncertaintyAnalysisResults$pkParameter == pk])
-          u02p5 <- unname(quantile(uncertaintyVec, 0.025))
-          u50 <- unname(quantile(uncertaintyVec, 0.5))
-          u97p5 <- unname(quantile(uncertaintyVec, 0.975))
-          uncertaintyValue <- (u97p5 - u02p5) / u50
-          uMean <- mean(uncertaintyVec)
-          # Case where PK can't be evaluated
-          if (any(c(NaN, NA) %in% c(u02p5, u50, u97p5))) {
-            uncertaintyValue <- 0
-          }
-          # Case where u50 = u95 = 0
-          if (uncertaintyValue %in% c(NaN, NA)) {
-            uncertaintyValue <- 0
+          uncertaintyVec <- uncertaintyAnalysisResults$value[uncertaintyAnalysisResults$parameterPath == pth & uncertaintyAnalysisResults$outputPath == outPth & uncertaintyAnalysisResults$pkParameter == pk]
+          uncertaintyStats <- getUncertaintyStatistics(
+            values = uncertaintyVec,
+            minimumValidDraws = minimumValidDraws,
+            quantiles = quantiles
+          )
+          if (!uncertaintyStats$defined) {
+            undefinedUncertaintyResults[[length(undefinedUncertaintyResults) + 1]] <- paste0(
+              pth, " / ", outPth, " / ", pk, ": ", uncertaintyStats$ValidDraws, "/", numberOfUncertaintyAnalysisSamples, " valid draws"
+            )
           }
 
-          df[["Mean"]] <- uMean
-          df[["Percentile_2.5"]] <- u02p5
-          df[["Median"]] <- u50
-          df[["Percentile_97.5"]] <- u97p5
-          df[["UncertaintyRatio"]] <- uncertaintyValue
-          df[["UncertaintyClass"]] <- getUncertaintyClass(uncertaintyValue)
+          df[["ValidDraws"]] <- uncertaintyStats$ValidDraws
+          df[["Mean"]] <- uncertaintyStats$Mean
+          df[["Percentile_2.5"]] <- uncertaintyStats$Percentile_2.5
+          df[["Median"]] <- uncertaintyStats$Median
+          df[["Percentile_97.5"]] <- uncertaintyStats$Percentile_97.5
+          df[["UncertaintyRatio"]] <- uncertaintyStats$UncertaintyRatio
+          df[["UncertaintyClass"]] <- getUncertaintyClass(uncertaintyStats$UncertaintyRatio)
           for (qv in quantiles) {
-            df[[paste0("Percentile_", 100 * qv)]] <- unname(quantile(uncertaintyVec, qv))
+            df[[paste0("Percentile_", 100 * qv)]] <- uncertaintyStats$quantileValues[[as.character(qv)]]
           }
         }
         suResultsList[[outPth]][[pk]] <- rbind.data.frame(suResultsList[[outPth]][[pk]], df)
@@ -369,6 +421,14 @@ runSU <- function(simulation,
         allSUResults <- rbind.data.frame(allSUResults, suResultsList[[outPth]][[pk]])
       }
     }
+  }
+
+  if (length(undefinedUncertaintyResults) > 0) {
+    warning(paste0(
+      "Uncertainty analysis: uncertainty is undefined (reported as NA) for ", length(undefinedUncertaintyResults),
+      " parameter / output / PK parameter combination(s) with fewer than ", minimumValidDraws,
+      " valid draws:\n  ", paste0(unlist(undefinedUncertaintyResults), collapse = "\n  ")
+    ))
   }
 
   summaryTable <- getSUSummaryDf(su = allSUResults)
@@ -415,7 +475,7 @@ cleanUpSUDf <- function(df) {
   newDf <- NULL
   for (sen in sensitivityLevels) {
     subdf <- df[df$Index %in% sen, ]
-    for (unc in c("High", "Medium", "Low", "Parameter")) {
+    for (unc in c("High", "Medium", "Low", "Undefined", "Parameter")) {
       if (!(unc %in% names(subdf))) {
         next
       }
@@ -428,7 +488,11 @@ cleanUpSUDf <- function(df) {
     if ("Parameter" %in% names(subdf)) {
       subdf <- rbind(data.frame("Index" = sen, "Parameter" = ""), subdf)
     } else {
-      subdf <- rbind(data.frame("Index" = sen, "High" = "", "Medium" = "", "Low" = ""), subdf)
+      headerRow <- data.frame("Index" = sen, "High" = "", "Medium" = "", "Low" = "")
+      if ("Undefined" %in% names(subdf)) {
+        headerRow$Undefined <- ""
+      }
+      subdf <- rbind(headerRow, subdf)
     }
 
     for (nr in rev(seq_len(nrow(subdf)))) {
@@ -455,6 +519,7 @@ renameSUDf <- function(df) {
   names(df)[names(df) == "High"] <- "High uncertainty"
   names(df)[names(df) == "Medium"] <- "Medium uncertainty"
   names(df)[names(df) == "Low"] <- "Low uncertainty"
+  names(df)[names(df) == "Undefined"] <- "Undefined uncertainty"
   df$Index[df$Index == "High"] <- "High sensitivity"
   df$Index[df$Index == "Medium"] <- "Medium sensitivity"
   df$Index[df$Index == "Low"] <- "Low sensitivity"
@@ -499,7 +564,11 @@ getSUSummaryDf <- function(su) {
             ppDisplayName <- subsu$ParameterDisplayName[subsu$SensitivityClass %in% sens & subsu$Parameter == pp]
             if ("UncertaintyClass" %in% names(subsu)) {
               uncLevel <- subsu$UncertaintyClass[subsu$SensitivityClass %in% sens & subsu$Parameter == pp]
-              newRow <- data.frame("Index" = sens, "High" = "", "Medium" = "", "Low" = "")
+              newRow <- data.frame("Index" = sens, "High" = "", "Medium" = "", "Low" = "", "Undefined" = "")
+              # NA uncertainty class: too few valid draws to assess uncertainty
+              if (is.na(uncLevel)) {
+                uncLevel <- "Undefined"
+              }
               newRow[[uncLevel]] <- ppDisplayName
               df <- rbind(df, newRow)
             } else {
@@ -509,6 +578,10 @@ getSUSummaryDf <- function(su) {
             }
           }
         }
+      }
+      # Only show the 'Undefined' uncertainty column when it is populated
+      if ("Undefined" %in% names(df) && all(df$Undefined == "")) {
+        df$Undefined <- NULL
       }
       df <- cleanUpSUDf(df)
       df <- renameSUDf(df)

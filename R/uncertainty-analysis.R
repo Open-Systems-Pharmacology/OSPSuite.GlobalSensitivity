@@ -106,12 +106,19 @@ getUncertaintyAnalysisResults <- function(simulation,
         updateProgress(value = counter / (length(sampleBlocks) * length(sensitiveParameterPaths)), detail = progressText)
       }
 
+      # Keep the id of each draw's run values so its result is looked up by id
+      # rather than position (see getBatchRunResult).
+      runValuesIds <- character(numberOfRowsInSampleBlock)
       for (r in seq_along(rowNumbersToSim)) {
-        simBatchesListMixed[[pth]][[r]]$addRunValues(parameterValues = U_list[[pth]][rowNumbersToSim[r]])
+        runValuesIds[r] <- simBatchesListMixed[[pth]][[r]]$addRunValues(parameterValues = U_list[[pth]][rowNumbersToSim[r]])
       }
       # A CVODES failure for an individual draw makes that draw's result NULL;
       # a hard failure can also abort the whole batch call.  Neither should stop
       # the analysis, so trap it here and fall through to the NA handling below.
+      # ospsuite only clears queued run values after a successful run, so after a
+      # hard failure the batches may still hold this block's values.  Recreate
+      # them so the stale values cannot run alongside, and be read in place of,
+      # the next block's draws.
       resMixed[[pth]] <- tryCatch(
         ospsuite::runSimulationBatches(simulationBatches = simBatchesListMixed[[pth]][1:numberOfRowsInSampleBlock]),
         error = function(e) {
@@ -119,10 +126,14 @@ getUncertaintyAnalysisResults <- function(simulation,
           NULL
         }
       )
+      if (is.null(resMixed[[pth]])) {
+        simBatchesListMixed[[pth]] <- getSimulationBatches(simulation, pth, numberParallelThreads)
+      }
 
       if (!is.null(DDIsimulation)) {
+        DDIrunValuesIds <- character(numberOfRowsInSampleBlock)
         for (r in seq_along(rowNumbersToSim)) {
-          DDIsimBatchesListMixed[[pth]][[r]]$addRunValues(parameterValues = U_list[[pth]][rowNumbersToSim[r]])
+          DDIrunValuesIds[r] <- DDIsimBatchesListMixed[[pth]][[r]]$addRunValues(parameterValues = U_list[[pth]][rowNumbersToSim[r]])
         }
         DDIresMixed[[pth]] <- tryCatch(
           ospsuite::runSimulationBatches(simulationBatches = DDIsimBatchesListMixed[[pth]][1:numberOfRowsInSampleBlock]),
@@ -131,6 +142,9 @@ getUncertaintyAnalysisResults <- function(simulation,
             NULL
           }
         )
+        if (is.null(DDIresMixed[[pth]])) {
+          DDIsimBatchesListMixed[[pth]] <- getSimulationBatches(DDIsimulation, pth, numberParallelThreads)
+        }
       }
 
       for (r in seq_along(rowNumbersToSim)) {
@@ -138,15 +152,15 @@ getUncertaintyAnalysisResults <- function(simulation,
 
         # runSimulationBatches returns NULL for the whole batch on a hard failure,
         # or a per-simulation result that is NULL when that individual CVODES
-        # solve failed.  Guard the indexing so either case resolves to res = NULL.
-        res <- tryCatch(resMixed[[pth]][[r]][[1]], error = function(e) NULL)
+        # solve failed.  Either case resolves to res = NULL.
+        res <- getBatchRunResult(resMixed[[pth]], r, runValuesIds[r])
         if (is.null(res)) {
           failed <- TRUE
         }
 
         DDIres <- NULL
         if (!is.null(DDIsimulation)) {
-          DDIres <- tryCatch(DDIresMixed[[pth]][[r]][[1]], error = function(e) NULL)
+          DDIres <- getBatchRunResult(DDIresMixed[[pth]], r, DDIrunValuesIds[r])
           if (is.null(DDIres)) {
             failed <- TRUE
           }

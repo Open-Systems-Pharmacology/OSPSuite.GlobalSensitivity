@@ -20,6 +20,21 @@ generateTornadoPlot <- function(sensitivityDataFrame, generateForUncertaintyAnal
 
   # Make sure 'Sensitivity' is numeric
   sensitivityDataFrame$values <- as.numeric(sensitivityDataFrame[[valuesColumnName]])
+  if (generateForUncertaintyAnalysis) {
+    # An NA uncertainty ratio is undefined (too few valid draws), not zero
+    # uncertainty, so leave it out of the plot rather than draw it as a zero bar.
+    undefinedRows <- !is.finite(sensitivityDataFrame$values)
+    if (any(undefinedRows)) {
+      warning(paste0(
+        "Undefined or non-finite uncertainty ratios omitted from tornado plots for: ",
+        paste0(unique(paste0(
+          sensitivityDataFrame$ParameterDisplayName[undefinedRows], " (", sensitivityDataFrame$OutputDisplayName[undefinedRows],
+          " - ", sensitivityDataFrame$PK[undefinedRows], ")"
+        )), collapse = ", "), "."
+      ))
+      sensitivityDataFrame <- sensitivityDataFrame[!undefinedRows, ]
+    }
+  }
   sensitivityDataFrame$values[is.na(sensitivityDataFrame$values)] <- 0
   sensitivityDataFrame$signColumn <- as.factor(sign(sensitivityDataFrame$values))
 

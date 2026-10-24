@@ -17,6 +17,7 @@ runSU(
   runUncertaintlyOnlyForSensitiveParameters = TRUE,
   numberOfUncertaintyAnalysisSamples = 100,
   quantiles = c(0.05, 0.5, 0.95),
+  minimumValidDrawFraction = 0.9,
   saveResults = FALSE,
   saveFolder = NULL,
   saveFileName = NULL,
@@ -50,7 +51,9 @@ Uncertainty analysis settings:}
 
 \item{numberOfUncertaintyAnalysisSamples}{Positive integer value giving the number of Monte Carlo runs for each parameter.}
 
-\item{quantiles}{Vector of numerical values between 0 and 1.  The \code{quantiles} input sets the percentiles of the PK parameters to be evaluated in addition to the 50\% and 95\% percentiles, which are computed by default.
+\item{quantiles}{Vector of numerical values between 0 and 1.  The \code{quantiles} input sets the percentiles of the PK parameters to be evaluated in addition to the 50\% and 95\% percentiles, which are computed by default.}
+
+\item{minimumValidDrawFraction}{Numeric value in (0, 1].  Minimum fraction of the \code{numberOfUncertaintyAnalysisSamples} draws that must evaluate successfully for a parameter / output / PK parameter combination.  Below this (or below 2 valid draws), the uncertainty summary statistics and \code{UncertaintyRatio} are reported as \code{NA} (undefined) rather than computed from the surviving draws.
 Save settings:}
 
 \item{saveResults}{Logical value.  If \code{TRUE}, the results will be saved.}

@@ -121,6 +121,19 @@ getSimulationBatches <- function(simulation, parameterPaths, numberParallelThrea
   })
 }
 
+#' @title getBatchRunResult
+#' @description Look up the result of one set of run values in the output of `ospsuite::runSimulationBatches`.
+#' Results are looked up by run values id rather than position, so results of any other run values that were
+#' still queued on the batch (e.g. left over from a run that threw) can never be attributed to these run values.
+#' @param batchResults Output of `ospsuite::runSimulationBatches`, or `NULL` if the run failed.
+#' @param batchIndex Position of the batch in the list passed to `ospsuite::runSimulationBatches`.
+#' @param runValuesId Id returned by `SimulationBatch$addRunValues` for the run values.
+#' @return The `SimulationResults` for `runValuesId`, or `NULL` if the run failed or no result exists for it.
+#' @keywords internal
+getBatchRunResult <- function(batchResults, batchIndex, runValuesId) {
+  tryCatch(batchResults[[batchIndex]][[runValuesId]], error = function(e) NULL)
+}
+
 verifyQuantileVec <- function(quantileVec) {
   if (any(quantileVec < 0) | any(quantileVec > 1)) {
     stop("Quantile out of bounds")
