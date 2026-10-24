@@ -23,6 +23,8 @@ Depends:
     stats,
     tictoc
 Imports:
+    bslib (>= 0.6.0),
+    htmltools,
     interp,
     utils
 Suggests: 
