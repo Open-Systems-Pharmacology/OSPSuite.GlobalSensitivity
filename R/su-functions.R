@@ -158,7 +158,6 @@ getParameterListForUncertaintyAnalysis <- function(parameterPaths, simulation, v
 #' @param runUncertaintlyOnlyForSensitiveParameters  Logical value.  If `TRUE`, uncertainty analysis will only be run for the parameters for which sensitivity exceeds `sensitivityThreshold`.
 #' @param numberOfUncertaintyAnalysisSamples Positive integer value giving the number of Monte Carlo runs for each parameter.
 #' @param quantiles  Vector of numerical values between 0 and 1.  The `quantiles` input sets the percentiles of the PK parameters to be evaluated in addition to the 50% and 95% percentiles, which are computed by default.
-#' @param minimumValidDrawFraction Numeric value in (0, 1].  Minimum fraction of the `numberOfUncertaintyAnalysisSamples` draws that must evaluate successfully for a parameter / output / PK parameter combination.  Below this (or below 2 valid draws), the uncertainty summary statistics and `UncertaintyRatio` are reported as `NA` (undefined) rather than computed from the surviving draws.
 #' Save settings:
 #' @param saveResults  Logical value.  If `TRUE`, the results will be saved.
 #' @param saveFolder String indicating the path to the folder in which the results are to be saved.
@@ -167,6 +166,7 @@ getParameterListForUncertaintyAnalysis <- function(parameterPaths, simulation, v
 #' @param runParallel  Logical value.  Sensitivity computation is run in parallel when `TRUE`.
 #' @param updateProgressSensitivity Logical value.  Updates shiny app GUI with sensitivity analysis progress when `TRUE`.
 #' @param updateProgressUncertainty Logical value.  Updates shiny app GUI with uncertainty analysis progress when `TRUE`.
+#' @param minimumValidDrawFraction Numeric value in (0, 1].  Minimum fraction of the `numberOfUncertaintyAnalysisSamples` draws that must evaluate successfully for a parameter / output / PK parameter combination.  Below this (or below 2 valid draws), the uncertainty summary statistics and `UncertaintyRatio` are reported as `NA` (undefined) rather than computed from the surviving draws.
 #' @return Sensitivity and uncertainty analysis results.
 #' @export
 runSU <- function(simulation,
@@ -183,7 +183,6 @@ runSU <- function(simulation,
                   runUncertaintlyOnlyForSensitiveParameters = TRUE,
                   numberOfUncertaintyAnalysisSamples = 100,
                   quantiles = c(0.05, 0.5, 0.95),
-                  minimumValidDrawFraction = 0.9,
                   ## Save settings
                   saveResults = FALSE,
                   saveFolder = NULL,
@@ -191,7 +190,9 @@ runSU <- function(simulation,
                   # Parallel run and updating settings
                   runParallel = TRUE,
                   updateProgressSensitivity = NULL,
-                  updateProgressUncertainty = NULL) {
+                  updateProgressUncertainty = NULL,
+                  # Uncertainty draw validity setting (appended to preserve positional argument order)
+                  minimumValidDrawFraction = 0.9) {
   print("Loading parameters.")
   error(condition = is.null(outputs), errorMessage = "No model outputs have been selected.")
   error(!(variationRange > 0 & variationRange < 1), paste0("Argument 'variationRange' must lie strictly between 0 and 1."))
