@@ -117,3 +117,32 @@ test_that("generateMorrisPlot applies a log10 transform to the axes when request
   expect_equal(sort(logX), sort(log10(morrisResults$mustar)))
   expect_equal(sort(linearX), sort(morrisResults$mustar))
 })
+
+test_that("runMorris runs the full workflow on a real simulation", {
+  skip_if_not_installed("ospsuite")
+  skip_on_ci()
+
+  simPath <- system.file("extdata", "Aciclovir.pkml", package = "ospsuite")
+  simulation <- ospsuite::loadSimulation(simPath)
+
+  parameters <- list(
+    SAParameter$new(simulation = simulation, path = "Aciclovir|Lipophilicity"),
+    SAParameter$new(simulation = simulation, path = "Aciclovir|Permeability")
+  )
+  output <- SAOutput$new(
+    simulation = simulation,
+    path = "Organism|PeripheralVenousBlood|Aciclovir|Plasma (Peripheral Venous Blood)"
+  )
+  output$addPKParameter(standardPKParameter = "C_max")
+
+  morrisResults <- runMorris(
+    simulation = simulation,
+    parameters = parameters,
+    outputs = list(output),
+    numberOfSamples = 2,
+    runParallel = FALSE
+  )
+
+  expect_s3_class(morrisResults$Results, "data.frame")
+  expect_true(all(is.finite(morrisResults$Results$mu)))
+})

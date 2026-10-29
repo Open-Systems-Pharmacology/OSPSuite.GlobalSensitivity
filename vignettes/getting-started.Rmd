@@ -368,9 +368,9 @@ pltEFAST <- generateEFASTBarGraph(EFASTresults$Results)
 
 An R Shiny graphical user interface (GUI) is provided with the *OSP Global
 Sensitivity* package to facilitate the setup and execution of the sensitivity
-algorithms. This app, which consists of four tabs, is launched by first loading
-the package using the `library(ospsuite.globalsensitivity)` command, followed by
-the `runGUI()` command:
+algorithms. This app, which guides the user through four steps, is launched by
+first loading the package using the `library(ospsuite.globalsensitivity)`
+command, followed by the `runGUI()` command:
 
 ```{r run-gui}
 library(ospsuite.globalsensitivity)
@@ -378,29 +378,30 @@ runGUI()
 ```
 
 The PKML simulation file, as well as the optional DDI simulation file, may be
-uploaded via the **Start** tab of the application. In the **Parameters** tab, a
-tree structure of the simulation paths is generated from the uploaded PKML. This
-tree enables the user to select the model input parameters to be analyzed. Once
-the parameters have been selected in the tree, clicking the **Specify
-distributions** button creates miniature forms through which the user may select
-the probability distribution of each parameter.
+uploaded in the **Simulation** step of the application. In the **Parameters**
+step, a tree structure of the simulation paths is generated from the uploaded
+PKML. This tree, which can be searched, enables the user to select the model
+input parameters to be analyzed. A form appears next to the tree for each
+selected parameter, through which the user may set its display name, its
+probability distribution and the unit of the distribution's values.
 
-In the **Outputs** tab, the user similarly selects the output quantities to be
-analyzed from a tree structure generated from the PKML simulation. Clicking the
-**Specify PK parameters** button then generates a miniature form through which
-the user can select the PK parameters to be analyzed for each model output.
+In the **Outputs** step, the user similarly selects the output quantities to be
+analyzed from a tree structure generated from the PKML simulation. A form
+appears for each selected output through which the user can set its display name
+and select the PK parameters to be analyzed.
 
-In the final **Run sensitivity analyses** tab, the user selects the sensitivity
-algorithm to run and specifies its run settings. Once run, a progress bar
-appears in the bottom right of the application. Upon completion, the user may
-download the sensitivity result in the form of Excel `.xlsx` files, or download
-visualizations of the sensitivity results. In addition, clicking the **Get
-code** button corresponding to any of the sensitivity algorithms generates an R
-script from which the analyses may be run from R. This R script is generated
-based on the user-specified input parameters and their distributions as well as
-the user-selected outputs and their PK parameters.
+In the final **Analyses** step, the user selects the sensitivity algorithm to
+run and specifies its run settings. Once run, a progress bar appears in the
+bottom right of the application. Upon completion, the results are plotted in the
+app, and the user may download the sensitivity results in the form of Excel
+`.xlsx` files, or download visualizations of the sensitivity results. In
+addition, clicking the **Get R code** button corresponding to any of the
+sensitivity algorithms generates an R script from which the analyses may be run
+from R. This R script is generated based on the user-specified input parameters
+and their distributions as well as the user-selected outputs and their PK
+parameters.
 
-```{r gui-figures, echo = FALSE, eval = TRUE, out.width = "48%", fig.show = "hold", fig.cap = "The four tabs of the accompanying R Shiny app graphical user interface to the OSP Global Sensitivity package."}
+```{r gui-figures, echo = FALSE, eval = TRUE, out.width = "48%", fig.show = "hold", fig.cap = "The four steps of the accompanying R Shiny app graphical user interface to the OSP Global Sensitivity package."}
 knitr::include_graphics(c(
   "figures/gui-start.png",
   "figures/gui-parameters.png",

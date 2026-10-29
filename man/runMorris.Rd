@@ -14,7 +14,10 @@ runMorris(
   updateProgress = NULL,
   saveResults = FALSE,
   saveFolder = NULL,
-  saveFileName = NULL
+  saveFileName = NULL,
+  resampleOnFailure = TRUE,
+  maxRunAttempts = NULL,
+  maxConsecutiveFailures = 20
 )
 }
 \arguments{
@@ -26,7 +29,7 @@ runMorris(
 
 \item{outputs}{List of \code{SAOutput} objects.}
 
-\item{numberOfSamples}{The number of runs of the Morris algorithm to perform.}
+\item{numberOfSamples}{The number of \emph{valid} Morris trajectories to collect.}
 
 \item{runParallel}{Logical value.  Morris computation is run in parallel when \code{TRUE}.}
 
@@ -37,10 +40,22 @@ runMorris(
 \item{saveFolder}{String indicating the path to the folder in which the results are to be saved.}
 
 \item{saveFileName}{String indicating the file name to use when saving the results.}
+
+\item{resampleOnFailure}{Logical.  If \code{TRUE} (default), a trajectory that fails to
+solve (or yields non-finite PK parameters) is discarded and a fresh trajectory is
+drawn to replace it, so the final result still contains \code{numberOfSamples} valid
+trajectories.  If \code{FALSE}, failed trajectories are simply dropped and the effective
+sample size is reduced.}
+
+\item{maxRunAttempts}{Integer.  Hard cap on the total number of trajectories attempted.
+Defaults to \code{3 * numberOfSamples} when \code{resampleOnFailure = TRUE}.}
+
+\item{maxConsecutiveFailures}{Integer.  If this many trajectories fail back-to-back,
+abort with an informative error (guards against a globally broken setup).}
 }
 \value{
 Morris sensitivity analysis results.
 }
 \description{
-Function to run Morris sensitivity analysis.
+Function to run Morris sensitivity analysis, robust to individual ODE-solver failures.
 }

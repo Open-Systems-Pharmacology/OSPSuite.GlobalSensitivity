@@ -22,7 +22,8 @@ runSU(
   saveFileName = NULL,
   runParallel = TRUE,
   updateProgressSensitivity = NULL,
-  updateProgressUncertainty = NULL
+  updateProgressUncertainty = NULL,
+  minimumValidDrawFraction = 0.9
 )
 }
 \arguments{
@@ -65,6 +66,8 @@ Parallel run and updating settings}
 \item{updateProgressSensitivity}{Logical value.  Updates shiny app GUI with sensitivity analysis progress when \code{TRUE}.}
 
 \item{updateProgressUncertainty}{Logical value.  Updates shiny app GUI with uncertainty analysis progress when \code{TRUE}.}
+
+\item{minimumValidDrawFraction}{Numeric value in (0, 1].  Minimum fraction of the \code{numberOfUncertaintyAnalysisSamples} draws that must evaluate successfully for a parameter / output / PK parameter combination.  Below this (or below 2 valid draws), the uncertainty summary statistics and \code{UncertaintyRatio} are reported as \code{NA} (undefined) rather than computed from the surviving draws.}
 }
 \value{
 Sensitivity and uncertainty analysis results.
