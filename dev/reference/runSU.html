@@ -9,7 +9,7 @@ Main parameters:"><meta name="robots" content="noindex"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ospsuite.globalsensitivity</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.1.0.9001</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.1.0.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,7 +71,8 @@ Main parameters:</p>
 <span>  saveFileName <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  runParallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  updateProgressSensitivity <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  updateProgressUncertainty <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  updateProgressUncertainty <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minimumValidDrawFraction <span class="op">=</span> <span class="fl">0.9</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -154,6 +155,10 @@ Parallel run and updating settings</p></dd>
 <dt id="arg-updateprogressuncertainty">updateProgressUncertainty<a class="anchor" aria-label="anchor" href="#arg-updateprogressuncertainty"></a></dt>
 <dd><p>Logical value.  Updates shiny app GUI with uncertainty analysis progress when <code>TRUE</code>.</p></dd>
 
+
+<dt id="arg-minimumvaliddrawfraction">minimumValidDrawFraction<a class="anchor" aria-label="anchor" href="#arg-minimumvaliddrawfraction"></a></dt>
+<dd><p>Numeric value in (0, 1].  Minimum fraction of the <code>numberOfUncertaintyAnalysisSamples</code> draws that must evaluate successfully for a parameter / output / PK parameter combination.  Below this (or below 2 valid draws), the uncertainty summary statistics and <code>UncertaintyRatio</code> are reported as <code>NA</code> (undefined) rather than computed from the surviving draws.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -169,7 +174,7 @@ Parallel run and updating settings</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

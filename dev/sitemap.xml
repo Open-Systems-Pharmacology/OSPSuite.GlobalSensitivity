@@ -39,6 +39,7 @@
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/generateParameterFrequenciesTotal.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/generateSobolBarGraph.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/generateTornadoPlot.html</loc></url>
+<url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/getBatchRunResult.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/getContourPlot.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/getEFASTBarGraph.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/getEFASTResultsDf.html</loc></url>
@@ -57,6 +58,7 @@
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/getTrajectory.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/getUncertaintyAnalysisResults.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/getUncertaintyClass.html</loc></url>
+<url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/getUncertaintyStatistics.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/grapes-or-or-grapes.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/index.html</loc></url>
 <url><loc>https://www.open-systems-pharmacology.org/OSPSuite.GlobalSensitivity/dev/reference/mapHypercubeToParameterSpace.html</loc></url>

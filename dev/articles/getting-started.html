@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ospsuite.globalsensitivity</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.1.0.9001</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.1.0.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -476,41 +476,40 @@ methods:</p>
 </h2>
 <p>An R Shiny graphical user interface (GUI) is provided with the
 <em>OSP Global Sensitivity</em> package to facilitate the setup and
-execution of the sensitivity algorithms. This app, which consists of
-four tabs, is launched by first loading the package using the
+execution of the sensitivity algorithms. This app, which guides the user
+through four steps, is launched by first loading the package using the
 <code><a href="https://github.com/Open-Systems-Pharmacology/OSPSuite.GlobalSensitivity" class="external-link">library(ospsuite.globalsensitivity)</a></code> command, followed by
 the <code><a href="../reference/runGUI.html">runGUI()</a></code> command:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Open-Systems-Pharmacology/OSPSuite.GlobalSensitivity" class="external-link">ospsuite.globalsensitivity</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/runGUI.html">runGUI</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The PKML simulation file, as well as the optional DDI simulation
-file, may be uploaded via the <strong>Start</strong> tab of the
-application. In the <strong>Parameters</strong> tab, a tree structure of
-the simulation paths is generated from the uploaded PKML. This tree
-enables the user to select the model input parameters to be analyzed.
-Once the parameters have been selected in the tree, clicking the
-<strong>Specify distributions</strong> button creates miniature forms
-through which the user may select the probability distribution of each
-parameter.</p>
-<p>In the <strong>Outputs</strong> tab, the user similarly selects the
+file, may be uploaded in the <strong>Simulation</strong> step of the
+application. In the <strong>Parameters</strong> step, a tree structure
+of the simulation paths is generated from the uploaded PKML. This tree,
+which can be searched, enables the user to select the model input
+parameters to be analyzed. A form appears next to the tree for each
+selected parameter, through which the user may set its display name, its
+probability distribution and the unit of the distribution’s values.</p>
+<p>In the <strong>Outputs</strong> step, the user similarly selects the
 output quantities to be analyzed from a tree structure generated from
-the PKML simulation. Clicking the <strong>Specify PK parameters</strong>
-button then generates a miniature form through which the user can select
-the PK parameters to be analyzed for each model output.</p>
-<p>In the final <strong>Run sensitivity analyses</strong> tab, the user
-selects the sensitivity algorithm to run and specifies its run settings.
-Once run, a progress bar appears in the bottom right of the application.
-Upon completion, the user may download the sensitivity result in the
-form of Excel <code>.xlsx</code> files, or download visualizations of
-the sensitivity results. In addition, clicking the <strong>Get
-code</strong> button corresponding to any of the sensitivity algorithms
-generates an R script from which the analyses may be run from R. This R
-script is generated based on the user-specified input parameters and
-their distributions as well as the user-selected outputs and their PK
-parameters.</p>
+the PKML simulation. A form appears for each selected output through
+which the user can set its display name and select the PK parameters to
+be analyzed.</p>
+<p>In the final <strong>Analyses</strong> step, the user selects the
+sensitivity algorithm to run and specifies its run settings. Once run, a
+progress bar appears in the bottom right of the application. Upon
+completion, the results are plotted in the app, and the user may
+download the sensitivity results in the form of Excel <code>.xlsx</code>
+files, or download visualizations of the sensitivity results. In
+addition, clicking the <strong>Get R code</strong> button corresponding
+to any of the sensitivity algorithms generates an R script from which
+the analyses may be run from R. This R script is generated based on the
+user-specified input parameters and their distributions as well as the
+user-selected outputs and their PK parameters.</p>
 <div class="figure">
-<img src="figures/gui-start.png" class="r-plt" alt="The four tabs of the accompanying R Shiny app graphical user interface to the OSP Global Sensitivity package." width="48%"><img src="figures/gui-parameters.png" class="r-plt" alt="The four tabs of the accompanying R Shiny app graphical user interface to the OSP Global Sensitivity package." width="48%"><img src="figures/gui-outputs.png" class="r-plt" alt="The four tabs of the accompanying R Shiny app graphical user interface to the OSP Global Sensitivity package." width="48%"><img src="figures/gui-run.png" class="r-plt" alt="The four tabs of the accompanying R Shiny app graphical user interface to the OSP Global Sensitivity package." width="48%"><p class="caption">
-The four tabs of the accompanying R Shiny app graphical user interface
+<img src="figures/gui-start.png" class="r-plt" alt="The four steps of the accompanying R Shiny app graphical user interface to the OSP Global Sensitivity package." width="48%"><img src="figures/gui-parameters.png" class="r-plt" alt="The four steps of the accompanying R Shiny app graphical user interface to the OSP Global Sensitivity package." width="48%"><img src="figures/gui-outputs.png" class="r-plt" alt="The four steps of the accompanying R Shiny app graphical user interface to the OSP Global Sensitivity package." width="48%"><img src="figures/gui-run.png" class="r-plt" alt="The four steps of the accompanying R Shiny app graphical user interface to the OSP Global Sensitivity package." width="48%"><p class="caption">
+The four steps of the accompanying R Shiny app graphical user interface
 to the OSP Global Sensitivity package.
 </p>
 </div>
@@ -539,7 +538,7 @@ variance-based methods</a> article.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

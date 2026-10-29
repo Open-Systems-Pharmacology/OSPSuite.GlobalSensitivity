@@ -1,6 +1,7 @@
 # runMorris
 
-Function to run Morris sensitivity analysis.
+Function to run Morris sensitivity analysis, robust to individual
+ODE-solver failures.
 
 ## Usage
 
@@ -15,7 +16,10 @@ runMorris(
   updateProgress = NULL,
   saveResults = FALSE,
   saveFolder = NULL,
-  saveFileName = NULL
+  saveFileName = NULL,
+  resampleOnFailure = TRUE,
+  maxRunAttempts = NULL,
+  maxConsecutiveFailures = 20
 )
 ```
 
@@ -39,7 +43,7 @@ runMorris(
 
 - numberOfSamples:
 
-  The number of runs of the Morris algorithm to perform.
+  The number of *valid* Morris trajectories to collect.
 
 - runParallel:
 
@@ -62,6 +66,24 @@ runMorris(
 - saveFileName:
 
   String indicating the file name to use when saving the results.
+
+- resampleOnFailure:
+
+  Logical. If `TRUE` (default), a trajectory that fails to solve (or
+  yields non-finite PK parameters) is discarded and a fresh trajectory
+  is drawn to replace it, so the final result still contains
+  `numberOfSamples` valid trajectories. If `FALSE`, failed trajectories
+  are simply dropped and the effective sample size is reduced.
+
+- maxRunAttempts:
+
+  Integer. Hard cap on the total number of trajectories attempted.
+  Defaults to `3 * numberOfSamples` when `resampleOnFailure = TRUE`.
+
+- maxConsecutiveFailures:
+
+  Integer. If this many trajectories fail back-to-back, abort with an
+  informative error (guards against a globally broken setup).
 
 ## Value
 

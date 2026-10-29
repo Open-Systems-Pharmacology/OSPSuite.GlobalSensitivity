@@ -24,7 +24,8 @@ runSU(
   saveFileName = NULL,
   runParallel = TRUE,
   updateProgressSensitivity = NULL,
-  updateProgressUncertainty = NULL
+  updateProgressUncertainty = NULL,
+  minimumValidDrawFraction = 0.9
 )
 ```
 
@@ -121,6 +122,15 @@ runSU(
 
   Logical value. Updates shiny app GUI with uncertainty analysis
   progress when `TRUE`.
+
+- minimumValidDrawFraction:
+
+  Numeric value in (0, 1\]. Minimum fraction of the
+  `numberOfUncertaintyAnalysisSamples` draws that must evaluate
+  successfully for a parameter / output / PK parameter combination.
+  Below this (or below 2 valid draws), the uncertainty summary
+  statistics and `UncertaintyRatio` are reported as `NA` (undefined)
+  rather than computed from the surviving draws.
 
 ## Value
 
