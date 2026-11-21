@@ -37,6 +37,11 @@ Config/testthat/parallel: true
 Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)
+Remotes:
+    ospsuite=Open-Systems-Pharmacology/OSPSuite-R,
+    ospsuite.plots=Open-Systems-Pharmacology/OSPSuite.Plots,
+    ospsuite.utils=Open-Systems-Pharmacology/OSPSuite.RUtils,
+    rSharp=Open-Systems-Pharmacology/rSharp
 Additional_repositories: https://open-systems-pharmacology.r-universe.dev
 Config/roxygen2/version: 8.0.0
 RoxygenNote: 7.3.3
